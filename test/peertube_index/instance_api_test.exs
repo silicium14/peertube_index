@@ -11,15 +11,15 @@ defmodule PeertubeIndex.InstanceAPITest do
     # Videos are local to the instance
     # videos are fetched across multiple pages
     expected = File.read!("test/peertube_index/instance_api_test_data/videos.json") |> Poison.decode!
-    {videos, _instances} = PeertubeIndex.InstanceAPI.scan("peertube.cpy.re", 5)
+    {videos, _instances} = PeertubeIndex.InstanceAPI.Httpc.scan("peertube.cpy.re", 5)
     assert videos == expected
   end
 
   # Execute this code to refresh the reference data for fetching videos test
   def refresh_fetch_video_test_data() do
-    {videos, _instances} = PeertubeIndex.InstanceAPI.scan("peertube.cpy.re", 5)
+    {videos, _instances} = PeertubeIndex.InstanceAPI.Httpc.scan("peertube.cpy.re", 5)
     File.write!(
-      "test/peertube_index/instance_api_test_data/videos2.json",
+      "test/peertube_index/instance_api_test_data/videos.json",
       Poison.encode!(videos, pretty: true),
       [:binary, :write]
     )
@@ -30,7 +30,7 @@ defmodule PeertubeIndex.InstanceAPITest do
 
     # Discover instances from demo PeerTube instance that we use as reference
     # Found instance set must not contain the scanned instance
-    {_videos, instances} = PeertubeIndex.InstanceAPI.scan("peertube.cpy.re")
+    {_videos, instances} = PeertubeIndex.InstanceAPI.Httpc.scan("peertube.cpy.re")
 
     only_in_expected = MapSet.difference(expected, instances)
     only_in_result = MapSet.difference(instances, expected)
@@ -40,9 +40,9 @@ defmodule PeertubeIndex.InstanceAPITest do
 
   # Execute this code to refresh the reference data for fetching instances test
   def refresh_discover_instances_test_data() do
-    {_videos, instances} = PeertubeIndex.InstanceAPI.scan("peertube.cpy.re", 5)
+    {_videos, instances} = PeertubeIndex.InstanceAPI.Httpc.scan("peertube.cpy.re", 5)
     File.write!(
-      "test/peertube_index/instance_api_test_data/instances.json",
+      "test/peertube_index/instance_api_test_data/instances2.json",
       Poison.encode!(MapSet.to_list(instances), pretty: true),
       [:binary, :write]
     )
