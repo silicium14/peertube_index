@@ -22,7 +22,7 @@ defmodule PeertubeIndex do
 
   def scan(hostnames) do
     for host <- hostnames do
-      {videos, _} = @instance_api.scan(host)
+      {:ok, {videos, _}} = @instance_api.scan(host)
       @storage.update_instance!(host, videos)
     end
   end

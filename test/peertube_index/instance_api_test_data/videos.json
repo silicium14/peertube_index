@@ -104,9 +104,9 @@
     }
   },
   {
-    "views": 15555,
+    "views": 15559,
     "uuid": "a8ea95b8-0396-49a6-8f30-e25e25fb2828",
-    "updatedAt": "2018-11-17T22:01:00.021Z",
+    "updatedAt": "2018-11-19T07:01:00.016Z",
     "thumbnailPath": "/static/thumbnails/a8ea95b8-0396-49a6-8f30-e25e25fb2828.jpg",
     "publishedAt": "2017-10-19T12:45:20.876Z",
     "privacy": {
@@ -156,9 +156,9 @@
     }
   },
   {
-    "views": 5954,
+    "views": 5957,
     "uuid": "c193a2f6-8b24-48c3-a93e-f89bd71cad42",
-    "updatedAt": "2018-11-17T22:01:00.304Z",
+    "updatedAt": "2018-11-18T23:01:00.168Z",
     "thumbnailPath": "/static/thumbnails/c193a2f6-8b24-48c3-a93e-f89bd71cad42.jpg",
     "publishedAt": "2017-10-20T09:11:13.113Z",
     "privacy": {
@@ -212,9 +212,9 @@
     }
   },
   {
-    "views": 7864,
+    "views": 7873,
     "uuid": "d2a5ec78-5f85-4090-8ec5-dc1102e022ea",
-    "updatedAt": "2018-11-17T22:01:00.403Z",
+    "updatedAt": "2018-11-19T07:01:00.290Z",
     "thumbnailPath": "/static/thumbnails/d2a5ec78-5f85-4090-8ec5-dc1102e022ea.jpg",
     "publishedAt": "2017-10-23T07:54:38.155Z",
     "privacy": {
@@ -268,9 +268,9 @@
     }
   },
   {
-    "views": 5602,
+    "views": 5605,
     "uuid": "b1e5ba7e-2a8a-44d4-8151-aa8f5f6eafd9",
-    "updatedAt": "2018-11-17T23:01:00.013Z",
+    "updatedAt": "2018-11-18T23:01:00.457Z",
     "thumbnailPath": "/static/thumbnails/b1e5ba7e-2a8a-44d4-8151-aa8f5f6eafd9.jpg",
     "publishedAt": "2017-11-18T21:52:37.894Z",
     "privacy": {
@@ -320,9 +320,9 @@
     }
   },
   {
-    "views": 2283,
+    "views": 2285,
     "uuid": "841cb902-2a49-4b4e-9e76-ad60f507bd7a",
-    "updatedAt": "2018-11-16T21:01:00.504Z",
+    "updatedAt": "2018-11-18T16:01:00.012Z",
     "thumbnailPath": "/static/thumbnails/841cb902-2a49-4b4e-9e76-ad60f507bd7a.jpg",
     "publishedAt": "2017-12-11T15:24:44.167Z",
     "privacy": {
@@ -376,9 +376,9 @@
     }
   },
   {
-    "views": 8244,
+    "views": 8261,
     "uuid": "da2b08d4-a242-4170-b32a-4ec8cbdca701",
-    "updatedAt": "2018-11-17T19:01:00.021Z",
+    "updatedAt": "2018-11-19T06:01:00.173Z",
     "thumbnailPath": "/static/thumbnails/da2b08d4-a242-4170-b32a-4ec8cbdca701.jpg",
     "publishedAt": "2018-01-05T14:07:54.967Z",
     "privacy": {
@@ -432,9 +432,9 @@
     }
   },
   {
-    "views": 622,
+    "views": 624,
     "uuid": "8c623bb4-72ac-4c35-a128-8adce2313f8f",
-    "updatedAt": "2018-11-14T10:01:00.014Z",
+    "updatedAt": "2018-11-18T11:01:00.210Z",
     "thumbnailPath": "/static/thumbnails/8c623bb4-72ac-4c35-a128-8adce2313f8f.jpg",
     "publishedAt": "2018-01-12T12:45:39.160Z",
     "privacy": {
@@ -488,9 +488,9 @@
     }
   },
   {
-    "views": 1892,
+    "views": 1894,
     "uuid": "84b9ff3a-c4b8-4416-a0c4-09e0ea187127",
-    "updatedAt": "2018-11-17T17:01:00.357Z",
+    "updatedAt": "2018-11-18T11:01:00.372Z",
     "thumbnailPath": "/static/thumbnails/84b9ff3a-c4b8-4416-a0c4-09e0ea187127.jpg",
     "publishedAt": "2018-01-12T15:12:50.379Z",
     "privacy": {
@@ -544,9 +544,9 @@
     }
   },
   {
-    "views": 4746,
+    "views": 4758,
     "uuid": "e8a1af4e-414a-4d58-bfe6-2146eed06d10",
-    "updatedAt": "2018-11-17T23:01:00.173Z",
+    "updatedAt": "2018-11-19T01:01:00.023Z",
     "thumbnailPath": "/static/thumbnails/e8a1af4e-414a-4d58-bfe6-2146eed06d10.jpg",
     "publishedAt": "2018-01-17T17:09:08.500Z",
     "privacy": {
@@ -556,7 +556,7 @@
     "previewPath": "/static/previews/e8a1af4e-414a-4d58-bfe6-2146eed06d10.jpg",
     "nsfw": false,
     "name": "PeerTube : préparer l'alternative à Youtube - HS - Monsieur Bidouille",
-    "likes": 31,
+    "likes": 32,
     "licence": {
       "label": "Attribution",
       "id": 1
@@ -656,9 +656,9 @@
     }
   },
   {
-    "views": 1862,
+    "views": 1864,
     "uuid": "1174e225-1a2e-4e6c-8ab4-1b709cd46978",
-    "updatedAt": "2018-11-16T17:01:00.535Z",
+    "updatedAt": "2018-11-18T23:01:00.776Z",
     "thumbnailPath": "/static/thumbnails/1174e225-1a2e-4e6c-8ab4-1b709cd46978.jpg",
     "publishedAt": "2018-02-13T15:57:15.666Z",
     "privacy": {
@@ -712,9 +712,9 @@
     }
   },
   {
-    "views": 1401,
+    "views": 1405,
     "uuid": "7024ae74-80a9-4e1d-8ede-cc11a470e131",
-    "updatedAt": "2018-11-17T14:01:01.134Z",
+    "updatedAt": "2018-11-18T20:01:00.284Z",
     "thumbnailPath": "/static/thumbnails/7024ae74-80a9-4e1d-8ede-cc11a470e131.jpg",
     "publishedAt": "2018-03-09T10:57:11.966Z",
     "privacy": {
@@ -768,9 +768,9 @@
     }
   },
   {
-    "views": 1299,
+    "views": 1304,
     "uuid": "f8a4b32d-0bf1-48ed-af9f-d8c5d87efedb",
-    "updatedAt": "2018-11-17T22:01:00.577Z",
+    "updatedAt": "2018-11-19T06:01:00.348Z",
     "thumbnailPath": "/static/thumbnails/f8a4b32d-0bf1-48ed-af9f-d8c5d87efedb.jpg",
     "publishedAt": "2018-08-02T13:55:13.338Z",
     "privacy": {

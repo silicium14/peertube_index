@@ -5,21 +5,22 @@ defmodule PeertubeIndex.InstanceAPI.Httpc do
 
   @impl true
   def scan(host, page_size \\ 100) do
-    videos = get_all("https://" <> host <> "/api/v1/videos", page_size)
-    followers = get_all("https://" <> host <> "/api/v1/server/followers", page_size)
-    following = get_all("https://" <> host <> "/api/v1/server/following", page_size)
+    with {:ok, videos} <- get_all("https://" <> host <> "/api/v1/videos", page_size),
+         {:ok, followers} = get_all("https://" <> host <> "/api/v1/server/followers", page_size),
+         {:ok, following} = get_all("https://" <> host <> "/api/v1/server/following", page_size) do
 
-    instances =
-      MapSet.new(
-        Enum.map(videos, fn video -> video["account"]["host"] end) ++
-        Enum.map(followers, fn item -> item["follower"]["host"] end) ++
-        Enum.map(following, fn item -> item["following"]["host"] end)
-      )
-      |> MapSet.delete(host)
+      instances =
+        MapSet.new(
+          Enum.map(videos, fn video -> video["account"]["host"] end) ++
+          Enum.map(followers, fn item -> item["follower"]["host"] end) ++
+          Enum.map(following, fn item -> item["following"]["host"] end)
+        )
+        |> MapSet.delete(host)
 
-    videos = Enum.filter(videos, fn video -> video["isLocal"] end)
+      videos = Enum.filter(videos, fn video -> video["isLocal"] end)
 
-    {videos, instances}
+      {:ok, {videos, instances}}
+    end
   end
 
   defp get_all(paginated_resource_url, page_size) do
@@ -27,39 +28,36 @@ defmodule PeertubeIndex.InstanceAPI.Httpc do
       "count" => page_size,
       "sort" => "createdAt"
     }
+    # TODO: refactor this
+    with {:ok, first_page_data} <- get_json(url_with_params(paginated_resource_url, common_params)) do
+      number_of_pages = (first_page_data["total"] / page_size) |> Float.ceil() |> trunc() |> max(1)
+      result =
+      1..number_of_pages
+      |> Enum.drop(1)
+      |> Enum.map(fn page_number ->
+        {page_number,
+          url_with_params(paginated_resource_url, Map.put(common_params, "start", (page_number - 1) * page_size))}
+      end)
+      |> Enum.reduce(
+        first_page_data["data"],
+        fn {_page_number, page_url}, accumulator ->
+  #        IO.puts("#{page_url}, page #{page_number}/#{number_of_pages}")
+          {:ok, parsed} = get_json(page_url)
+          accumulator ++ parsed["data"]
+        end
+      )
 
-    first_page_data = get_json(url_with_params(paginated_resource_url, common_params))
-    number_of_pages = (first_page_data["total"] / page_size) |> Float.ceil() |> trunc() |> max(1)
-
-    1..number_of_pages
-    |> Enum.drop(1)
-    |> Enum.map(fn page_number ->
-      {page_number,
-        url_with_params(paginated_resource_url, Map.put(common_params, "start", (page_number - 1) * page_size))}
-    end)
-    |> Enum.reduce(
-      first_page_data["data"],
-      fn {_page_number, page_url}, accumulator ->
-#        IO.puts("#{page_url}, page #{page_number}/#{number_of_pages}")
-        accumulator ++ get_json(page_url)["data"]
-      end
-    )
+      {:ok, result}
+    end
   end
 
   defp get_json(url) do
-    {:ok, {{_, status_code, _} = status, _headers, body}} =
-      :httpc.request(
-        :get,
-        {String.to_charlist(url), []},
-        [],
-        body_format: :binary
-      )
-
-    if status_code >= 400 do
-      raise "HTTP error for URL #{inspect(url)}: status=#{inspect(status)}"
+    with {:ok, {
+             {_http_version, status_code, _reason_phrase} = status_line, _headers, body
+         }} <- :httpc.request(:get, {String.to_charlist(url), []}, [], body_format: :binary),
+         {:ok, parsed} <- Poison.decode(body) do
+      {:ok, parsed}
     end
-
-    Poison.decode!(body)
   end
 
   defp url_with_params(url, params) do
