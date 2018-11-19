@@ -54,7 +54,7 @@ defmodule PeertubeIndex.InstanceAPI.Httpc do
 
   defp request_without_error(url) do
     with {:ok, {
-             {_http_version, status_code, _reason_phrase} = status_line, _headers, body
+             {_http_version, status_code, _reason_phrase}, _headers, body
          }} <- :httpc.request(:get, {String.to_charlist(url), []}, [], body_format: :binary) do
       if status_code >= 400 do
         {:error, :bad_request}

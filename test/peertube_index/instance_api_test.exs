@@ -72,7 +72,16 @@ defmodule PeertubeIndex.InstanceAPITest do
     assert result == {:error, :bad_request}
   end
 
-#  test "parse error" do
+  test "JSON parse error", %{bypass: bypass} do
+    Bypass.expect_once bypass, "GET", "/api/v1/videos", fn conn ->
+      Plug.Conn.resp(conn, 200, "invalid JSON document")
+    end
+
+    result = PeertubeIndex.InstanceAPI.Httpc.scan("localhost:#{bypass.port}", 100, false)
+    assert result == {:error, %Poison.ParseError{pos: 0, rest: nil, value: "i"}}
+  end
+
+#  test "wrong format" do
 #
 #  end
 
