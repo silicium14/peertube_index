@@ -4,10 +4,11 @@ defmodule PeertubeIndex.InstanceAPI.Httpc do
   @behaviour PeertubeIndex.InstanceAPI
 
   @impl true
-  def scan(host, page_size \\ 100) do
-    with {:ok, videos} <- get_all("https://" <> host <> "/api/v1/videos", page_size),
-         {:ok, followers} = get_all("https://" <> host <> "/api/v1/server/followers", page_size),
-         {:ok, following} = get_all("https://" <> host <> "/api/v1/server/following", page_size) do
+  def scan(host, page_size \\ 100, use_tls \\ true) do
+    scheme = if use_tls, do: "https://", else: "http://"
+    with {:ok, videos} <- get_all(scheme <> host <> "/api/v1/videos", page_size),
+         {:ok, followers} = get_all(scheme <> host <> "/api/v1/server/followers", page_size),
+         {:ok, following} = get_all(scheme <> host <> "/api/v1/server/following", page_size) do
 
       instances =
         MapSet.new(
@@ -51,10 +52,20 @@ defmodule PeertubeIndex.InstanceAPI.Httpc do
     end
   end
 
-  defp get_json(url) do
+  defp request_without_error(url) do
     with {:ok, {
              {_http_version, status_code, _reason_phrase} = status_line, _headers, body
-         }} <- :httpc.request(:get, {String.to_charlist(url), []}, [], body_format: :binary),
+         }} <- :httpc.request(:get, {String.to_charlist(url), []}, [], body_format: :binary) do
+      if status_code >= 400 do
+        {:error, :bad_request}
+      else
+        {:ok, body}
+      end
+    end
+  end
+
+  defp get_json(url) do
+    with {:ok, body} <- request_without_error(url),
          {:ok, parsed} <- Poison.decode(body) do
       {:ok, parsed}
     end

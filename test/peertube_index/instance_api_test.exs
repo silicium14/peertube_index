@@ -64,9 +64,13 @@ defmodule PeertubeIndex.InstanceAPITest do
     }}
   end
 
-#  test "bad request" do
-#
-#  end
+  test "Bad HTTP status", %{bypass: bypass} do
+    Bypass.expect_once bypass, "GET", "/api/v1/videos", fn conn ->
+      Plug.Conn.resp(conn, 400, "{}")
+    end
+    result = PeertubeIndex.InstanceAPI.Httpc.scan("localhost:#{bypass.port}", 100, false)
+    assert result == {:error, :bad_request}
+  end
 
 #  test "parse error" do
 #
