@@ -8,10 +8,11 @@ defmodule PeertubeIndex do
 
 #  TODO
 #  - Better project structure
+#  - Scan multiple instances concurrently
 #  - Save instance status
 #  - Use case tests
-#  - Test instance API
 #  - Update from status database
+#  - We can see instances' status
 #  - Search frontend
 #  - Use document type from Elasticsearch library?
 #  - Remember that in the domain we directly use the objects returned by the storage without any conversion, we are coupled to the storage format for now
