@@ -67,8 +67,17 @@ defmodule PeertubeIndex.InstanceAPI.Httpc do
 
   defp get_json(url) do
     with {:ok, body} <- request_without_error(url),
-         {:ok, parsed} <- Poison.decode(body) do
-      {:ok, parsed}
+         {:ok, parsed} <- Poison.decode(body),
+         {:ok, validated} <- validate_page_data(parsed) do
+      {:ok, validated}
+    end
+  end
+
+  defp validate_page_data(page_data) do
+    if is_integer(Map.get(page_data, "total")) and is_list(Map.get(page_data, "data")) do
+      {:ok, page_data}
+    else
+      {:error, :page_invalid}
     end
   end
 

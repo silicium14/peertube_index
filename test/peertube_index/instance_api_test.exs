@@ -142,24 +142,13 @@ defmodule PeertubeIndex.InstanceAPITest do
            ]
   end
 
-#  test "wrong document format", %{bypass: bypass} do
-#    Bypass.expect_once bypass, "GET", "/api/v1/videos", fn conn ->
-#      Plug.Conn.resp(conn, 200, "{\"not the correct format\": \"some value\"}")
-#    end
-#
-#    result = PeertubeIndex.InstanceAPI.Httpc.scan("localhost:#{bypass.port}", 100, false)
-#    assert result == {:error, :unexcpected_document_format}
-#  end
+  test "wrong page format", %{bypass: bypass} do
+    Bypass.expect_once bypass, "GET", "/api/v1/videos", fn conn ->
+      Plug.Conn.resp(conn, 200, "{\"not the correct format\": \"some value\"}")
+    end
 
-#  test "only one page" do
-#
-#  end
+    result = PeertubeIndex.InstanceAPI.Httpc.scan("localhost:#{bypass.port}", 100, false)
+    assert result == {:error, :page_invalid}
+  end
 
-#  test "gets all videos" do
-#
-#  end
-
-#  test "page number larger than 100" do
-#
-#  end
 end
