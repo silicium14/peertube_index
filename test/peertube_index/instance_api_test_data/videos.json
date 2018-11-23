@@ -1,8 +1,8 @@
 [
   {
-    "views": 4525,
+    "views": 4542,
     "uuid": "e2651856-4809-408a-99d4-b85b01fefb09",
-    "updatedAt": "2018-11-17T14:01:00.010Z",
+    "updatedAt": "2018-11-23T21:01:00.028Z",
     "thumbnailPath": "/static/thumbnails/e2651856-4809-408a-99d4-b85b01fefb09.jpg",
     "publishedAt": "2017-10-17T13:48:25.357Z",
     "privacy": {
@@ -52,9 +52,9 @@
     }
   },
   {
-    "views": 14163,
+    "views": 14175,
     "uuid": "f78a97f8-a142-4ce1-a5bd-154bf9386504",
-    "updatedAt": "2018-11-15T19:01:00.208Z",
+    "updatedAt": "2018-11-23T21:01:00.306Z",
     "thumbnailPath": "/static/thumbnails/f78a97f8-a142-4ce1-a5bd-154bf9386504.jpg",
     "publishedAt": "2017-10-18T13:05:51.467Z",
     "privacy": {
@@ -104,9 +104,9 @@
     }
   },
   {
-    "views": 15559,
+    "views": 15579,
     "uuid": "a8ea95b8-0396-49a6-8f30-e25e25fb2828",
-    "updatedAt": "2018-11-19T07:01:00.016Z",
+    "updatedAt": "2018-11-23T19:01:00.033Z",
     "thumbnailPath": "/static/thumbnails/a8ea95b8-0396-49a6-8f30-e25e25fb2828.jpg",
     "publishedAt": "2017-10-19T12:45:20.876Z",
     "privacy": {
@@ -156,9 +156,9 @@
     }
   },
   {
-    "views": 5957,
+    "views": 5975,
     "uuid": "c193a2f6-8b24-48c3-a93e-f89bd71cad42",
-    "updatedAt": "2018-11-18T23:01:00.168Z",
+    "updatedAt": "2018-11-23T17:01:00.052Z",
     "thumbnailPath": "/static/thumbnails/c193a2f6-8b24-48c3-a93e-f89bd71cad42.jpg",
     "publishedAt": "2017-10-20T09:11:13.113Z",
     "privacy": {
@@ -212,9 +212,9 @@
     }
   },
   {
-    "views": 7873,
+    "views": 7915,
     "uuid": "d2a5ec78-5f85-4090-8ec5-dc1102e022ea",
-    "updatedAt": "2018-11-19T07:01:00.290Z",
+    "updatedAt": "2018-11-23T21:01:00.661Z",
     "thumbnailPath": "/static/thumbnails/d2a5ec78-5f85-4090-8ec5-dc1102e022ea.jpg",
     "publishedAt": "2017-10-23T07:54:38.155Z",
     "privacy": {
@@ -268,9 +268,9 @@
     }
   },
   {
-    "views": 5605,
+    "views": 5625,
     "uuid": "b1e5ba7e-2a8a-44d4-8151-aa8f5f6eafd9",
-    "updatedAt": "2018-11-18T23:01:00.457Z",
+    "updatedAt": "2018-11-23T16:01:00.036Z",
     "thumbnailPath": "/static/thumbnails/b1e5ba7e-2a8a-44d4-8151-aa8f5f6eafd9.jpg",
     "publishedAt": "2017-11-18T21:52:37.894Z",
     "privacy": {
@@ -320,9 +320,9 @@
     }
   },
   {
-    "views": 2285,
+    "views": 2291,
     "uuid": "841cb902-2a49-4b4e-9e76-ad60f507bd7a",
-    "updatedAt": "2018-11-18T16:01:00.012Z",
+    "updatedAt": "2018-11-20T22:01:00.579Z",
     "thumbnailPath": "/static/thumbnails/841cb902-2a49-4b4e-9e76-ad60f507bd7a.jpg",
     "publishedAt": "2017-12-11T15:24:44.167Z",
     "privacy": {
@@ -376,9 +376,9 @@
     }
   },
   {
-    "views": 8261,
+    "views": 8327,
     "uuid": "da2b08d4-a242-4170-b32a-4ec8cbdca701",
-    "updatedAt": "2018-11-19T06:01:00.173Z",
+    "updatedAt": "2018-11-23T21:01:00.739Z",
     "thumbnailPath": "/static/thumbnails/da2b08d4-a242-4170-b32a-4ec8cbdca701.jpg",
     "publishedAt": "2018-01-05T14:07:54.967Z",
     "privacy": {
@@ -388,7 +388,7 @@
     "previewPath": "/static/previews/da2b08d4-a242-4170-b32a-4ec8cbdca701.jpg",
     "nsfw": false,
     "name": "PeerTube demo with Mastodon",
-    "likes": 39,
+    "likes": 40,
     "licence": {
       "label": "Public Domain Dedication",
       "id": 7
@@ -432,9 +432,9 @@
     }
   },
   {
-    "views": 624,
+    "views": 629,
     "uuid": "8c623bb4-72ac-4c35-a128-8adce2313f8f",
-    "updatedAt": "2018-11-18T11:01:00.210Z",
+    "updatedAt": "2018-11-23T21:01:00.865Z",
     "thumbnailPath": "/static/thumbnails/8c623bb4-72ac-4c35-a128-8adce2313f8f.jpg",
     "publishedAt": "2018-01-12T12:45:39.160Z",
     "privacy": {
@@ -488,9 +488,9 @@
     }
   },
   {
-    "views": 1894,
+    "views": 1900,
     "uuid": "84b9ff3a-c4b8-4416-a0c4-09e0ea187127",
-    "updatedAt": "2018-11-18T11:01:00.372Z",
+    "updatedAt": "2018-11-23T18:01:00.651Z",
     "thumbnailPath": "/static/thumbnails/84b9ff3a-c4b8-4416-a0c4-09e0ea187127.jpg",
     "publishedAt": "2018-01-12T15:12:50.379Z",
     "privacy": {
@@ -544,9 +544,9 @@
     }
   },
   {
-    "views": 4758,
+    "views": 4774,
     "uuid": "e8a1af4e-414a-4d58-bfe6-2146eed06d10",
-    "updatedAt": "2018-11-19T01:01:00.023Z",
+    "updatedAt": "2018-11-23T17:01:00.614Z",
     "thumbnailPath": "/static/thumbnails/e8a1af4e-414a-4d58-bfe6-2146eed06d10.jpg",
     "publishedAt": "2018-01-17T17:09:08.500Z",
     "privacy": {
@@ -556,7 +556,7 @@
     "previewPath": "/static/previews/e8a1af4e-414a-4d58-bfe6-2146eed06d10.jpg",
     "nsfw": false,
     "name": "PeerTube : préparer l'alternative à Youtube - HS - Monsieur Bidouille",
-    "likes": 32,
+    "likes": 33,
     "licence": {
       "label": "Attribution",
       "id": 1
@@ -600,9 +600,9 @@
     }
   },
   {
-    "views": 1058,
+    "views": 1061,
     "uuid": "bc5b5ab6-b322-43c3-8881-0d4f17974ca6",
-    "updatedAt": "2018-11-17T20:01:00.209Z",
+    "updatedAt": "2018-11-22T16:01:00.933Z",
     "thumbnailPath": "/static/thumbnails/bc5b5ab6-b322-43c3-8881-0d4f17974ca6.jpg",
     "publishedAt": "2018-02-09T09:16:13.086Z",
     "privacy": {
@@ -656,9 +656,9 @@
     }
   },
   {
-    "views": 1864,
+    "views": 1870,
     "uuid": "1174e225-1a2e-4e6c-8ab4-1b709cd46978",
-    "updatedAt": "2018-11-18T23:01:00.776Z",
+    "updatedAt": "2018-11-23T15:01:00.800Z",
     "thumbnailPath": "/static/thumbnails/1174e225-1a2e-4e6c-8ab4-1b709cd46978.jpg",
     "publishedAt": "2018-02-13T15:57:15.666Z",
     "privacy": {
@@ -712,9 +712,9 @@
     }
   },
   {
-    "views": 1405,
+    "views": 1429,
     "uuid": "7024ae74-80a9-4e1d-8ede-cc11a470e131",
-    "updatedAt": "2018-11-18T20:01:00.284Z",
+    "updatedAt": "2018-11-23T19:01:00.326Z",
     "thumbnailPath": "/static/thumbnails/7024ae74-80a9-4e1d-8ede-cc11a470e131.jpg",
     "publishedAt": "2018-03-09T10:57:11.966Z",
     "privacy": {
@@ -768,9 +768,9 @@
     }
   },
   {
-    "views": 1304,
+    "views": 1339,
     "uuid": "f8a4b32d-0bf1-48ed-af9f-d8c5d87efedb",
-    "updatedAt": "2018-11-19T06:01:00.348Z",
+    "updatedAt": "2018-11-23T21:01:01.105Z",
     "thumbnailPath": "/static/thumbnails/f8a4b32d-0bf1-48ed-af9f-d8c5d87efedb.jpg",
     "publishedAt": "2018-08-02T13:55:13.338Z",
     "privacy": {

@@ -23,7 +23,7 @@ defmodule PeertubeIndex.MixProject do
   defp deps do
     [
       {:elasticsearch, "~> 0.6.0"},
-      {:poison, "~> 4.0.1"},
+      {:poison, "~> 4.0"},
       {:bypass, "~> 0.9.0", only: :test},
       {:plug_cowboy, "~> 1.0", only: :test},
       {:mox, "~> 0.4.0", only: :test},

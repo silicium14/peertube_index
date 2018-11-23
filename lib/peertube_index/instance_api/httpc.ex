@@ -29,28 +29,29 @@ defmodule PeertubeIndex.InstanceAPI.Httpc do
       "count" => page_size,
       "sort" => "createdAt"
     }
-    # TODO: refactor this
     with {:ok, first_page_data} <- get_json(url_with_params(paginated_resource_url, common_params)) do
-      number_of_pages = (first_page_data["total"] / page_size) |> Float.ceil() |> trunc() |> max(1)
-      result =
-      1..number_of_pages
-      |> Enum.drop(1)
-      |> Enum.map(fn page_number ->
-        {page_number,
-          url_with_params(paginated_resource_url, Map.put(common_params, "start", (page_number - 1) * page_size))}
-      end)
-      |> Enum.reduce(
-        first_page_data["data"],
-        fn {_page_number, page_url}, accumulator ->
-  #        IO.puts("#{page_url}, page #{page_number}/#{number_of_pages}")
-          {:ok, parsed} = get_json(page_url)
-          accumulator ++ parsed["data"]
+      number_of_pages = (first_page_data["total"] / page_size) |> Float.ceil() |> trunc()
+      if number_of_pages > 1 do
+        urls = for page_number <- 2..number_of_pages do
+          url_with_params(
+            paginated_resource_url,
+            Map.put(common_params, "start", (page_number - 1) * page_size)
+          )
         end
-      )
-
-      {:ok, result}
+        get_recursive(urls, first_page_data["data"])
+      else
+        {:ok, first_page_data["data"]}
+      end
     end
   end
+
+  defp get_recursive([next_url | rest], results) do
+    with {:ok, page_data} <- get_json(next_url) do
+      get_recursive(rest, results ++ page_data["data"])
+    end
+  end
+
+  defp get_recursive([], results), do: {:ok, results}
 
   defp request_without_error(url) do
     with {:ok, {

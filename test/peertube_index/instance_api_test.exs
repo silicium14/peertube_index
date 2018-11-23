@@ -10,7 +10,7 @@ defmodule PeertubeIndex.InstanceAPITest do
 
   # TODO: ignore changes in demo instance for tests OR use our own test instance
 
-  test "we can fetch videos" do
+  test "scan gives the same videos" do
     # Fetch videos from demo PeerTube instance that we use as reference
     # Videos are sorted by creation date
     # Videos are local to the instance
@@ -30,7 +30,7 @@ defmodule PeertubeIndex.InstanceAPITest do
     )
   end
 
-  test "we can discover instances" do
+  test "scan gives the same instances" do
     expected = File.read!("test/peertube_index/instance_api_test_data/instances.json") |> Poison.decode! |> MapSet.new
 
     # Discover instances from demo PeerTube instance that we use as reference
@@ -64,7 +64,7 @@ defmodule PeertubeIndex.InstanceAPITest do
     }}
   end
 
-  test "Bad HTTP status", %{bypass: bypass} do
+  test "bad HTTP status", %{bypass: bypass} do
     Bypass.expect_once bypass, "GET", "/api/v1/videos", fn conn ->
       Plug.Conn.resp(conn, 400, "{}")
     end
@@ -81,15 +81,85 @@ defmodule PeertubeIndex.InstanceAPITest do
     assert result == {:error, %Poison.ParseError{pos: 0, rest: nil, value: "i"}}
   end
 
-#  test "wrong format" do
+  test "error after fist page", %{bypass: bypass}do
+    Bypass.expect bypass, "GET", "/api/v1/videos", fn conn ->
+      conn = Plug.Conn.fetch_query_params(conn)
+      response = if Map.has_key?(conn.query_params, "start") do
+        ~s<bad json>
+      else
+        ~s<{"total": 10, "data": []}>
+      end
+      Plug.Conn.resp(conn, 200, response)
+    end
+
+    {status, _} = PeertubeIndex.InstanceAPI.Httpc.scan("localhost:#{bypass.port}", 5, false)
+    assert status == :error
+  end
+
+  test "gets all videos correctly with a single page", %{bypass: bypass} do
+    Bypass.expect bypass, "GET", "/api/v1/videos", fn conn ->
+      conn = Plug.Conn.fetch_query_params(conn)
+      IO.puts(conn.request_path <> "?" <> conn.query_string)
+      Plug.Conn.resp(conn, 200, ~s<{"total": 2, "data": [{"id": 0, "isLocal": true}, {"id": 1, "isLocal": true}]}>)
+    end
+
+    Bypass.stub bypass, "GET", "/api/v1/server/followers", fn conn ->
+      Plug.Conn.resp(conn, 200, ~s<{"total": 0, "data": []}>)
+    end
+
+    Bypass.stub bypass, "GET", "/api/v1/server/following", fn conn ->
+      Plug.Conn.resp(conn, 200, ~s<{"total": 0, "data": []}>)
+    end
+
+    {:ok, {videos, _instances}} = PeertubeIndex.InstanceAPI.Httpc.scan("localhost:#{bypass.port}", 10, false)
+    assert videos == [
+             %{"id" =>  0, "isLocal" => true},
+             %{"id" =>  1, "isLocal" => true}
+           ]
+  end
+
+  test "gets all videos correctly with pagination", %{bypass: bypass} do
+    Bypass.expect bypass, "GET", "/api/v1/videos", fn conn ->
+      conn = Plug.Conn.fetch_query_params(conn)
+      IO.puts(conn.request_path <> "?" <> conn.query_string)
+      start = Map.get(conn.query_params, "start", "0")
+      Plug.Conn.resp(conn, 200, ~s<{"total": 3, "data": [{"id": #{start}, "isLocal": true}]}>)
+    end
+
+    Bypass.stub bypass, "GET", "/api/v1/server/followers", fn conn ->
+      Plug.Conn.resp(conn, 200, ~s<{"total": 0, "data": []}>)
+    end
+
+    Bypass.stub bypass, "GET", "/api/v1/server/following", fn conn ->
+      Plug.Conn.resp(conn, 200, ~s<{"total": 0, "data": []}>)
+    end
+
+    {:ok, {videos, _instances}} = PeertubeIndex.InstanceAPI.Httpc.scan("localhost:#{bypass.port}", 1, false)
+    assert videos == [
+             %{"id" =>  0, "isLocal" => true},
+             %{"id" =>  1, "isLocal" => true},
+             %{"id" =>  2, "isLocal" => true}
+           ]
+  end
+
+#  test "wrong document format", %{bypass: bypass} do
+#    Bypass.expect_once bypass, "GET", "/api/v1/videos", fn conn ->
+#      Plug.Conn.resp(conn, 200, "{\"not the correct format\": \"some value\"}")
+#    end
+#
+#    result = PeertubeIndex.InstanceAPI.Httpc.scan("localhost:#{bypass.port}", 100, false)
+#    assert result == {:error, :unexcpected_document_format}
+#  end
+
+#  test "only one page" do
 #
 #  end
 
-#  test "error after fist page" do
+#  test "gets all videos" do
 #
 #  end
 
-#  test "?visits all available pages" do
+#  test "page number larger than 100" do
 #
 #  end
 end
