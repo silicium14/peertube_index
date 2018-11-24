@@ -2,14 +2,15 @@ defmodule PeertubeIndexTest do
   use ExUnit.Case, async: true
 
 
-  test "we can search a video by its name using storage" do
+  test "we can search a videos by their name using storage" do
     # Given there are videos
-    a_cat_video = %{"name" => "A video about a cat"}
+    a_video = %{"name" => "A video about a cat"}
+    another_video = %{"name" => "A video about a cats and dogs"}
     Mox.expect(
       PeertubeIndex.VideoStorage.Mock, :search,
       # Then The storage is asked for the correct term
       fn "cat" ->
-        [a_cat_video]
+        [a_video, another_video]
       end
     )
 
@@ -18,8 +19,8 @@ defmodule PeertubeIndexTest do
 
     # Then the storage is asked for matching videos
     Mox.verify!()
-    # And the matching videos are returned
-    assert videos == [a_cat_video]
+    # And the matching videos are returned in the same order as returned by the storage
+    assert videos == [a_video, another_video]
   end
 
   test "scan uses instance api and updates instances in storage" do

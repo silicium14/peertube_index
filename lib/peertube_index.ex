@@ -9,7 +9,9 @@ defmodule PeertubeIndex do
 
 #  TODO
 #  - Better project structure
+#  - Document at least InstanceAPI behaviour
 #  - Scan multiple instances concurrently
+#  - Scan works with http and detects https or http
 #  - Save instance status
 #  - Use case tests
 #  - Update from status database
