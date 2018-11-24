@@ -1,7 +1,7 @@
-defmodule PeertubeIndex.Storage.Elasticsearch do
+defmodule PeertubeIndex.VideoStorage.Elasticsearch do
   @moduledoc false
 
-  @behaviour PeertubeIndex.Storage
+  @behaviour PeertubeIndex.VideoStorage
 
   @elasticsearch_config Application.fetch_env!(:peertube_index, :elasticsearch_config)
   @index "videos"

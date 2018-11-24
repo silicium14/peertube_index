@@ -3,6 +3,6 @@ use Mix.Config
 config :peertube_index,
   # Only used for integration tests
   elasticsearch_config: %{url: "http://localhost:5555", api: Elasticsearch.API.HTTP},
-  storage: PeertubeIndex.Storage.Mock,
+  video_storage: PeertubeIndex.VideoStorage.Mock,
   instance_api: PeertubeIndex.InstanceAPI.Mock,
   status_storage: PeertubeIndex.StatusStorage.Mock

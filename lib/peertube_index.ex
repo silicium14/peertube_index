@@ -3,7 +3,7 @@ defmodule PeertubeIndex do
   PeerTube Index use cases
   """
 
-  @storage Application.fetch_env!(:peertube_index, :storage)
+  @storage Application.fetch_env!(:peertube_index, :video_storage)
   @instance_api Application.fetch_env!(:peertube_index, :instance_api)
   @status_storage Application.fetch_env!(:peertube_index, :status_storage)
 

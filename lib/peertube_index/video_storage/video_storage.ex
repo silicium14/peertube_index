@@ -1,4 +1,4 @@
-defmodule PeertubeIndex.Storage do
+defmodule PeertubeIndex.VideoStorage do
   @moduledoc false
 
   @callback update_instance!(String.t, [map]) :: :ok
