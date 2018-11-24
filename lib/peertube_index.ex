@@ -29,11 +29,16 @@ defmodule PeertubeIndex do
       case result do
         {:ok, {videos, found_instances}} ->
           @storage.update_instance!(host, videos)
-          @status_storage.new(host, :ok, scan_end)
-          for instance <- found_instances, do: @status_storage.new(instance, :discovered, scan_end)
+          @status_storage.new_status(host, :ok, scan_end)
+          for instance <- found_instances, do: @status_storage.new_status(instance, :discovered, scan_end)
         {:error, reason} ->
-          @status_storage.new(host, {:error, reason}, scan_end)
+          @status_storage.new_status(host, {:error, reason}, scan_end)
       end
     end
+  end
+
+  def rescan(get_local_time \\ &:calendar.local_time/0, scan_function \\ &scan/1) do
+    @status_storage.instances_to_rescan(get_local_time.())
+    |> scan_function.()
   end
 end
