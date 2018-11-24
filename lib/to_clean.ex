@@ -22,6 +22,14 @@ defmodule ToClean do
     |> Stream.map(fn {item, _index} -> item end)
   end
 
+  def get_all(_host) do
+    []
+  end
+
+  def scan_one_instance(_host) do
+    []
+  end
+
   def scan() do
     instances =
       get_all("https://instances.joinpeertube.org/api/v1/instances")

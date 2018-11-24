@@ -23,6 +23,8 @@ defmodule PeertubeIndexTest do
   end
 
   test "scan uses instance api and updates instances in storage" do
+    Mox.stub(PeertubeIndex.StatusStorage.Mock, :new, fn _host, _status, _date -> :ok end)
+
     videos = [%{"name" => "some video"}]
     Mox.expect(PeertubeIndex.InstanceAPI.Mock, :scan, fn "some-instance.example.com" -> {:ok, {videos, MapSet.new()}} end)
     Mox.expect( PeertubeIndex.Storage.Mock, :update_instance!, fn "some-instance.example.com", ^videos -> :ok end)
@@ -36,14 +38,37 @@ defmodule PeertubeIndexTest do
     Mox.verify!()
   end
 
-#  test "scan logs failures in a file" do
-#    Mox.expect(
-#      PeertubeIndex.InstanceAPI.Mock, :scan,
-#      fn "failing-instance.example.com" -> raise "Failing on purpose for the test" end
-#    )
-#
-#    PeertubeIndex.scan(["failing-instance.example.com"])
-#
-#    Mox.verify!()
+  test "scan updates instance status" do
+    Mox.stub(PeertubeIndex.InstanceAPI.Mock, :scan, fn "some-instance.example.com" -> {:ok, {[], MapSet.new()}} end)
+    Mox.stub(PeertubeIndex.Storage.Mock, :update_instance!, fn "some-instance.example.com", _videos -> :ok end)
+    finishes_at = {{2018, 1, 1}, {14, 15, 16}}
+    Mox.expect(PeertubeIndex.StatusStorage.Mock, :new, fn "some-instance.example.com", :ok, ^finishes_at -> :ok end)
+
+
+    PeertubeIndex.scan(["some-instance.example.com"], fn -> finishes_at end)
+
+    Mox.verify!()
+  end
+
+  test "scan create a status for discovered instances" do
+    Mox.stub(
+      PeertubeIndex.InstanceAPI.Mock, :scan,
+      fn "some-instance.example.com" ->
+        {:ok, {[], MapSet.new(["found-instance.example.com", "another-found-instance.example.com"])}}
+      end
+    )
+    Mox.stub(PeertubeIndex.Storage.Mock, :update_instance!, fn "some-instance.example.com", _videos -> :ok end)
+    finishes_at = {{2018, 1, 1}, {14, 15, 16}}
+    Mox.expect(PeertubeIndex.StatusStorage.Mock, :new, fn "some-instance.example.com", :ok, ^finishes_at -> :ok end)
+    Mox.expect(PeertubeIndex.StatusStorage.Mock, :new, fn "another-found-instance.example.com", :discovered, ^finishes_at -> :ok end)
+    Mox.expect(PeertubeIndex.StatusStorage.Mock, :new, fn "found-instance.example.com", :discovered, ^finishes_at -> :ok end)
+
+
+    PeertubeIndex.scan(["some-instance.example.com"], fn -> finishes_at end)
+
+    Mox.verify!()
+  end
+
+#  test "handle failures" do
 #  end
 end

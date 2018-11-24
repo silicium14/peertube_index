@@ -5,6 +5,7 @@ defmodule PeertubeIndex do
 
   @storage Application.fetch_env!(:peertube_index, :storage)
   @instance_api Application.fetch_env!(:peertube_index, :instance_api)
+  @status_storage Application.fetch_env!(:peertube_index, :status_storage)
 
 #  TODO
 #  - Better project structure
@@ -21,11 +22,12 @@ defmodule PeertubeIndex do
     @storage.search(name)
   end
 
-  def scan(hostnames) do
+  def scan(hostnames, get_local_time \\ &:calendar.local_time/0) do
     for host <- hostnames do
-      {:ok, {videos, _}} = @instance_api.scan(host)
+      {_, {videos, found_instances}} = @instance_api.scan(host)
       @storage.update_instance!(host, videos)
+      @status_storage.new(host, :ok, get_local_time.())
+      for instance <- found_instances, do: @status_storage.new(instance, :discovered, get_local_time.())
     end
   end
-
 end
