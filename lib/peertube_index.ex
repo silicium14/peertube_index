@@ -24,10 +24,16 @@ defmodule PeertubeIndex do
 
   def scan(hostnames, get_local_time \\ &:calendar.local_time/0) do
     for host <- hostnames do
-      {_, {videos, found_instances}} = @instance_api.scan(host)
-      @storage.update_instance!(host, videos)
-      @status_storage.new(host, :ok, get_local_time.())
-      for instance <- found_instances, do: @status_storage.new(instance, :discovered, get_local_time.())
+      result = @instance_api.scan(host)
+      scan_end = get_local_time.()
+      case result do
+        {:ok, {videos, found_instances}} ->
+          @storage.update_instance!(host, videos)
+          @status_storage.new(host, :ok, scan_end)
+          for instance <- found_instances, do: @status_storage.new(instance, :discovered, scan_end)
+        {:error, reason} ->
+          @status_storage.new(host, {:error, reason}, scan_end)
+      end
     end
   end
 end

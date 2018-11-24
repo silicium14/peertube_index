@@ -50,7 +50,7 @@ defmodule PeertubeIndexTest do
     Mox.verify!()
   end
 
-  test "scan create a status for discovered instances" do
+  test "scan reports the appropriate status for discovered instances" do
     Mox.stub(
       PeertubeIndex.InstanceAPI.Mock, :scan,
       fn "some-instance.example.com" ->
@@ -69,6 +69,13 @@ defmodule PeertubeIndexTest do
     Mox.verify!()
   end
 
-#  test "handle failures" do
-#  end
+  test "scan handles failures and reports the corresponding statuses" do
+    Mox.stub(PeertubeIndex.InstanceAPI.Mock, :scan, fn "some-instance.example.com" -> {:error, :reason} end)
+    finishes_at = {{2018, 1, 1}, {14, 15, 16}}
+    Mox.expect(PeertubeIndex.StatusStorage.Mock, :new, fn "some-instance.example.com", {:error, :reason}, ^finishes_at -> :ok end)
+
+    PeertubeIndex.scan(["some-instance.example.com"], fn -> finishes_at end)
+
+    Mox.verify!()
+  end
 end
