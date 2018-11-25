@@ -11,6 +11,22 @@ defmodule PeertubeIndex.StatusStorage.Filesystem do
   end
 
   @impl true
+  def with_statuses(statuses) do
+    empty()
+    for status <- statuses do
+      case status do
+        {host, :ok, date} ->
+          write_status_map(host, %{"host" => host, "status" => "ok", "date" => date})
+        {host, {:error, reason}, date} ->
+          write_status_map(host, %{"host" => host, "status" => "error", "reason" => inspect(reason), "date" => date})
+        {host, :discovered, date} ->
+          write_status_map(host, %{"host" => host, "status" => "discovered", "date" => date})
+      end
+
+    end
+  end
+
+  @impl true
   def all() do
     for file <- File.ls!(@directory) do
       {:ok, bytes} = :file.read_file("#{@directory}/#{file}")
@@ -38,12 +54,25 @@ defmodule PeertubeIndex.StatusStorage.Filesystem do
 
   @impl true
   def discovered_instance(host, date) do
-    write_status_map(host, %{"host" => host, "status" => "discovered", "date" => date})
+    if has_no_already_existing_status(host) do
+      write_status_map(host, %{"host" => host, "status" => "discovered", "date" => date})
+    end
   end
 
   defp write_status_map(host, status_map) do
-    {:ok, file} = :file.open("#{@directory}/#{host}.json", [:raw, :write])
+    {:ok, file} = :file.open(host_file(host), [:raw, :write])
     :file.write(file, Poison.encode!(status_map, pretty: true))
     :file.close(file)
+  end
+
+  def has_no_already_existing_status(host) do
+    host
+    |> host_file()
+    |> File.exists?()
+    |> Kernel.not()
+  end
+
+  defp host_file(host) do
+    "#{@directory}/#{host}.json"
   end
 end

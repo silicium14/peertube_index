@@ -8,6 +8,11 @@ defmodule PeertubeIndex.StatusStorage do
   @callback empty() :: :ok
 
   @doc """
+  Create a status storage with given statuses for testing
+  """
+  @callback with_statuses([tuple()]) :: :ok
+
+  @doc """
   Returns the list of all statuses
   """
   @callback all() :: :ok

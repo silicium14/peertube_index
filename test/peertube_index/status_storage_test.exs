@@ -16,4 +16,22 @@ defmodule PeertubeIndex.StatusStorageTest do
              {"newly-discovered.example.com", :discovered, ~N[2018-02-05 10:00:00]}
            ])
   end
+
+  test "discover instance does not override an existing status" do
+    PeertubeIndex.StatusStorage.Filesystem.with_statuses([
+      {"example.com", :ok, ~N[2018-03-11 20:10:31]},
+      {"failed.example.com", {:error, :some_reason}, ~N[2018-03-12 09:01:22]},
+      {"discovered.example.com", :discovered, ~N[2018-03-13 11:55:14]},
+    ])
+
+    PeertubeIndex.StatusStorage.Filesystem.discovered_instance("example.com", ~N[2018-03-11 20:10:32])
+    PeertubeIndex.StatusStorage.Filesystem.discovered_instance("failed.example.com", ~N[2018-03-12 09:01:23])
+    PeertubeIndex.StatusStorage.Filesystem.discovered_instance("discovered.example.com", ~N[2018-03-13 11:55:15])
+
+    assert MapSet.new(PeertubeIndex.StatusStorage.Filesystem.all()) == MapSet.new([
+             {"example.com", :ok, ~N[2018-03-11 20:10:31]},
+             {"failed.example.com", {:error, ":some_reason"}, ~N[2018-03-12 09:01:22]},
+             {"discovered.example.com", :discovered, ~N[2018-03-13 11:55:14]},
+           ])
+  end
 end
