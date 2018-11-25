@@ -16,9 +16,11 @@ defmodule PeertubeIndex.StatusStorage.Filesystem do
       {:ok, bytes} = :file.read_file("#{@directory}/#{file}")
       status_map = Poison.decode!(bytes)
       case status_map do
-        %{"host" => host, "ok" => true, "date" => date_string} ->
+        %{"host" => host, "status" => "discovered", "date" => date_string} ->
+          {host, :discovered, NaiveDateTime.from_iso8601!(date_string)}
+        %{"host" => host, "status" => "ok", "date" => date_string} ->
           {host, :ok, NaiveDateTime.from_iso8601!(date_string)}
-        %{"host" => host, "ok" => false, "reason" => reason_string, "date" => date_string} ->
+        %{"host" => host, "status" => "error", "reason" => reason_string, "date" => date_string} ->
           {host, {:error, reason_string}, NaiveDateTime.from_iso8601!(date_string)}
       end
     end
@@ -29,10 +31,12 @@ defmodule PeertubeIndex.StatusStorage.Filesystem do
     {:ok, file} = :file.open("#{@directory}/#{host}.json", [:raw, :write])
     status_map =
     case status do
+      :discovered ->
+        %{"host" => host, "status" => "discovered", "date" => date}
       :ok ->
-        %{"host" => host, "ok" => true, "date" => date}
+        %{"host" => host, "status" => "ok", "date" => date}
       {:error, reason} ->
-        %{"host" => host, "ok" => false, "reason" => inspect(reason), "date" => date}
+        %{"host" => host, "status" => "error", "reason" => inspect(reason), "date" => date}
     end
     :file.write(file, Poison.encode!(status_map, pretty: true))
     :file.close(file)
