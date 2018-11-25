@@ -27,17 +27,22 @@ defmodule PeertubeIndex.StatusStorage.Filesystem do
   end
 
   @impl true
-  def new_status(host, status, date) do
+  def ok_instance(host, date) do
+    write_status_map(host, %{"host" => host, "status" => "ok", "date" => date})
+  end
+
+  @impl true
+  def failed_instance(host, reason, date) do
+    write_status_map(host, %{"host" => host, "status" => "error", "reason" => inspect(reason), "date" => date})
+  end
+
+  @impl true
+  def discovered_instance(host, date) do
+    write_status_map(host, %{"host" => host, "status" => "discovered", "date" => date})
+  end
+
+  defp write_status_map(host, status_map) do
     {:ok, file} = :file.open("#{@directory}/#{host}.json", [:raw, :write])
-    status_map =
-    case status do
-      :discovered ->
-        %{"host" => host, "status" => "discovered", "date" => date}
-      :ok ->
-        %{"host" => host, "status" => "ok", "date" => date}
-      {:error, reason} ->
-        %{"host" => host, "status" => "error", "reason" => inspect(reason), "date" => date}
-    end
     :file.write(file, Poison.encode!(status_map, pretty: true))
     :file.close(file)
   end

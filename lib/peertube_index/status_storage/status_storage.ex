@@ -11,7 +11,9 @@ defmodule PeertubeIndex.StatusStorage do
   Returns the list of all statuses
   """
   @callback all() :: :ok
-  @callback new_status(String.t, :ok | {:error, any()}, NaiveDateTime.t) :: :ok
+  @callback ok_instance(String.t, NaiveDateTime.t) :: :ok
+  @callback failed_instance(String.t, any(), NaiveDateTime.t) :: :ok
+  @callback discovered_instance(String.t, NaiveDateTime.t) :: :ok
   @callback instances_to_rescan((-> NaiveDateTime.t)) :: list(String.t)
 
 end
