@@ -41,6 +41,27 @@ defmodule PeertubeIndex.StatusStorage.Filesystem do
       end
     end
   end
+  
+  @impl true
+  def instances_to_rescan(get_current_time \\ &get_current_time_naivedatetime/0) do
+    current_instant = get_current_time.()
+
+    all()
+    |> Enum.filter(fn {host, status, date} -> should_we_rescan?(status, date, current_instant) end)
+    |> Enum.map(fn {host, status, date} -> host end)
+    |> Enum.to_list()
+  end
+
+  defp should_we_rescan?(:discovered, _date, current_instant), do: true
+  defp should_we_rescan?(_ok_or_error, date, current_instant) do
+    NaiveDateTime.diff(current_instant, date) > (24*60*60)
+  end
+
+  defp get_current_time_naivedatetime() do
+    {{year, month, day}, {hour, minute, second}} = :calendar.local_time()
+    {:ok, current_time} = NaiveDateTime.new(year, month, day, hour, minute, second)
+    current_time
+  end
 
   @impl true
   def ok_instance(host, date) do

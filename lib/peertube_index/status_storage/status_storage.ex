@@ -19,6 +19,10 @@ defmodule PeertubeIndex.StatusStorage do
   @callback ok_instance(String.t, NaiveDateTime.t) :: :ok
   @callback failed_instance(String.t, any(), NaiveDateTime.t) :: :ok
   @callback discovered_instance(String.t, NaiveDateTime.t) :: :ok
+
+  @doc """
+  Returns the instances that are just discovered and the ok or failed instances with a status older than a day
+  """
   @callback instances_to_rescan((-> NaiveDateTime.t)) :: list(String.t)
 
 end

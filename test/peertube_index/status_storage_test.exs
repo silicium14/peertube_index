@@ -34,4 +34,27 @@ defmodule PeertubeIndex.StatusStorageTest do
              {"discovered.example.com", :discovered, ~N[2018-03-13 11:55:14]},
            ])
   end
+
+  test "instances to rescan are the discovered instances and failed or ok instances with a status older than a day" do
+    year = 2018
+    month = 3
+    day = 10
+    hour = 12
+    minute = 30
+    second = 30
+
+    {:ok, very_recent} = NaiveDateTime.new(year, month, day, hour, minute, second-1)
+    {:ok, just_more_that_a_day_ago} = NaiveDateTime.new(year, month, day-1, hour, minute, second-1)
+    PeertubeIndex.StatusStorage.Filesystem.with_statuses([
+      {"ok-too-recent.example.com", :ok, very_recent},
+      {"ok-old-enough.example.com", :ok, just_more_that_a_day_ago},
+      {"failed-too-recent.example.com", {:error, :some_reason}, very_recent},
+      {"failed-old-enough.example.com", {:error, :some_reason}, just_more_that_a_day_ago},
+      {"discovered.example.com", :discovered, very_recent},
+    ])
+
+    {:ok, current_time} = NaiveDateTime.new(year, month, day, hour, minute, second)
+    instances_to_rescan = PeertubeIndex.StatusStorage.Filesystem.instances_to_rescan(fn -> current_time end)
+    assert MapSet.new(instances_to_rescan) == MapSet.new(["ok-old-enough.example.com", "failed-old-enough.example.com", "discovered.example.com"])
+  end
 end
