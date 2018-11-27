@@ -54,7 +54,7 @@ defmodule PeertubeIndex.StatusStorage.Filesystem do
 
   defp should_we_rescan?(:discovered, _date, current_instant), do: true
   defp should_we_rescan?(_ok_or_error, date, current_instant) do
-    NaiveDateTime.diff(current_instant, date) > (24*60*60)
+    NaiveDateTime.diff(current_instant, date) > (24 * 60 * 60)
   end
 
   defp get_current_time_naivedatetime() do

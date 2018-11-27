@@ -15,9 +15,9 @@ defmodule PeertubeIndex.VideoStorage.Elasticsearch do
       %{"query" => %{"term" => %{"account.host" => hostname}}}
     )
 
-    videos
-    |> Enum.map(fn video -> Elasticsearch.post!(@elasticsearch_config, "/#{@index}/#{@document_type}", video) end)
-    |> Enum.to_list()
+    for video <- videos do
+      Elasticsearch.post!(@elasticsearch_config, "/#{@index}/#{@document_type}", video)
+    end
 
     :ok
   end

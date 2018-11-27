@@ -43,8 +43,8 @@ defmodule PeertubeIndex.StatusStorageTest do
     minute = 30
     second = 30
 
-    {:ok, very_recent} = NaiveDateTime.new(year, month, day, hour, minute, second-1)
-    {:ok, just_more_that_a_day_ago} = NaiveDateTime.new(year, month, day-1, hour, minute, second-1)
+    {:ok, very_recent} = NaiveDateTime.new(year, month, day, hour, minute, second - 1)
+    {:ok, just_more_that_a_day_ago} = NaiveDateTime.new(year, month, day - 1, hour, minute, second - 1)
     PeertubeIndex.StatusStorage.Filesystem.with_statuses([
       {"ok-too-recent.example.com", :ok, very_recent},
       {"ok-old-enough.example.com", :ok, just_more_that_a_day_ago},

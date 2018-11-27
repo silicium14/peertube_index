@@ -28,7 +28,7 @@ defmodule PeertubeIndexTest do
 
     videos = [%{"name" => "some video"}]
     Mox.expect(PeertubeIndex.InstanceAPI.Mock, :scan, fn "some-instance.example.com" -> {:ok, {videos, MapSet.new()}} end)
-    Mox.expect( PeertubeIndex.VideoStorage.Mock, :update_instance!, fn "some-instance.example.com", ^videos -> :ok end)
+    Mox.expect(PeertubeIndex.VideoStorage.Mock, :update_instance!, fn "some-instance.example.com", ^videos -> :ok end)
 
     videos = [%{"name" => "some other video"}]
     Mox.expect(PeertubeIndex.InstanceAPI.Mock, :scan, fn "some-other-instance.example.com" -> {:ok, {videos, MapSet.new()}} end)

@@ -14,7 +14,7 @@ defmodule PeertubeIndex do
 #  - Add task to seed status storage with known instance hosts
 #  - We can see instances' status
 #  - Search frontend
-#  - Isolate failures of the steps in scan function
+#  - Isolate and handle failures of the steps in scan function
 #  - Use document type from Elasticsearch library?
 #  - Remember that in the domain we directly use the objects returned by the storage without any conversion, we are coupled to the storage format for now
 

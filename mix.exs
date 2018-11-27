@@ -24,6 +24,7 @@ defmodule PeertubeIndex.MixProject do
     [
       {:elasticsearch, "~> 0.6.0"},
       {:poison, "~> 4.0"},
+      {:credo, "~> 1.0", only: :dev, runtime: false},
       {:bypass, "~> 0.9.0", only: :test},
       {:plug_cowboy, "~> 1.0", only: :test},
       {:mox, "~> 0.4.0", only: :test},
