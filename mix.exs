@@ -7,9 +7,13 @@ defmodule PeertubeIndex.MixProject do
       version: "0.1.0",
       elixir: "~> 1.7",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      elixirc_paths: elixirc_paths(Mix.env),
     ]
   end
+
+  def elixirc_paths(:test), do: ["test/support", "lib"]
+  def elixirc_paths(_),     do: ["lib"]
 
   # Run "mix help compile.app" to learn about applications.
   def application do
