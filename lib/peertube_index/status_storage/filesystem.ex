@@ -22,8 +22,9 @@ defmodule PeertubeIndex.StatusStorage.Filesystem do
         {host, :discovered, date} ->
           write_status_map(host, %{"host" => host, "status" => "discovered", "date" => date})
       end
-
     end
+
+    :ok
   end
 
   @impl true
@@ -47,12 +48,12 @@ defmodule PeertubeIndex.StatusStorage.Filesystem do
     current_instant = get_current_time.()
 
     all()
-    |> Enum.filter(fn {host, status, date} -> should_we_rescan?(status, date, current_instant) end)
-    |> Enum.map(fn {host, status, date} -> host end)
+    |> Enum.filter(fn {_host, status, date} -> should_we_rescan?(status, date, current_instant) end)
+    |> Enum.map(fn {host, _status, _date} -> host end)
     |> Enum.to_list()
   end
 
-  defp should_we_rescan?(:discovered, _date, current_instant), do: true
+  defp should_we_rescan?(:discovered, _date, _current_instant), do: true
   defp should_we_rescan?(_ok_or_error, date, current_instant) do
     NaiveDateTime.diff(current_instant, date) > (24 * 60 * 60)
   end

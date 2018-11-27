@@ -99,7 +99,6 @@ defmodule PeertubeIndex.InstanceAPITest do
   test "gets all videos correctly with a single page", %{bypass: bypass} do
     Bypass.expect bypass, "GET", "/api/v1/videos", fn conn ->
       conn = Plug.Conn.fetch_query_params(conn)
-      IO.puts(conn.request_path <> "?" <> conn.query_string)
       Plug.Conn.resp(conn, 200, ~s<{"total": 2, "data": [{"id": 0, "isLocal": true}, {"id": 1, "isLocal": true}]}>)
     end
 
@@ -121,7 +120,6 @@ defmodule PeertubeIndex.InstanceAPITest do
   test "gets all videos correctly with pagination", %{bypass: bypass} do
     Bypass.expect bypass, "GET", "/api/v1/videos", fn conn ->
       conn = Plug.Conn.fetch_query_params(conn)
-      IO.puts(conn.request_path <> "?" <> conn.query_string)
       start = Map.get(conn.query_params, "start", "0")
       Plug.Conn.resp(conn, 200, ~s<{"total": 3, "data": [{"id": #{start}, "isLocal": true}]}>)
     end

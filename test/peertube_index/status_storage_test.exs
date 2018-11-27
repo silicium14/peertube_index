@@ -18,7 +18,7 @@ defmodule PeertubeIndex.StatusStorageTest do
   end
 
   test "discover instance does not override an existing status" do
-    PeertubeIndex.StatusStorage.Filesystem.with_statuses([
+    :ok = PeertubeIndex.StatusStorage.Filesystem.with_statuses([
       {"example.com", :ok, ~N[2018-03-11 20:10:31]},
       {"failed.example.com", {:error, :some_reason}, ~N[2018-03-12 09:01:22]},
       {"discovered.example.com", :discovered, ~N[2018-03-13 11:55:14]},
