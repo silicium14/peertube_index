@@ -54,7 +54,7 @@ defmodule PeertubeIndex.StatusStorageTest do
     ])
 
     {:ok, current_time} = NaiveDateTime.new(year, month, day, hour, minute, second)
-    instances_to_rescan = PeertubeIndex.StatusStorage.Filesystem.instances_to_rescan(fn -> current_time end)
+    instances_to_rescan = PeertubeIndex.StatusStorage.Filesystem.instances_to_rescan(current_time)
     assert MapSet.new(instances_to_rescan) == MapSet.new(["ok-old-enough.example.com", "failed-old-enough.example.com", "discovered.example.com"])
   end
 
