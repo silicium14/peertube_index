@@ -8,13 +8,13 @@ defmodule PeertubeIndex do
   @status_storage Application.fetch_env!(:peertube_index, :status_storage)
 
 #  TODO
-#  - Add test setup methods to VideoStorage behaviour
 #  - Scan multiple instances concurrently
 #  - Scan works with http and detects https or http
 #  - Add task to seed status storage with known instance hosts
 #  - We can see instances' status
 #  - Search frontend
 #  - Isolate and handle failures of the steps in scan function
+#  - Refine search behaviour
 #  - Use document type from Elasticsearch library?
 #  - Remember that in the domain we directly use the objects returned by the storage without any conversion, we are coupled to the storage format for now
 

@@ -6,14 +6,14 @@ defmodule PeertubeIndex.VideoStorageTest do
 
   test "we can search videos" do
     videos = [%{"name" => "A cat video"}, %{"name" => "A video about a cat"}]
-    PeertubeIndex.VideoStorage.Elasticsearch._with_videos(videos)
+    PeertubeIndex.VideoStorage.Elasticsearch.with_videos(videos)
     Process.sleep 1_000
-    assert PeertubeIndex.VideoStorage.Elasticsearch.search("cat") == videos
+    assert MapSet.new(PeertubeIndex.VideoStorage.Elasticsearch.search("cat")) == MapSet.new(videos)
   end
 
-  test "update_instance adds videos and we can search them" do
+  test "update_instance! adds videos and we can search them" do
     # Given I have an empty index
-    PeertubeIndex.VideoStorage.Elasticsearch._empty()
+    PeertubeIndex.VideoStorage.Elasticsearch.empty()
     # When I update an instance with some videos
     a_video = %{"name" => "A dummy video"}
     another_video = %{"name" => "An interesting video"}
@@ -24,11 +24,11 @@ defmodule PeertubeIndex.VideoStorageTest do
     assert PeertubeIndex.VideoStorage.Elasticsearch.search("interesting") == [another_video]
   end
 
-  test "update_instance deletes existing instance videos" do
+  test "update_instance! deletes existing instance videos" do
     # Given We have videos from two instances
     other_instance_video = %{"name" => "Other instance video", "account" => %{"host" => "other.example.com"}}
     video = %{"name" => "A dummy video", "account" => %{"host" => "example.com"}}
-    PeertubeIndex.VideoStorage.Elasticsearch._with_videos([video, other_instance_video])
+    PeertubeIndex.VideoStorage.Elasticsearch.with_videos([video, other_instance_video])
     Process.sleep 1_000
     # When I update instance with no videos
     PeertubeIndex.VideoStorage.Elasticsearch.update_instance!("example.com", [])

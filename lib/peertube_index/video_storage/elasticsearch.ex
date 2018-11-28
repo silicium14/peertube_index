@@ -35,7 +35,7 @@ defmodule PeertubeIndex.VideoStorage.Elasticsearch do
     |> Enum.to_list()
   end
 
-  def create_index() do
+  defp create_index() do
     Elasticsearch.Index.create(
       @elasticsearch_config,
       @index,
@@ -77,17 +77,18 @@ defmodule PeertubeIndex.VideoStorage.Elasticsearch do
     )
   end
 
-  # Test helper functions below
-  # Todo: should we add those functions to behaviour module?
-
-  def _with_videos(videos) do
-    _empty()
+  @impl true
+  def with_videos(videos) do
+    empty()
     videos
     |> Enum.map(fn video -> Elasticsearch.post!(@elasticsearch_config, "/#{@index}/#{@document_type}", video) end)
     |> Enum.to_list()
+
+    :ok
   end
 
-  def _empty() do
+  @impl true
+  def empty() do
     _delete_index_ignore_not_exising!()
     create_index()
   end
