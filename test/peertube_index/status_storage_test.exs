@@ -57,4 +57,20 @@ defmodule PeertubeIndex.StatusStorageTest do
     instances_to_rescan = PeertubeIndex.StatusStorage.Filesystem.instances_to_rescan(fn -> current_time end)
     assert MapSet.new(instances_to_rescan) == MapSet.new(["ok-old-enough.example.com", "failed-old-enough.example.com", "discovered.example.com"])
   end
+
+  test "failed_instance overrides existing status" do
+    :ok = PeertubeIndex.StatusStorage.Filesystem.with_statuses([{"example.com", :ok, ~N[2018-03-11 20:10:31]}])
+
+    PeertubeIndex.StatusStorage.Filesystem.failed_instance("example.com", {:some_error_reason, "arbitrary error data"}, ~N[2018-04-01 12:40:00])
+
+    assert PeertubeIndex.StatusStorage.Filesystem.all() == [{"example.com", {:error, inspect({:some_error_reason, "arbitrary error data"})}, ~N[2018-04-01 12:40:00]}]
+  end
+
+  test "ok_instance overrides existing status" do
+    :ok = PeertubeIndex.StatusStorage.Filesystem.with_statuses([{"example.com", :ok, ~N[2018-03-11 20:10:31]}])
+
+    PeertubeIndex.StatusStorage.Filesystem.ok_instance("example.com", ~N[2018-04-01 12:40:00])
+
+    assert PeertubeIndex.StatusStorage.Filesystem.all() == [{"example.com", :ok, ~N[2018-04-01 12:40:00]}]
+  end
 end
