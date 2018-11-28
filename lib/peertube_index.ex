@@ -3,11 +3,12 @@ defmodule PeertubeIndex do
   PeerTube Index use cases
   """
 
-  @storage Application.fetch_env!(:peertube_index, :video_storage)
+  @video_storage Application.fetch_env!(:peertube_index, :video_storage)
   @instance_api Application.fetch_env!(:peertube_index, :instance_api)
   @status_storage Application.fetch_env!(:peertube_index, :status_storage)
 
 #  TODO
+#  - Add an end to end test
 #  - Scan multiple instances concurrently
 #  - Scan works with http and detects https or http
 #  - Add task to seed status storage with known instance hosts
@@ -20,7 +21,7 @@ defmodule PeertubeIndex do
 
   @spec search(String.t) :: [map]
   def search(name) do
-    @storage.search(name)
+    @video_storage.search(name)
   end
 
   @spec scan([String.t], (-> NaiveDateTime.t)) :: :ok
@@ -30,7 +31,7 @@ defmodule PeertubeIndex do
       scan_end = get_local_time.()
       case result do
         {:ok, {videos, found_instances}} ->
-          @storage.update_instance!(host, videos)
+          @video_storage.update_instance!(host, videos)
           @status_storage.ok_instance(host, scan_end)
           for instance <- found_instances, do: @status_storage.discovered_instance(instance, scan_end)
         {:error, reason} ->

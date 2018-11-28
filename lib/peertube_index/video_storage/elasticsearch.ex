@@ -81,10 +81,7 @@ defmodule PeertubeIndex.VideoStorage.Elasticsearch do
   def with_videos(videos) do
     empty()
     videos
-    |> Enum.map(fn video -> Elasticsearch.post!(@elasticsearch_config, "/#{@index}/#{@document_type}", video) end)
-    |> Enum.to_list()
-
-    :ok
+    |> Enum.each(fn video -> Elasticsearch.post!(@elasticsearch_config, "/#{@index}/#{@document_type}", video) end)
   end
 
   @impl true
