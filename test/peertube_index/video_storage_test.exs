@@ -5,10 +5,10 @@ defmodule PeertubeIndex.VideoStorageTest do
 
 
   test "we can search videos" do
-    video = %{"name" => "A dummy video"}
-    PeertubeIndex.VideoStorage.Elasticsearch._with_videos([video])
+    videos = [%{"name" => "A cat video"}, %{"name" => "A video about a cat"}]
+    PeertubeIndex.VideoStorage.Elasticsearch._with_videos(videos)
     Process.sleep 1_000
-    assert PeertubeIndex.VideoStorage.Elasticsearch.search("dummy") == [video]
+    assert PeertubeIndex.VideoStorage.Elasticsearch.search("cat") == videos
   end
 
   test "update_instance adds videos and we can search them" do

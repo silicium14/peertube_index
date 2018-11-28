@@ -15,7 +15,7 @@ defmodule PeertubeIndex.StatusStorage do
   @doc """
   Returns the list of all statuses
   """
-  @callback all() :: [String.t]
+  @callback all() :: [tuple()]
 
   @doc """
   Notify a successful instance scan at the given datetime

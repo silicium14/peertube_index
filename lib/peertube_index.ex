@@ -8,7 +8,7 @@ defmodule PeertubeIndex do
   @status_storage Application.fetch_env!(:peertube_index, :status_storage)
 
 #  TODO
-#  - Better project structure
+#  - Add test setup methods to VideoStorage behaviour
 #  - Scan multiple instances concurrently
 #  - Scan works with http and detects https or http
 #  - Add task to seed status storage with known instance hosts
@@ -18,11 +18,13 @@ defmodule PeertubeIndex do
 #  - Use document type from Elasticsearch library?
 #  - Remember that in the domain we directly use the objects returned by the storage without any conversion, we are coupled to the storage format for now
 
+  @spec search(String.t) :: [map]
   def search(name) do
     @storage.search(name)
   end
 
-  def scan(hostnames, get_local_time \\ &:calendar.local_time/0) do
+  @spec scan([String.t], (-> NaiveDateTime.t)) :: :ok
+  def scan(hostnames, get_local_time \\ &get_current_time_naivedatetime/0) do
     for host <- hostnames do
       result = @instance_api.scan(host)
       scan_end = get_local_time.()
@@ -35,10 +37,20 @@ defmodule PeertubeIndex do
           @status_storage.failed_instance(host, reason, scan_end)
       end
     end
+
+    :ok
   end
 
-  def rescan(get_local_time \\ &:calendar.local_time/0, scan_function \\ &scan/1) do
+  @spec rescan((-> NaiveDateTime.t), ([String.t] -> :ok)) :: :ok
+  def rescan(get_local_time \\ &get_current_time_naivedatetime/0, scan_function \\ &scan/1) do
     @status_storage.instances_to_rescan(get_local_time.())
     |> scan_function.()
+  end
+
+  @spec get_current_time_naivedatetime() :: NaiveDateTime.t
+  defp get_current_time_naivedatetime() do
+    {{year, month, day}, {hour, minute, second}} = :calendar.local_time()
+    {:ok, current_time} = NaiveDateTime.new(year, month, day, hour, minute, second)
+    current_time
   end
 end
