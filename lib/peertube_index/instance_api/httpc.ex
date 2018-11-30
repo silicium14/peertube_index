@@ -58,7 +58,7 @@ defmodule PeertubeIndex.InstanceAPI.Httpc do
              {_http_version, status_code, _reason_phrase}, _headers, body
          }} <- :httpc.request(:get, {String.to_charlist(url), []}, [], body_format: :binary) do
       if status_code >= 400 do
-        {:error, :bad_request}
+        {:error, :http_error}
       else
         {:ok, body}
       end
@@ -66,6 +66,7 @@ defmodule PeertubeIndex.InstanceAPI.Httpc do
   end
 
   defp get_json(url) do
+    Logger.debug "Getting #{url}"
     with {:ok, body} <- request_without_error(url),
          {:ok, parsed} <- Poison.decode(body),
          {:ok, validated} <- validate_page_data(parsed) do

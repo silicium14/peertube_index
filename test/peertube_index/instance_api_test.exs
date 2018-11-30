@@ -69,7 +69,7 @@ defmodule PeertubeIndex.InstanceAPITest do
       Plug.Conn.resp(conn, 400, "{}")
     end
     result = PeertubeIndex.InstanceAPI.Httpc.scan("localhost:#{bypass.port}", 100, false)
-    assert result == {:error, :bad_request}
+    assert result == {:error, :http_error}
   end
 
   test "JSON parse error", %{bypass: bypass} do
