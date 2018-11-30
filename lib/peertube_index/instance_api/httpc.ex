@@ -1,6 +1,7 @@
 defmodule PeertubeIndex.InstanceAPI.Httpc do
   @moduledoc false
 
+  require Logger
   @behaviour PeertubeIndex.InstanceAPI
 
   @impl true
@@ -31,6 +32,7 @@ defmodule PeertubeIndex.InstanceAPI.Httpc do
     }
     with {:ok, first_page_data} <- get_json(url_with_params(paginated_resource_url, common_params)) do
       number_of_pages = (first_page_data["total"] / page_size) |> Float.ceil() |> trunc()
+      Logger.debug fn -> "Getting #{paginated_resource_url} that has #{first_page_data["total"]} items, using #{number_of_pages} pages" end
       if number_of_pages > 1 do
         urls = for page_number <- 2..number_of_pages do
           url_with_params(
@@ -66,7 +68,7 @@ defmodule PeertubeIndex.InstanceAPI.Httpc do
   end
 
   defp get_json(url) do
-    Logger.debug "Getting #{url}"
+    Logger.debug fn -> "Getting #{url}" end
     with {:ok, body} <- request_without_error(url),
          {:ok, parsed} <- Poison.decode(body),
          {:ok, validated} <- validate_page_data(parsed) do

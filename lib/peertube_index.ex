@@ -3,21 +3,12 @@ defmodule PeertubeIndex do
   PeerTube Index use cases
   """
 
+  require Logger
+
   @video_storage Application.fetch_env!(:peertube_index, :video_storage)
   @instance_api Application.fetch_env!(:peertube_index, :instance_api)
   @status_storage Application.fetch_env!(:peertube_index, :status_storage)
 
-#  TODO
-#  - Add an end to end test
-#  - Scan multiple instances concurrently
-#  - Scan works with http and detects https or http
-#  - Add task to seed status storage with known instance hosts
-#  - We can see instances' status
-#  - Search frontend
-#  - Isolate and handle failures of the steps in scan function
-#  - Refine search behaviour
-#  - Use document type from Elasticsearch library?
-#  - Remember that in the domain we directly use the objects returned by the storage without any conversion, we are coupled to the storage format for now
 
   @spec search(String.t) :: [map]
   def search(name) do
@@ -27,10 +18,12 @@ defmodule PeertubeIndex do
   @spec scan([String.t], (-> NaiveDateTime.t)) :: :ok
   def scan(hostnames, get_local_time \\ &get_current_time_naivedatetime/0) do
     for host <- hostnames do
+      Logger.info "Scanning instance #{host}"
       result = @instance_api.scan(host)
       scan_end = get_local_time.()
       case result do
         {:ok, {videos, found_instances}} ->
+          Logger.info "Scan successful for #{host} with #{length(videos)} videos and #{MapSet.size(found_instances)} instances"
           @video_storage.update_instance!(host, videos)
           @status_storage.ok_instance(host, scan_end)
           for instance <- found_instances, do: @status_storage.discovered_instance(instance, scan_end)
