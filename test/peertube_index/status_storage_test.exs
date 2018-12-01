@@ -35,27 +35,52 @@ defmodule PeertubeIndex.StatusStorageTest do
            ])
   end
 
-  test "instances to rescan are the discovered instances and failed or ok instances with a status older than a day" do
+  test "find_instances with status" do
+    :ok = PeertubeIndex.StatusStorage.Filesystem.with_statuses([
+      {"discovered1.example.com", :discovered, ~N[2018-03-11 20:10:31]},
+      {"discovered2.example.com", :discovered, ~N[2018-03-12 21:10:31]},
+      {"ok1.example.com", :ok, ~N[2018-03-11 20:10:31]},
+      {"ok2.example.com", :ok, ~N[2018-03-12 21:10:31]},
+      {"failed1.example.com", {:error, :some_reason}, ~N[2018-03-11 20:10:31]},
+      {"failed2.example.com", {:error, :some_reason}, ~N[2018-03-12 21:10:31]}
+    ])
+
+    instances = PeertubeIndex.StatusStorage.Filesystem.find_instances(:ok)
+    assert MapSet.new(instances) == MapSet.new(["ok1.example.com", "ok2.example.com"])
+
+    instances = PeertubeIndex.StatusStorage.Filesystem.find_instances(:discovered)
+    assert MapSet.new(instances) == MapSet.new(["discovered1.example.com", "discovered2.example.com"])
+
+    instances = PeertubeIndex.StatusStorage.Filesystem.find_instances(:error)
+    assert MapSet.new(instances) == MapSet.new(["failed1.example.com", "failed2.example.com"])
+  end
+
+  test "find_instances with status and maximum date" do
     year = 2018
     month = 3
     day = 10
     hour = 12
     minute = 30
     second = 30
-
-    {:ok, very_recent} = NaiveDateTime.new(year, month, day, hour, minute, second - 1)
-    {:ok, just_more_that_a_day_ago} = NaiveDateTime.new(year, month, day - 1, hour, minute, second - 1)
+    {:ok, maximum_date} = NaiveDateTime.new(year, month, day, hour, minute, second)
+    {:ok, old_enough} = NaiveDateTime.new(year, month, day , hour, minute, second - 1)
     PeertubeIndex.StatusStorage.Filesystem.with_statuses([
-      {"ok-too-recent.example.com", :ok, very_recent},
-      {"ok-old-enough.example.com", :ok, just_more_that_a_day_ago},
-      {"failed-too-recent.example.com", {:error, :some_reason}, very_recent},
-      {"failed-old-enough.example.com", {:error, :some_reason}, just_more_that_a_day_ago},
-      {"discovered.example.com", :discovered, very_recent},
+      {"ok-too-recent.example.com", :ok, maximum_date},
+      {"ok-old-enough.example.com", :ok, old_enough},
+      {"failed-too-recent.example.com", {:error, :some_reason}, maximum_date},
+      {"failed-old-enough.example.com", {:error, :some_reason}, old_enough},
+      {"discovered-too-recent.example.com", :discovered, maximum_date},
+      {"discovered-old-enough.example.com", :discovered, old_enough},
     ])
 
-    {:ok, current_time} = NaiveDateTime.new(year, month, day, hour, minute, second)
-    instances_to_rescan = PeertubeIndex.StatusStorage.Filesystem.instances_to_rescan(current_time)
-    assert MapSet.new(instances_to_rescan) == MapSet.new(["ok-old-enough.example.com", "failed-old-enough.example.com", "discovered.example.com"])
+    instances = PeertubeIndex.StatusStorage.Filesystem.find_instances(:discovered, maximum_date)
+    assert MapSet.new(instances) == MapSet.new(["discovered-old-enough.example.com"])
+
+    instances = PeertubeIndex.StatusStorage.Filesystem.find_instances(:ok, maximum_date)
+    assert MapSet.new(instances) == MapSet.new(["ok-old-enough.example.com"])
+
+    instances = PeertubeIndex.StatusStorage.Filesystem.find_instances(:error, maximum_date)
+    assert MapSet.new(instances) == MapSet.new(["failed-old-enough.example.com"])
   end
 
   test "failed_instance overrides existing status" do

@@ -37,14 +37,19 @@ defmodule PeertubeIndex do
 
   @spec rescan((-> NaiveDateTime.t), ([String.t] -> :ok)) :: :ok
   def rescan(get_local_time \\ &get_current_time_naivedatetime/0, scan_function \\ &scan/1) do
-    @status_storage.instances_to_rescan(get_local_time.())
-    |> scan_function.()
+    one_day_in_seconds = 24 * 60 * 60
+    maximum_date = NaiveDateTime.add(get_local_time.(), - one_day_in_seconds)
+
+    instances_to_rescan =
+    @status_storage.find_instances(:discovered)
+    ++ @status_storage.find_instances(:ok, maximum_date)
+    ++ @status_storage.find_instances(:error, maximum_date)
+
+    scan_function.(instances_to_rescan)
   end
 
   @spec get_current_time_naivedatetime() :: NaiveDateTime.t
   defp get_current_time_naivedatetime() do
-    {{year, month, day}, {hour, minute, second}} = :calendar.local_time()
-    {:ok, current_time} = NaiveDateTime.new(year, month, day, hour, minute, second)
-    current_time
+    :calendar.local_time() |> NaiveDateTime.from_erl!()
   end
 end

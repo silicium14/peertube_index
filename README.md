@@ -14,8 +14,6 @@ docker run -d --name peertube-index-elasticsearch -p 9200:9200 -p 9300:9300 -e "
 docker run -d --name peertube-index-elasticsearch-test -p 5555:9200 -e "discovery.type=single-node" elasticsearch:6.4.2
 
 ##  TODO
-- Move instances to scan rule to domain layer
-- Log
 - Add an end to end test
 - Scan multiple instances concurrently
 - Scan works with http and detects https or http

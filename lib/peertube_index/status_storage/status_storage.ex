@@ -18,6 +18,17 @@ defmodule PeertubeIndex.StatusStorage do
   @callback all() :: [tuple()]
 
   @doc """
+  Find instances that have the given status and with a status updated before the given date
+  """
+  @callback find_instances(:ok | :error | :discovered, NaiveDateTime.t) :: [String.t]
+
+  @doc """
+  Find instances that have the given status
+  """
+  @callback find_instances(:ok | :error | :discovered) :: [String.t]
+
+
+  @doc """
   Notify a successful instance scan at the given datetime
   """
   @callback ok_instance(String.t, NaiveDateTime.t) :: :ok
@@ -32,10 +43,4 @@ defmodule PeertubeIndex.StatusStorage do
   This will not override any previously existing status for the same instance.
   """
   @callback discovered_instance(String.t, NaiveDateTime.t) :: :ok
-
-  @doc """
-  Returns the instances with discovered status and the ok or failed instances with a status older than a day relative to the given date
-  """
-  @callback instances_to_rescan(NaiveDateTime.t) :: list(String.t)
-
 end

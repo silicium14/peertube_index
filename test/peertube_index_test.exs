@@ -80,14 +80,22 @@ defmodule PeertubeIndexTest do
     Mox.verify!()
   end
 
-  test "rescan scans instances to rescan" do
-    {:ok, current_time} = NaiveDateTime.new(2018, 1, 1, 14, 15, 16)
-    instances_to_rescan = ["some-instance.example.com", "another-instance.example.com"]
-    Mox.expect(PeertubeIndex.StatusStorage.Mock, :instances_to_rescan, fn ^current_time -> instances_to_rescan end)
+  test "rescan" do
+    {:ok, current_time} = NaiveDateTime.new(2018, 2, 2, 14, 15, 16)
+    {:ok, maximum_date} = NaiveDateTime.new(2018, 2, 1, 14, 15, 16)
 
-    PeertubeIndex.rescan(fn -> current_time end, fn instances -> send self(), {:scan_function_called, [instances]} end)
+    discovered_instances = ["discovered1.example.com", "discovered2.example.com"]
+    ok_and_old_enough_instances = ["ok1.example.com", "ok2.example.com"]
+    failed_and_old_enough_instances = ["failed1.example.com", "failed2.example.com"]
+
+    Mox.expect(PeertubeIndex.StatusStorage.Mock, :find_instances, fn :discovered -> discovered_instances end)
+    Mox.expect(PeertubeIndex.StatusStorage.Mock, :find_instances, fn :ok, ^maximum_date -> ok_and_old_enough_instances end)
+    Mox.expect(PeertubeIndex.StatusStorage.Mock, :find_instances, fn :error, ^maximum_date -> failed_and_old_enough_instances end)
+
+    PeertubeIndex.rescan(fn -> current_time end, fn instances -> send self(), {:scan_function_called, instances} end)
+    insances_to_rescan = discovered_instances ++ ok_and_old_enough_instances ++ failed_and_old_enough_instances
 
     Mox.verify!()
-    assert_received {:scan_function_called, [instances_to_rescan]}
+    assert_received {:scan_function_called, ^insances_to_rescan}
   end
 end
