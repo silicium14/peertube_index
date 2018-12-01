@@ -9,4 +9,8 @@ defmodule PeertubeIndex.WebFrontend do
   get "/ping" do
     send_resp(conn, 200, "pong")
   end
+
+  match _ do
+    send_resp(conn, 404, "Not found")
+  end
 end
