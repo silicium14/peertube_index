@@ -11,11 +11,13 @@ defmodule PeertubeIndex.InstanceAPITest do
   # TODO: ignore changes in demo instance for tests OR use our own test instance
 
   test "scan gives the same videos" do
-    # Fetch videos from demo PeerTube instance that we use as reference
+    # Fetch videos from demo PeerTube instance that we use as reference and compare the result to the saved results
+    # The saved results have to be manually reviewed before commit
+    expected = File.read!("test/peertube_index/instance_api_test_data/videos.json") |> Poison.decode!
+
     # Videos are sorted by creation date
     # Videos are local to the instance
     # videos are fetched across multiple pages
-    expected = File.read!("test/peertube_index/instance_api_test_data/videos.json") |> Poison.decode!
     {:ok, {videos, _instances}} = PeertubeIndex.InstanceAPI.Httpc.scan("peertube.cpy.re", 5)
     assert videos == expected
   end
@@ -31,9 +33,10 @@ defmodule PeertubeIndex.InstanceAPITest do
   end
 
   test "scan gives the same instances" do
+    # Discover instances from demo PeerTube instance that we use as reference and compare the result to the saved results
+    # The saved results have to be manually reviewed before commit
     expected = File.read!("test/peertube_index/instance_api_test_data/instances.json") |> Poison.decode! |> MapSet.new
 
-    # Discover instances from demo PeerTube instance that we use as reference
     # Found instance set must not contain the scanned instance
     {:ok, {_videos, instances}} = PeertubeIndex.InstanceAPI.Httpc.scan("peertube.cpy.re")
 

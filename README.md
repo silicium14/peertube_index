@@ -17,7 +17,7 @@ docker run -d --name peertube-index-elasticsearch-test -p 5555:9200 -e "discover
 - Add an end to end test
 - Scan multiple instances concurrently
 - Scan works with http and detects https or http
-- Add task to seed status storage with known instance hosts
+- Seed status storage with known instance hosts list
 - Search frontend
 - Search pagination
 - Search filter NSFW
