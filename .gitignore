@@ -23,5 +23,5 @@ erl_crash.dump
 peertube_index-*.tar
 
 .idea/
-database/
-failed/
+status_storage_test/
+status_storage_dev/
