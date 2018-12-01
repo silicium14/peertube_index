@@ -1,10 +1,5 @@
 defmodule ToClean do
-
-  use Application
-
-  def start(_type, _args) do
-    PeertubeIndex.Supervisor.start_link(name: PeertubeIndex.Supervisor)
-  end
+  @moduledoc false
 
   def log_failures({_hostname, :ok, _data}) do
   end
@@ -55,7 +50,7 @@ defmodule ToClean do
     |> log_progress(total)
     |> Stream.each(&log_failures/1)
     |> Stream.filter(fn {_hostname, status, _data} -> status == :ok end)
-    |> Stream.each(fn {hostname, _status, {_instances, videos}} -> PeertubeIndex.Storage.Elasticsearch.update_instance!(hostname, videos) end)
+    |> Stream.each(fn {hostname, _status, {_instances, videos}} -> update_one_instance!(hostname, videos) end)
     |> Enum.to_list()
   end
 
@@ -63,6 +58,9 @@ defmodule ToClean do
     {:ok, file} = :file.open("inspect.exs", [:raw, :write])
     :file.write(file, inspect(term, pretty: true))
     :file.close(file)
+  end
+
+  def update_one_instance!(_hostnames, _videos) do
   end
 
 end

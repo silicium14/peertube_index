@@ -18,8 +18,7 @@ defmodule PeertubeIndex.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger],
-#      mod: {PeertubeIndex, []}
+      mod: {PeertubeIndex.Application, []}
     ]
   end
 
@@ -28,10 +27,11 @@ defmodule PeertubeIndex.MixProject do
     [
       {:elasticsearch, "~> 0.6.0"},
       {:poison, "~> 4.0"},
+      {:plug, "~> 1.7"},
+      {:plug_cowboy, "~> 2.0"},
       {:credo, "~> 1.0", only: :dev, runtime: false},
       {:dialyxir, "~> 1.0.0-rc.4", only: [:dev], runtime: false},
-      {:bypass, "~> 0.9.0", only: :test},
-      {:plug_cowboy, "~> 1.0", only: :test},
+      {:bypass, "~> 1.0.0", only: :test},
       {:mox, "~> 0.4.0", only: :test},
       {:remix, "~> 0.0.2", only: :dev}
     ]

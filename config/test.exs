@@ -7,4 +7,5 @@ config :peertube_index,
   instance_api: PeertubeIndex.InstanceAPI.Mock,
   status_storage: PeertubeIndex.StatusStorage.Mock,
   # For integration tests
-  status_storage_directory: "status_storage_test"
+  status_storage_directory: "status_storage_test",
+  web_frontend_port: 4001

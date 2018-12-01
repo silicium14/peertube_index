@@ -1,5 +1,5 @@
 defmodule PeertubeIndex.VideoStorageTest do
-  use ExUnit.Case
+  use ExUnit.Case, async: true
 
   @moduletag :integration
 

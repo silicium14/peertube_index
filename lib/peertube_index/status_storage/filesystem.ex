@@ -62,19 +62,13 @@ defmodule PeertubeIndex.StatusStorage.Filesystem do
 
   defp matches_status?({_host, instance_status, _date}, wanted_status) do
     case instance_status do
-      {^wanted_status, reason} ->
+      {^wanted_status, _reason} ->
         true
       ^wanted_status ->
         true
       _ ->
         false
     end
-  end
-
-  defp get_current_time_naivedatetime() do
-    {{year, month, day}, {hour, minute, second}} = :calendar.local_time()
-    {:ok, current_time} = NaiveDateTime.new(year, month, day, hour, minute, second)
-    current_time
   end
 
   @impl true
