@@ -1,8 +1,7 @@
 defmodule PeertubeIndex.InstanceAPI.Httpc do
   @moduledoc false
-
-  require Logger
   @behaviour PeertubeIndex.InstanceAPI
+  require Logger
 
   @impl true
   def scan(host, page_size \\ 100, use_tls \\ true) do
@@ -11,17 +10,19 @@ defmodule PeertubeIndex.InstanceAPI.Httpc do
          {:ok, followers} = get_all(scheme <> host <> "/api/v1/server/followers", page_size),
          {:ok, following} = get_all(scheme <> host <> "/api/v1/server/following", page_size) do
 
-      instances =
-        MapSet.new(
-          Enum.map(videos, fn video -> video["account"]["host"] end) ++
-          Enum.map(followers, fn item -> item["follower"]["host"] end) ++
-          Enum.map(following, fn item -> item["following"]["host"] end)
-        )
-        |> MapSet.delete(host)
-
       videos = Enum.filter(videos, fn video -> video["isLocal"] end)
 
-      {:ok, {videos, instances}}
+      instances_from_videos = Enum.map(videos, fn video -> video["account"]["host"] end)
+      instances_from_followers = Enum.map(followers, fn item -> item["follower"]["host"] end)
+      instances_from_following = Enum.map(following, fn item -> item["following"]["host"] end)
+      all_instances = instances_from_videos ++ instances_from_followers ++ instances_from_following
+
+      unique_instances =
+        all_instances
+        |> MapSet.new()
+        |> MapSet.delete(host)
+
+      {:ok, {videos, unique_instances}}
     end
   end
 

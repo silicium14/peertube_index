@@ -45,7 +45,8 @@ defmodule ToClean do
         max_concurrency: System.schedulers_online() * 8
       )
 
-    Stream.zip(instances, task_stream)
+    instances
+    |> Stream.zip(task_stream)
     |> Stream.map(fn {hostname, {status, data}} -> {hostname, status, data} end)
     |> log_progress(total)
     |> Stream.each(&log_failures/1)
