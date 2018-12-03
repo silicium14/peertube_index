@@ -1,0 +1,24 @@
+<html>
+<body>
+<header>
+    <h1>
+    PeerTube Index
+    </h1>
+</header>
+<main>
+    <form action="search">
+        <input type="text" name="text" required>
+        <button type="submit">Search</button>
+    </form>
+</main>
+
+<%= for video <- videos do %>
+    <article>
+        <a href="https://<%= video["account"]["host"] %>/videos/watch/<%= video["uuid"] %>"><h3><%= video["name"] %></h3></a>
+        <img src="https://<%= video["account"]["host"] %><%= video["thumbnailPath"] %>">
+        <pre><%= Poison.encode!(video, pretty: true) %></pre>
+    </article>
+<% end %>
+
+</body>
+</html>

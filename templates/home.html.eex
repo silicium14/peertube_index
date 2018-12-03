@@ -1,0 +1,15 @@
+<html>
+<body>
+<header>
+    <h1>
+    PeerTube Index
+    </h1>
+</header>
+<main>
+    <form action="search">
+        <input type="text" name="text" required>
+        <button type="submit">Search</button>
+    </form>
+</main>
+</body>
+</html>
