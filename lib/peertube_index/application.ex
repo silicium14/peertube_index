@@ -7,10 +7,10 @@ defmodule PeertubeIndex.Application do
 
   def start(_type, _args) do
     children = [
-      Plug.Cowboy.child_spec(scheme: :http, plug: PeertubeIndex.WebFrontend, options: [port: @port])
+      Plug.Cowboy.child_spec(scheme: :http, plug: PeertubeIndex.HttpApi, options: [port: @port])
     ]
 
-    opts = [strategy: :one_for_one, name: PeertubeIndex.WebFrontendSupervisor]
+    opts = [strategy: :one_for_one, name: PeertubeIndex.HttpApiSupervisor]
     Supervisor.start_link(children, opts)
   end
 end
