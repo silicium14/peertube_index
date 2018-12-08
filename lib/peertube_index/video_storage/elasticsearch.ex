@@ -27,7 +27,18 @@ defmodule PeertubeIndex.VideoStorage.Elasticsearch do
     %{"hits" => %{"hits" => hits}} = Elasticsearch.post!(
       @elasticsearch_config,
       "/#{@index}/_search",
-      %{"query" => %{"match" => %{"name" => name}}}
+      %{
+        "query" => %{
+          "bool" => %{
+            "must" => [
+              %{"match" => %{"name" => name}}
+            ],
+            "filter" => [
+              %{"term" => %{"nsfw": false}}
+            ]
+          }
+        }
+      }
     )
 
     hits
