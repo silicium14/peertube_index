@@ -9,11 +9,12 @@ To run storage tests you need an ElasticSearch instance running.
 Use config/test.exs configure the instance to use for the tests.
 
 ## Infrastructure
-To run Elasticsearch in docker 
+To run Elasticsearch in docker
 docker run -d --name peertube-index-elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:6.4.2
 docker run -d --name peertube-index-elasticsearch-test -p 5555:9200 -e "discovery.type=single-node" elasticsearch:6.4.2
 
-##  TODO
+## TODO
+- HTTP API: pagination: add number of pages to response, search use case pagination
 - Search pagination
 - Error and not found pages
 - Add an end to end test
