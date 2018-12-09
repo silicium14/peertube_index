@@ -28,13 +28,14 @@ defmodule PeertubeIndex.VideoStorage.Elasticsearch do
       @elasticsearch_config,
       "/#{@index}/_search",
       %{
+        "from" => "0", "size" => 100,
         "query" => %{
           "bool" => %{
             "must" => [
               %{"match" => %{"name" => name}}
             ],
             "filter" => [
-              %{"term" => %{"nsfw": false}}
+              %{"term" => %{"nsfw" => false}}
             ]
           }
         }

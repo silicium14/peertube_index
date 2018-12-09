@@ -19,6 +19,16 @@ defmodule PeertubeIndex.VideoStorageTest do
     assert PeertubeIndex.VideoStorage.Elasticsearch.search("video") == [safe_video]
   end
 
+  test "search gives the first 100 results" do
+    videos =
+    for index <- 1..110 do
+      %{"name" => "A cat video", "nsfw" => false, "uuid" => "#{index}"}
+    end
+    PeertubeIndex.VideoStorage.Elasticsearch.with_videos(videos)
+    Process.sleep 1_000
+    assert length(PeertubeIndex.VideoStorage.Elasticsearch.search("video")) == 100
+  end
+
   test "update_instance! adds videos and we can search them" do
     # Given I have an empty index
     PeertubeIndex.VideoStorage.Elasticsearch.empty()
