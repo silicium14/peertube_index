@@ -25,6 +25,7 @@ defmodule PeertubeIndex.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
+      {:confex, "~> 3.3"},
       {:elasticsearch, "~> 0.6.0"},
       {:poison, "~> 4.0"},
       {:plug, "~> 1.7"},

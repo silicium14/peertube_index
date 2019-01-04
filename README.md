@@ -3,27 +3,45 @@
 ## Decisions
 We should not put too much pressure on instances by querying them heavily so we scan one instance sequentially.
 
-## Tests
+## How to run the project
+### Development
+- To run Elasticsearch in docker
+```bash
+docker run -d --name peertube-index-elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:6.5.4
+# For tests
+docker run -d --name peertube-index-elasticsearch-test -p 5555:9200 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:6.5.4
+```
 
-To run storage tests you need an ElasticSearch instance running.
-Use config/test.exs configure the instance to use for the tests.
+- To start iex
+This project relies on environment variables for configuration, see the `config.exs` file for the environment variables you need to set
+```bash
+HTTP_API_PORT=4000 ELASTICSEARCH_URL="http://localhost:9200" STATUS_STORAGE_DIRECTORY="status_storage_dev" iex -S mix
+```
 
-## Infrastructure
-To run Elasticsearch in docker
-docker run -d --name peertube-index-elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" elasticsearch:6.4.2
-docker run -d --name peertube-index-elasticsearch-test -p 5555:9200 -e "discovery.type=single-node" elasticsearch:6.4.2
+- To run tests
+```bash
+HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRECTORY="status_storage_test" mix test
+```
 
 ## TODO
+- Scan timeout
+- Fuzzy search
+- Auto rescan periodically
+- Stats endpoint?
+- Deployment
+    - Build with tests
+    - Separate ElasticSearch
+    - Separate status storage?
+    - HTTPS
+- Log incoming requests
+- Monitoring
 - HTTP API: pagination: add number of pages to response, search use case pagination
-- Search pagination
 - Error and not found pages
 - Add an end to end test
 - Scan multiple instances concurrently
 - Scan works with http and detects https or http
 - Seed status storage with known instance hosts list
 - Search frontend
-- Search pagination
-- Search filter NSFW
 - Status frontend
 - Isolate and handle failures of the steps in scan function
 - Refine search behaviour

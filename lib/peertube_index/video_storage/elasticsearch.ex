@@ -3,20 +3,20 @@ defmodule PeertubeIndex.VideoStorage.Elasticsearch do
 
   @behaviour PeertubeIndex.VideoStorage
 
-  @elasticsearch_config Application.fetch_env!(:peertube_index, :elasticsearch_config)
   @index "videos"
   @document_type "_doc"
+  def elasticsearch_config(), do: Confex.fetch_env!(:peertube_index, :elasticsearch_config)
 
   @impl true
   def update_instance!(hostname, videos) do
     Elasticsearch.post!(
-      @elasticsearch_config,
+      elasticsearch_config(),
       "/#{@index}/_delete_by_query",
       %{"query" => %{"term" => %{"account.host" => hostname}}}
     )
 
     for video <- videos do
-      Elasticsearch.post!(@elasticsearch_config, "/#{@index}/#{@document_type}", video)
+      Elasticsearch.post!(elasticsearch_config(), "/#{@index}/#{@document_type}", video)
     end
 
     :ok
@@ -25,7 +25,7 @@ defmodule PeertubeIndex.VideoStorage.Elasticsearch do
   @impl true
   def search(name) do
     %{"hits" => %{"hits" => hits}} = Elasticsearch.post!(
-      @elasticsearch_config,
+      elasticsearch_config(),
       "/#{@index}/_search",
       %{
         "from" => "0", "size" => 100,
@@ -49,7 +49,7 @@ defmodule PeertubeIndex.VideoStorage.Elasticsearch do
 
   defp create_index() do
     Elasticsearch.Index.create(
-      @elasticsearch_config,
+      elasticsearch_config(),
       @index,
       %{
         "mappings"=> %{
@@ -93,7 +93,7 @@ defmodule PeertubeIndex.VideoStorage.Elasticsearch do
   def with_videos(videos) do
     empty()
     videos
-    |> Enum.each(fn video -> Elasticsearch.post!(@elasticsearch_config, "/#{@index}/#{@document_type}", video) end)
+    |> Enum.each(fn video -> Elasticsearch.post!(elasticsearch_config(), "/#{@index}/#{@document_type}", video) end)
   end
 
   @impl true
@@ -103,7 +103,7 @@ defmodule PeertubeIndex.VideoStorage.Elasticsearch do
   end
 
   defp _delete_index_ignore_not_exising!() do
-    result = Elasticsearch.delete(@elasticsearch_config, "/#{@index}")
+    result = Elasticsearch.delete(elasticsearch_config(), "/#{@index}")
     case result do
       {:ok, _} ->
         :ok

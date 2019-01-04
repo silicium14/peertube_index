@@ -2,12 +2,12 @@ defmodule PeertubeIndex.StatusStorage.Filesystem do
   @moduledoc false
 
   @behaviour PeertubeIndex.StatusStorage
-  @directory Application.fetch_env!(:peertube_index, :status_storage_directory)
+  def directory(), do: Confex.fetch_env!(:peertube_index, :status_storage_directory)
 
   @impl true
   def empty() do
-    File.rm_rf(@directory)
-    File.mkdir!(@directory)
+    File.rm_rf(directory())
+    File.mkdir!(directory())
   end
 
   @impl true
@@ -29,8 +29,8 @@ defmodule PeertubeIndex.StatusStorage.Filesystem do
 
   @impl true
   def all() do
-    for file <- File.ls!(@directory) do
-      {:ok, bytes} = :file.read_file("#{@directory}/#{file}")
+    for file <- File.ls!(directory()) do
+      {:ok, bytes} = :file.read_file("#{directory()}/#{file}")
       status_map = Poison.decode!(bytes)
       case status_map do
         %{"host" => host, "status" => "discovered", "date" => date_string} ->
@@ -102,6 +102,6 @@ defmodule PeertubeIndex.StatusStorage.Filesystem do
   end
 
   defp host_file(host) do
-    "#{@directory}/#{host}.json"
+    "#{directory()}/#{host}.json"
   end
 end

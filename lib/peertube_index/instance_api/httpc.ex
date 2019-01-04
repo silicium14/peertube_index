@@ -32,6 +32,7 @@ defmodule PeertubeIndex.InstanceAPI.Httpc do
       "sort" => "createdAt"
     }
     with {:ok, first_page_data} <- get_json(url_with_params(paginated_resource_url, common_params)) do
+      # credo:disable-for-next-line Credo.Check.Refactor.PipeChainStart
       number_of_pages = (first_page_data["total"] / page_size) |> Float.ceil() |> trunc()
       Logger.debug fn -> "Getting #{paginated_resource_url} that has #{first_page_data["total"]} items, using #{number_of_pages} pages" end
       if number_of_pages > 1 do
