@@ -24,9 +24,8 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 ```
 
 ## TODO
-- Detect and handle HTTP and HTTPS instances
 - Scan timeout
-- Fuzzy search
+- Detect and handle HTTP and HTTPS instances
 - Auto rescan periodically
 - Stats endpoint?
 - Deployment
