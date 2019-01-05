@@ -11,6 +11,13 @@ defmodule PeertubeIndex.VideoStorageTest do
     assert MapSet.new(PeertubeIndex.VideoStorage.Elasticsearch.search("cat")) == MapSet.new(videos)
   end
 
+  test "search is fuzzy" do
+    videos = [%{"name" => "Cats best moments", "nsfw" => false}]
+    PeertubeIndex.VideoStorage.Elasticsearch.with_videos(videos)
+    Process.sleep 1_000
+    assert MapSet.new(PeertubeIndex.VideoStorage.Elasticsearch.search("cat best momt")) == MapSet.new(videos)
+  end
+
   test "search excludes NSFW videos by default" do
     safe_video = %{"name" => "A video", "nsfw" => false}
     videos = [safe_video, %{"name" => "Another video", "nsfw" => true}]
@@ -44,8 +51,8 @@ defmodule PeertubeIndex.VideoStorageTest do
 
   test "update_instance! deletes existing instance videos" do
     # Given We have videos from two instances
-    other_instance_video = %{"name" => "Other instance video", "account" => %{"host" => "other.example.com"}, "nsfw" => false}
     video = %{"name" => "A dummy video", "account" => %{"host" => "example.com"}, "nsfw" => false}
+    other_instance_video = %{"name" => "Other instance video", "account" => %{"host" => "other.example.com"}, "nsfw" => false}
     PeertubeIndex.VideoStorage.Elasticsearch.with_videos([video, other_instance_video])
     Process.sleep 1_000
     # When I update instance with no videos

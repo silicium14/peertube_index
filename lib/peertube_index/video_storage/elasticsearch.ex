@@ -23,7 +23,7 @@ defmodule PeertubeIndex.VideoStorage.Elasticsearch do
   end
 
   @impl true
-  def search(name) do
+  def search(query) do
     %{"hits" => %{"hits" => hits}} = Elasticsearch.post!(
       elasticsearch_config(),
       "/#{@index}/_search",
@@ -32,7 +32,14 @@ defmodule PeertubeIndex.VideoStorage.Elasticsearch do
         "query" => %{
           "bool" => %{
             "must" => [
-              %{"match" => %{"name" => name}}
+              %{
+                "match" => %{
+                  "name" => %{
+                    "query" => query,
+                    "fuzziness" => "AUTO"
+                  }
+                }
+              }
             ],
             "filter" => [
               %{"term" => %{"nsfw" => false}}
