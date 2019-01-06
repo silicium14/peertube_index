@@ -3,7 +3,6 @@ defmodule PeertubeIndex.VideoStorageTest do
 
   @moduletag :integration
 
-
   test "we can search videos" do
     videos = [%{"name" => "A cat video", "nsfw" => false}, %{"name" => "A video about a cat", "nsfw" => false}]
     PeertubeIndex.VideoStorage.Elasticsearch.with_videos(videos)

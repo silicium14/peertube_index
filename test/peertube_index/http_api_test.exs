@@ -4,7 +4,6 @@ defmodule PeertubeIndex.HttpApiTest do
 
   @moduletag :integration
 
-
   @opts PeertubeIndex.HttpApi.init([])
 
   test "unknown URL returns not found page" do

@@ -9,7 +9,6 @@ defmodule PeertubeIndex do
   @instance_api Application.fetch_env!(:peertube_index, :instance_api)
   @status_storage Application.fetch_env!(:peertube_index, :status_storage)
 
-
   @spec search(String.t) :: [map]
   def search(name) do
     @video_storage.search(name)
@@ -48,8 +47,8 @@ defmodule PeertubeIndex do
     scan_function.(instances_to_rescan)
   end
 
-  @spec get_current_time_naivedatetime() :: NaiveDateTime.t
-  defp get_current_time_naivedatetime() do
+  @spec get_current_time_naivedatetime :: NaiveDateTime.t
+  defp get_current_time_naivedatetime do
     :calendar.local_time() |> NaiveDateTime.from_erl!()
   end
 end

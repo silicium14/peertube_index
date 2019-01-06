@@ -1,7 +1,6 @@
 defmodule PeertubeIndexTest do
   use ExUnit.Case, async: true
 
-
   test "we can search a videos by their name using storage" do
     # Given there are videos
     a_video = %{"name" => "A video about a cat"}
@@ -45,7 +44,6 @@ defmodule PeertubeIndexTest do
     {:ok, finishes_at} = NaiveDateTime.new(2018, 1, 1, 14, 15, 16)
     Mox.expect(PeertubeIndex.StatusStorage.Mock, :ok_instance, fn "some-instance.example.com", ^finishes_at -> :ok end)
 
-
     PeertubeIndex.scan(["some-instance.example.com"], fn -> finishes_at end)
 
     Mox.verify!()
@@ -63,7 +61,6 @@ defmodule PeertubeIndexTest do
     Mox.expect(PeertubeIndex.StatusStorage.Mock, :ok_instance, fn "some-instance.example.com", ^finishes_at -> :ok end)
     Mox.expect(PeertubeIndex.StatusStorage.Mock, :discovered_instance, fn "another-found-instance.example.com", ^finishes_at -> :ok end)
     Mox.expect(PeertubeIndex.StatusStorage.Mock, :discovered_instance, fn "found-instance.example.com", ^finishes_at -> :ok end)
-
 
     PeertubeIndex.scan(["some-instance.example.com"], fn -> finishes_at end)
 

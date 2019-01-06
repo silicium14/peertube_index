@@ -4,7 +4,6 @@ defmodule PeertubeIndex.WebFrontendTest do
 
   @moduletag :integration
 
-
   @opts PeertubeIndex.WebFrontend.init([])
 
   test "ping works" do

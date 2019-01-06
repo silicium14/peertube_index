@@ -5,7 +5,11 @@ defmodule PeertubeIndex.Application do
 
   def start(_type, _args) do
     children = [
-      Plug.Cowboy.child_spec(scheme: :http, plug: PeertubeIndex.HttpApi, options: [port: Confex.fetch_env!(:peertube_index, :http_api_port)])
+      Plug.Cowboy.child_spec(
+        scheme: :http,
+        plug: PeertubeIndex.HttpApi,
+        options: [port: Confex.fetch_env!(:peertube_index, :http_api_port)]
+      )
     ]
 
     opts = [strategy: :one_for_one, name: PeertubeIndex.HttpApiSupervisor]

@@ -17,7 +17,7 @@ defmodule PeertubeIndex.InstanceApiTest do
     }}
   end
 
-  defp empty_instance() do
+  defp empty_instance do
     %{
       {"GET", "/api/v1/videos"} => {
         :stub, fn conn ->

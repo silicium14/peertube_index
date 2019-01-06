@@ -1,7 +1,6 @@
 defmodule PeertubeIndex.StatusStorage do
   @moduledoc false
 
-
   @doc """
   Create an empty status storage for testing
   """
@@ -26,7 +25,6 @@ defmodule PeertubeIndex.StatusStorage do
   Find instances that have the given status
   """
   @callback find_instances(:ok | :error | :discovered) :: [String.t]
-
 
   @doc """
   Notify a successful instance scan at the given datetime

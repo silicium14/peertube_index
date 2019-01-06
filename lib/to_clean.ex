@@ -25,12 +25,11 @@ defmodule ToClean do
     []
   end
 
-  def scan() do
+  def scan do
     instances =
       get_all("https://instances.joinpeertube.org/api/v1/instances")
       |> Enum.sort_by(fn instance -> instance["totalVideos"] end)
       |> Enum.map(fn instance -> instance["host"] end)
-
 
     total = length(instances)
 

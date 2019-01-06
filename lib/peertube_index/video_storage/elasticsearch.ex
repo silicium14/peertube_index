@@ -5,7 +5,7 @@ defmodule PeertubeIndex.VideoStorage.Elasticsearch do
 
   @index "videos"
   @document_type "_doc"
-  def elasticsearch_config(), do: Confex.fetch_env!(:peertube_index, :elasticsearch_config)
+  def elasticsearch_config, do: Confex.fetch_env!(:peertube_index, :elasticsearch_config)
 
   @impl true
   def update_instance!(hostname, videos) do
@@ -54,7 +54,7 @@ defmodule PeertubeIndex.VideoStorage.Elasticsearch do
     |> Enum.to_list()
   end
 
-  defp create_index() do
+  defp create_index do
     Elasticsearch.Index.create(
       elasticsearch_config(),
       @index,
@@ -104,12 +104,12 @@ defmodule PeertubeIndex.VideoStorage.Elasticsearch do
   end
 
   @impl true
-  def empty() do
+  def empty do
     _delete_index_ignore_not_exising!()
     create_index()
   end
 
-  defp _delete_index_ignore_not_exising!() do
+  defp _delete_index_ignore_not_exising! do
     result = Elasticsearch.delete(elasticsearch_config(), "/#{@index}")
     case result do
       {:ok, _} ->
