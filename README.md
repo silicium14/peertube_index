@@ -24,9 +24,11 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 ```
 
 ## TODO
+- In modules rename API to Api?
 - Scan timeout
 - Detect and handle HTTP and HTTPS instances
 - Auto rescan periodically
+- More automated Instance API non regression tests: use our own instance?
 - Stats endpoint?
 - Deployment
     - Build with tests
