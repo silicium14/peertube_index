@@ -99,6 +99,42 @@ defmodule PeertubeIndex.InstanceAPITest do
     assert status == :error
   end
 
+  test "error on followers", %{bypass: bypass} do
+    Bypass.stub bypass, "GET", "/api/v1/videos", fn conn ->
+      Plug.Conn.resp(conn, 200, ~s<{"total": 0, "data": []}>)
+    end
+
+    Bypass.stub bypass, "GET", "/api/v1/server/followers", fn conn ->
+      Plug.Conn.resp(conn, 500, "Error")
+    end
+
+    Bypass.stub bypass, "GET", "/api/v1/server/following", fn conn ->
+      Plug.Conn.resp(conn, 200, "Error")
+    end
+
+    result = PeertubeIndex.InstanceAPI.Httpc.scan("localhost:#{bypass.port}", 100, false)
+
+    assert result == {:error, :http_error}
+  end
+
+  test "error on following", %{bypass: bypass} do
+    Bypass.stub bypass, "GET", "/api/v1/videos", fn conn ->
+      Plug.Conn.resp(conn, 200, ~s<{"total": 0, "data": []}>)
+    end
+
+    Bypass.stub bypass, "GET", "/api/v1/server/followers", fn conn ->
+      Plug.Conn.resp(conn, 200, ~s<{"total": 0, "data": []}>)
+    end
+
+    Bypass.stub bypass, "GET", "/api/v1/server/following", fn conn ->
+      Plug.Conn.resp(conn, 500, "Error")
+    end
+
+    result = PeertubeIndex.InstanceAPI.Httpc.scan("localhost:#{bypass.port}", 100, false)
+
+    assert result == {:error, :http_error}
+  end
+
   test "gets all videos correctly with a single page", %{bypass: bypass} do
     Bypass.expect bypass, "GET", "/api/v1/videos", fn conn ->
       conn = Plug.Conn.fetch_query_params(conn)

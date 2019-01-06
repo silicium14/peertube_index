@@ -7,8 +7,8 @@ defmodule PeertubeIndex.InstanceAPI.Httpc do
   def scan(host, page_size \\ 100, use_tls \\ true) do
     scheme = if use_tls, do: "https://", else: "http://"
     with {:ok, videos} <- get_all(scheme <> host <> "/api/v1/videos", page_size),
-         {:ok, followers} = get_all(scheme <> host <> "/api/v1/server/followers", page_size),
-         {:ok, following} = get_all(scheme <> host <> "/api/v1/server/following", page_size) do
+         {:ok, followers} <- get_all(scheme <> host <> "/api/v1/server/followers", page_size),
+         {:ok, following} <- get_all(scheme <> host <> "/api/v1/server/following", page_size) do
 
       videos = Enum.filter(videos, fn video -> video["isLocal"] end)
 
