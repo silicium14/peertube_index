@@ -27,6 +27,7 @@ defmodule PeertubeIndex do
           @status_storage.ok_instance(host, scan_end)
           for instance <- found_instances, do: @status_storage.discovered_instance(instance, scan_end)
         {:error, reason} ->
+          Logger.info "Scan failed for #{host}, reason: #{inspect(reason)}"
           @status_storage.failed_instance(host, reason, scan_end)
       end
     end
