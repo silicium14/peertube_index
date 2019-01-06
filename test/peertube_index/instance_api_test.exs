@@ -138,7 +138,6 @@ defmodule PeertubeIndex.InstanceApiTest do
     assert result == {:error, :page_invalid}
   end
 
-  @tag skip: "TODO"
   test "can timeout on requests", %{bypass: bypass} do
     reponse_delay = 600
     empty_instance_but(bypass, :expect, "GET", "/api/v1/videos", fn conn ->
@@ -146,7 +145,7 @@ defmodule PeertubeIndex.InstanceApiTest do
       Plug.Conn.resp(conn, 200, ~s<{"total": 0, "data": []}>)
     end)
 
-    result = PeertubeIndex.InstanceAPI.Httpc.scan("localhost:#{bypass.port}", 100, false, reponse_delay - 500)
+    result = PeertubeIndex.InstanceAPI.Httpc.scan("localhost:#{bypass.port}", 100, false, reponse_delay - 100)
     assert result == {:error, :timeout}
   end
 
