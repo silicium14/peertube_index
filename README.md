@@ -24,7 +24,6 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 ```
 
 ## TODO
-- Scan loop
 - Detect and handle HTTP and HTTPS instances
 - Use Hackney instead of httpc
 - Rename InstanceAPI to InstanceScanner
