@@ -9,8 +9,13 @@ defmodule PeertubeIndex.VideoStorage do
 
   @doc """
   Search for a video by its name
+  Options:
+    - nsfw:
+      - missing: do not filter on safety, gets both safe and unsafe videos
+      - true: only get unsafe for work videos
+      - false: only get safe for work videos
   """
-  @callback search(String.t) :: [map]
+  @callback search(String.t, Keyword.t()) :: [map]
 
   @doc """
   Create a video storage with some videos for testing

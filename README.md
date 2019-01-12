@@ -24,16 +24,17 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 ```
 
 ## TODO
-- In modules rename API to Api?
-- Scan timeout
+- Scan loop
 - Detect and handle HTTP and HTTPS instances
+- Use Hackney instead of httpc
+- Rename InstanceAPI to InstanceScanner
+- Figure why httpc truncates response in some cases or change http client
 - Auto rescan periodically
-- More automated Instance API non regression tests: use our own instance?
+- Kubernetes
+- Seed status storage with known instance hosts list
 - Stats endpoint?
+- More automated Instance API non regression tests: use our own instance?
 - Deployment
-    - Build with tests
-    - Separate ElasticSearch
-    - Separate status storage?
     - HTTPS
 - Log incoming requests
 - Monitoring
@@ -41,11 +42,8 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 - Error and not found pages
 - Add an end to end test
 - Scan multiple instances concurrently
-- Scan works with http and detects https or http
-- Seed status storage with known instance hosts list
 - Search frontend
 - Status frontend
 - Isolate and handle failures of the steps in scan function
-- Refine search behaviour
 - Use document type from Elasticsearch library?
 - Remember that in the domain we directly use the objects returned by the storage without any conversion, we are coupled to the storage format for now

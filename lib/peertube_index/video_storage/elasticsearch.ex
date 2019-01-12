@@ -23,31 +23,33 @@ defmodule PeertubeIndex.VideoStorage.Elasticsearch do
   end
 
   @impl true
-  def search(query) do
-    %{"hits" => %{"hits" => hits}} = Elasticsearch.post!(
-      elasticsearch_config(),
-      "/#{@index}/_search",
-      %{
-        "from" => "0", "size" => 100,
-        "query" => %{
-          "bool" => %{
-            "must" => [
-              %{
-                "match" => %{
-                  "name" => %{
-                    "query" => query,
-                    "fuzziness" => "AUTO"
-                  }
+  def search(query, options \\ []) do
+    elasticsearch_query = %{
+      "from" => "0", "size" => 100,
+      "query" => %{
+        "bool" => %{
+          "must" => [
+            %{
+              "match" => %{
+                "name" => %{
+                  "query" => query,
+                  "fuzziness" => "AUTO"
                 }
               }
-            ],
-            "filter" => [
-              %{"term" => %{"nsfw" => false}}
-            ]
-          }
+            }
+          ]
         }
       }
-    )
+    }
+    nsfw = options[:nsfw]
+    elasticsearch_query =
+    if is_nil(nsfw)  do
+      elasticsearch_query
+    else
+      put_in(elasticsearch_query, ["query", "bool", "filter"], [%{"term" => %{"nsfw" => nsfw}}])
+    end
+
+    %{"hits" => %{"hits" => hits}} = Elasticsearch.post!(elasticsearch_config(), "/#{@index}/_search", elasticsearch_query)
 
     hits
     |> Enum.map(fn hit -> hit["_source"] end)

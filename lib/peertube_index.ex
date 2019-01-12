@@ -11,7 +11,7 @@ defmodule PeertubeIndex do
 
   @spec search(String.t) :: [map]
   def search(name) do
-    @video_storage.search(name)
+    @video_storage.search(name, nsfw: false)
   end
 
   @spec scan([String.t], (-> NaiveDateTime.t)) :: :ok

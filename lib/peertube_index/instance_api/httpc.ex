@@ -57,7 +57,6 @@ defmodule PeertubeIndex.InstanceAPI.Httpc do
 
   defp get_recursive([], _request_timeout, results), do: {:ok, results}
 
-
   defp request_with_timeout(url, timeout) do
     request = Task.async(fn ->
       :httpc.request(
