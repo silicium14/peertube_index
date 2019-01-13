@@ -24,11 +24,11 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 ```
 
 ## TODO
-- Detect and handle HTTP and HTTPS instances
+- Use a single file for behaviour and their implementation if there is only one implementation (auto generated mocks for testing do not count)
 - Use Hackney instead of httpc
+- Handle the case of scan failure but instance has videos in video storage
 - Rename InstanceAPI to InstanceScanner
 - Figure why httpc truncates response in some cases or change http client
-- Auto rescan periodically
 - Kubernetes
 - Seed status storage with known instance hosts list
 - Stats endpoint?
@@ -46,3 +46,4 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 - Isolate and handle failures of the steps in scan function
 - Use document type from Elasticsearch library?
 - Remember that in the domain we directly use the objects returned by the storage without any conversion, we are coupled to the storage format for now
+- Analysis tool check matching of collaboration and contract tests

@@ -10,7 +10,7 @@ defmodule Mix.Tasks.RefreshInstanceApiNonRegressionReference do
   Update reference data for instance API non regression tests
   """
   def run(_) do
-    {:ok, {videos, instances}} = PeertubeIndex.InstanceAPI.Httpc.scan("peertube.cpy.re", 100)
+    {:ok, {videos, instances}} = PeertubeIndex.InstanceAPI.Http.scan("peertube.cpy.re", 100)
 
     File.write!(
       "test/peertube_index/instance_api_non_regression_test_data/reference_videos.json",

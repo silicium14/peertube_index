@@ -18,7 +18,7 @@ defmodule InstanceApiNonRegressionTest do
   @result_instances_file "test/peertube_index/instance_api_non_regression_test_data/instances.json"
 
   setup_all do
-    {:ok, {videos, instances}} = PeertubeIndex.InstanceAPI.Httpc.scan("peertube.cpy.re", 5)
+    {:ok, {videos, instances}} = PeertubeIndex.InstanceAPI.Http.scan("peertube.cpy.re", 5)
 
     # Save results for debugging
     File.write!(
