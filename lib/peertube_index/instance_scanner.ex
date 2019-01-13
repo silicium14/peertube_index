@@ -1,4 +1,4 @@
-defmodule PeertubeIndex.InstanceAPI do
+defmodule PeertubeIndex.InstanceScanner do
   @moduledoc false
 
   @callback scan(String.t, integer, boolean) :: {:ok, {[map], MapSet.t}} | {:error, any()}
@@ -6,9 +6,9 @@ defmodule PeertubeIndex.InstanceAPI do
   @callback scan(String.t) :: {:ok, {[map], MapSet.t}} | {:error, any()}
 end
 
-defmodule PeertubeIndex.InstanceAPI.Http do
+defmodule PeertubeIndex.InstanceScanner.Http do
   @moduledoc false
-  @behaviour PeertubeIndex.InstanceAPI
+  @behaviour PeertubeIndex.InstanceScanner
   require Logger
 
   @impl true

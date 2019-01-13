@@ -24,11 +24,10 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 ```
 
 ## TODO
-- Use a single file for behaviour and their implementation if there is only one implementation (auto generated mocks for testing do not count)
 - Use Hackney instead of httpc
-- Handle the case of scan failure but instance has videos in video storage
-- Rename InstanceAPI to InstanceScanner
 - Figure why httpc truncates response in some cases or change http client
+- Ban instance from search results use case
+- Handle the case of scan failure but instance has videos in video storage
 - Kubernetes
 - Seed status storage with known instance hosts list
 - Stats endpoint?

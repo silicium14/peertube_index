@@ -5,7 +5,7 @@ defmodule InstanceApiNonRegressionTest do
   The state of the reference PeerTube instance we use changes frequently,
   to take this this into account we suggest the following workflow:
   - checkout to a known working version of the instance API module
-  - update reference dataset with `mix refresh_instance_api_non_regression_reference`
+  - update reference dataset with `mix refresh_instance_scanner_non_regression_reference`
   - checkout to the instance API module version to test
   - run this test
   """
@@ -18,7 +18,7 @@ defmodule InstanceApiNonRegressionTest do
   @result_instances_file "test/peertube_index/instance_api_non_regression_test_data/instances.json"
 
   setup_all do
-    {:ok, {videos, instances}} = PeertubeIndex.InstanceAPI.Http.scan("peertube.cpy.re", 5)
+    {:ok, {videos, instances}} = PeertubeIndex.InstanceScanner.Http.scan("peertube.cpy.re", 5)
 
     # Save results for debugging
     File.write!(

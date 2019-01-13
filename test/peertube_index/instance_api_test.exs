@@ -1,4 +1,4 @@
-defmodule PeertubeIndex.InstanceApiTest do
+defmodule PeertubeIndex.InstanceScannerTest do
   use ExUnit.Case, async: true
 
   setup do
@@ -8,7 +8,7 @@ defmodule PeertubeIndex.InstanceApiTest do
 
   test "unable to connect", %{bypass: bypass} do
     Bypass.down(bypass)
-    result = PeertubeIndex.InstanceAPI.Http.scan("localhost:#{bypass.port}")
+    result = PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}")
     assert result == {:error, {
       :failed_connect, [
         {:to_address, {'localhost', bypass.port}},
@@ -61,13 +61,13 @@ defmodule PeertubeIndex.InstanceApiTest do
 
   test "bad HTTP status", %{bypass: bypass} do
     empty_instance_but(bypass, :expect_once, "GET", "/api/v1/videos", &Plug.Conn.resp(&1, 400, "{}"))
-    result = PeertubeIndex.InstanceAPI.Http.scan("localhost:#{bypass.port}", 100, false)
+    result = PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}", 100, false)
     assert result == {:error, :http_error}
   end
 
   test "JSON parse error", %{bypass: bypass} do
     empty_instance_but(bypass, :expect_once, "GET", "/api/v1/videos", &Plug.Conn.resp(&1, 200, "invalid JSON document"))
-    result = PeertubeIndex.InstanceAPI.Http.scan("localhost:#{bypass.port}", 100, false)
+    result = PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}", 100, false)
     assert result == {:error, %Poison.ParseError{pos: 0, rest: nil, value: "i"}}
   end
 
@@ -82,19 +82,19 @@ defmodule PeertubeIndex.InstanceApiTest do
       Plug.Conn.resp(conn, 200, response)
     end)
 
-    {status, _} = PeertubeIndex.InstanceAPI.Http.scan("localhost:#{bypass.port}", 5, false)
+    {status, _} = PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}", 5, false)
     assert status == :error
   end
 
   test "error on followers", %{bypass: bypass} do
     empty_instance_but(bypass, :expect, "GET", "/api/v1/server/followers", &Plug.Conn.resp(&1, 500, "Error"))
-    result = PeertubeIndex.InstanceAPI.Http.scan("localhost:#{bypass.port}", 100, false)
+    result = PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}", 100, false)
     assert result == {:error, :http_error}
   end
 
   test "error on following", %{bypass: bypass} do
     empty_instance_but(bypass, :expect, "GET", "/api/v1/server/following", &Plug.Conn.resp(&1, 500, "Error"))
-    result = PeertubeIndex.InstanceAPI.Http.scan("localhost:#{bypass.port}", 100, false)
+    result = PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}", 100, false)
     assert result == {:error, :http_error}
   end
 
@@ -110,7 +110,7 @@ defmodule PeertubeIndex.InstanceApiTest do
       }>)
     end)
 
-    {:ok, {videos, _instances}} = PeertubeIndex.InstanceAPI.Http.scan("localhost:#{bypass.port}", 10, false)
+    {:ok, {videos, _instances}} = PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}", 10, false)
     assert videos == [
       %{"id" =>  0, "isLocal" => true},
       %{"id" =>  1, "isLocal" => true}
@@ -124,7 +124,7 @@ defmodule PeertubeIndex.InstanceApiTest do
       Plug.Conn.resp(conn, 200, ~s<{"total": 3, "data": [{"id": #{start}, "isLocal": true}]}>)
     end)
 
-    {:ok, {videos, _instances}} = PeertubeIndex.InstanceAPI.Http.scan("localhost:#{bypass.port}", 1, false)
+    {:ok, {videos, _instances}} = PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}", 1, false)
     assert videos == [
       %{"id" =>  0, "isLocal" => true},
       %{"id" =>  1, "isLocal" => true},
@@ -134,7 +134,7 @@ defmodule PeertubeIndex.InstanceApiTest do
 
   test "wrong page format", %{bypass: bypass} do
     empty_instance_but(bypass, :expect, "GET", "/api/v1/videos", &Plug.Conn.resp(&1, 200, "{\"not the correct format\": \"some value\"}"))
-    result = PeertubeIndex.InstanceAPI.Http.scan("localhost:#{bypass.port}", 100, false)
+    result = PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}", 100, false)
     assert result == {:error, :page_invalid}
   end
 
@@ -145,7 +145,7 @@ defmodule PeertubeIndex.InstanceApiTest do
       Plug.Conn.resp(conn, 200, ~s<{"total": 0, "data": []}>)
     end)
 
-    result = PeertubeIndex.InstanceAPI.Http.scan("localhost:#{bypass.port}", 100, false, reponse_delay - 100)
+    result = PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}", 100, false, reponse_delay - 100)
     assert result == {:error, :timeout}
   end
 

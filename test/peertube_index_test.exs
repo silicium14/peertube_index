@@ -26,11 +26,11 @@ defmodule PeertubeIndexTest do
     Mox.stub(PeertubeIndex.StatusStorage.Mock, :ok_instance, fn _host, _date -> :ok end)
 
     videos = [%{"name" => "some video"}]
-    Mox.expect(PeertubeIndex.InstanceAPI.Mock, :scan, fn "some-instance.example.com" -> {:ok, {videos, MapSet.new()}} end)
+    Mox.expect(PeertubeIndex.InstanceScanner.Mock, :scan, fn "some-instance.example.com" -> {:ok, {videos, MapSet.new()}} end)
     Mox.expect(PeertubeIndex.VideoStorage.Mock, :update_instance!, fn "some-instance.example.com", ^videos -> :ok end)
 
     videos = [%{"name" => "some other video"}]
-    Mox.expect(PeertubeIndex.InstanceAPI.Mock, :scan, fn "some-other-instance.example.com" -> {:ok, {videos, MapSet.new()}} end)
+    Mox.expect(PeertubeIndex.InstanceScanner.Mock, :scan, fn "some-other-instance.example.com" -> {:ok, {videos, MapSet.new()}} end)
     Mox.expect(PeertubeIndex.VideoStorage.Mock, :update_instance!, fn "some-other-instance.example.com", ^videos -> :ok end)
 
     PeertubeIndex.scan(["some-instance.example.com", "some-other-instance.example.com"])
@@ -39,7 +39,7 @@ defmodule PeertubeIndexTest do
   end
 
   test "scan updates instance status" do
-    Mox.stub(PeertubeIndex.InstanceAPI.Mock, :scan, fn "some-instance.example.com" -> {:ok, {[], MapSet.new()}} end)
+    Mox.stub(PeertubeIndex.InstanceScanner.Mock, :scan, fn "some-instance.example.com" -> {:ok, {[], MapSet.new()}} end)
     Mox.stub(PeertubeIndex.VideoStorage.Mock, :update_instance!, fn "some-instance.example.com", _videos -> :ok end)
     {:ok, finishes_at} = NaiveDateTime.new(2018, 1, 1, 14, 15, 16)
     Mox.expect(PeertubeIndex.StatusStorage.Mock, :ok_instance, fn "some-instance.example.com", ^finishes_at -> :ok end)
@@ -51,7 +51,7 @@ defmodule PeertubeIndexTest do
 
   test "scan reports the appropriate status for discovered instances" do
     Mox.stub(
-      PeertubeIndex.InstanceAPI.Mock, :scan,
+      PeertubeIndex.InstanceScanner.Mock, :scan,
       fn "some-instance.example.com" ->
         {:ok, {[], MapSet.new(["found-instance.example.com", "another-found-instance.example.com"])}}
       end
@@ -68,7 +68,7 @@ defmodule PeertubeIndexTest do
   end
 
   test "scan handles failures and reports the corresponding statuses" do
-    Mox.stub(PeertubeIndex.InstanceAPI.Mock, :scan, fn "some-instance.example.com" -> {:error, :some_reason} end)
+    Mox.stub(PeertubeIndex.InstanceScanner.Mock, :scan, fn "some-instance.example.com" -> {:error, :some_reason} end)
     {:ok, finishes_at} = NaiveDateTime.new(2018, 1, 1, 14, 15, 16)
     Mox.expect(PeertubeIndex.StatusStorage.Mock, :failed_instance, fn "some-instance.example.com", :some_reason, ^finishes_at -> :ok end)
 
