@@ -24,9 +24,13 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 ```
 
 ## TODO
-- Use Hackney instead of httpc
+- Use Hackney instead of httpc (waiting for https://github.com/PSPDFKit-labs/bypass/issues/75)
 - Figure why httpc truncates response in some cases or change http client
-- Ban instance from search results use case
+- respect `/robots.txt`?
+- Sensitive content warning start page?
+- Ban instance/account/video from search results use case?
+    - Report feature?
+- Search frontend, HTML safe video data?
 - Handle the case of scan failure but instance has videos in video storage
 - Kubernetes
 - Seed status storage with known instance hosts list
@@ -36,11 +40,11 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
     - HTTPS
 - Log incoming requests
 - Monitoring
-- HTTP API: pagination: add number of pages to response, search use case pagination
+- Rate limiting
 - Error and not found pages
 - Add an end to end test
 - Scan multiple instances concurrently
-- Search frontend
+- HTTP API: pagination: add number of pages to response, search use case pagination
 - Status frontend
 - Isolate and handle failures of the steps in scan function
 - Use document type from Elasticsearch library?

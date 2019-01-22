@@ -7,7 +7,7 @@ defmodule PeertubeIndex.Application do
     children = [
       Plug.Cowboy.child_spec(
         scheme: :http,
-        plug: PeertubeIndex.HttpApi,
+        plug: PeertubeIndex.WebFrontend,
         options: [port: Confex.fetch_env!(:peertube_index, :http_api_port)]
       )
     ]

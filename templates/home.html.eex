@@ -1,15 +1,8 @@
 <html>
+<style><%= EEx.eval_file("templates/search_component.css.eex") %></style>
 <body>
-<header>
-    <h1>
-    PeerTube Index
-    </h1>
-</header>
 <main>
-    <form action="search">
-        <input type="text" name="text" required>
-        <button type="submit">Search</button>
-    </form>
+    <%= EEx.eval_file("templates/search_component.html.eex", [query: ""]) %>
 </main>
 </body>
 </html>

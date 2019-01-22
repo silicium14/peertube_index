@@ -40,14 +40,15 @@ defmodule PeertubeIndex.WebFrontendTest do
   end
 
   test "user can search videos" do
-    conn = conn(:get, "/search?text=the_user_search_text2")
+    query = "the_user_search_text2"
+    conn = conn(:get, "/search?text=#{query}")
     videos = []
     conn = assign(conn, :search_usecase_function, fn text ->
       send self(), {:search_function_called, text}
       videos
     end)
-    conn = assign(conn, :render_page_function, fn videos ->
-      send self(), {:render_function_called, videos}
+    conn = assign(conn, :render_page_function, fn videos, query ->
+      send self(), {:render_function_called, videos, query}
       "Fake search result"
     end)
 
@@ -55,11 +56,11 @@ defmodule PeertubeIndex.WebFrontendTest do
     conn = PeertubeIndex.WebFrontend.call(conn, @opts)
 
     # Then the search use case is called with the user search text
-    assert_received {:search_function_called, "the_user_search_text2"}
+    assert_received {:search_function_called, ^query}
     # And the search result is given to the page rendering
-    assert_received {:render_function_called, ^videos}
+    assert_received {:render_function_called, ^videos, ^query}
 
-    # Then he sees a reponse
+    # Then he sees a response
     assert conn.state == :sent
     assert conn.status == 200
     assert List.keyfind(conn.resp_headers, "content-type", 0) == {"content-type", "text/html; charset=utf-8"}
