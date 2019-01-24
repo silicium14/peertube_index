@@ -2,6 +2,6 @@
     <a href="/"><h1>
         PeerTube Index
     </h1></a>
-    <input type="text" name="text" value="<%=query%>" placeholder="Search something" required>
+    <%= Phoenix.HTML.Tag.tag("input", type: "text", name: "text", value: query, placeholder: "Search something", required: true) |> Phoenix.HTML.safe_to_string() %>
     <button type="submit">Search</button>
 </form>

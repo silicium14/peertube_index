@@ -28,11 +28,31 @@ article a {
     <article>
         <img src='https://raw.githubusercontent.com/Chocobozzz/PeerTube/develop/client/src/assets/images/icons/icon-512x512.png'>
         <div>
-            <a href="https://<%= video["account"]["host"] %>/videos/watch/<%= video["uuid"] %>"><h3><%= video["name"] %></h3></a>
+            <h3><%=
+                Phoenix.HTML.Link.link(
+                video["name"],
+                to: "https://#{video["account"]["host"]}/videos/watch/#{video["uuid"]}"
+                ) |> Phoenix.HTML.safe_to_string
+            %></h3>
             <ul>
-                <li><a href="<%= video["account"]["url"] %>">User: <%= video["account"]["displayName"] %></a></li>
-                <li><a href="<%= video["channel"]["url"] %>">Channel: <%= video["channel"]["displayName"] %></a></li>
-                <li><a href="https://<%= video["account"]["host"] %>">Instance: <%= video["account"]["host"] %></a></li>
+                <li><%=
+                    Phoenix.HTML.Link.link(
+                        "User: #{video["account"]["displayName"]}",
+                        to: video["account"]["url"]
+                    ) |> Phoenix.HTML.safe_to_string
+                %></li>
+                <li><%=
+                    Phoenix.HTML.Link.link(
+                        "Channel: #{video["channel"]["displayName"]}",
+                        to: video["channel"]["url"]
+                    ) |> Phoenix.HTML.safe_to_string
+                %></li>
+                <li><%=
+                    Phoenix.HTML.Link.link(
+                        "Instance: #{video["account"]["host"]}",
+                        to: "https://#{video["account"]["host"]}"
+                    ) |> Phoenix.HTML.safe_to_string
+                %></li>
             </ul>
         </div>
     </article>

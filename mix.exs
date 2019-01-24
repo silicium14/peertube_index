@@ -27,6 +27,7 @@ defmodule PeertubeIndex.MixProject do
     [
       {:confex, "~> 3.3"},
       {:elasticsearch, "~> 0.6.0"},
+      {:phoenix_html, "~> 2.13"},
       {:poison, "~> 4.0"},
       {:plug, "~> 1.7"},
       {:plug_cowboy, "~> 2.0"},
