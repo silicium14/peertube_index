@@ -24,6 +24,10 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 ```
 
 ## TODO
+- Simplify infrastructure code with docker compose?
+- Expose both web frontend behind digest authentication
+- HTTP Digest authentication for web frontend with a reverse proxy
+- Rename InstanceAPI to InstanceScanner in filenames
 - Use Hackney instead of httpc (waiting for https://github.com/PSPDFKit-labs/bypass/issues/75)
 - Figure why httpc truncates response in some cases or change http client
 - respect `/robots.txt`?

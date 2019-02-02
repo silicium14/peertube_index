@@ -22,5 +22,9 @@ erl_crash.dump
 # Ignore package tarball (built via "mix hex.build").
 peertube_index-*.tar
 
+infrastructure/deploy.env
+infrastructure/builds/
+infrastructure/deploy.log
+
 .idea/
 local_only/
