@@ -1,1 +1,7 @@
-.gitignore
+/.git/
+/.idea/
+
+/infrastructure/deploy.env
+/infrastructure/builds/
+/infrastructure/deploy.log
+/local_only/
