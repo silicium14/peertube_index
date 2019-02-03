@@ -1,0 +1,19 @@
+[file]
+
+[accessLog]
+
+[entryPoints]
+  [entryPoints.http]
+    address = ":80"
+    compress = true
+
+[backends]
+  [backends.peertube-index]
+    [backends.peertube-index.servers.server1]
+    url = "http://peertube-index:80"
+
+[frontends]
+  [frontends.peertube-index]
+  backend = "peertube-index"
+  [frontends.peertube-index.routes.get]
+    rule = "Method: GET"

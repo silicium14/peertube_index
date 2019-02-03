@@ -32,18 +32,27 @@ docker run \
     docker.elastic.co/elasticsearch/elasticsearch:6.5.4
 ```
 
-### Build and upload of docker image to the server
+### Build and upload of docker images to the server
 Locally
 ```bash
 export VERSION=$(git rev-parse --short --verify HEAD)
+
 docker build -t peertube-index:${VERSION} .
 docker image save -o infrastructure/builds/peertube-index-image-${VERSION}.tar peertube-index:${VERSION}
+
+docker build -t peertube-index-traefik:${VERSION} infrastructure/traefik
+docker image save -o infrastructure/builds/peertube-index-traefik-image-${VERSION}.tar peertube-index-traefik:${VERSION}
+
+rsync -avz infrastructure/builds/peertube-index-traefik-image-${VERSION}.tar user@machine-hostname.domain:
 rsync -avz infrastructure/builds/peertube-index-image-${VERSION}.tar user@machine-hostname.domain:
 ```
 
 ### Creation of the Elasticsearch index and the status storage directory
-On the server, start an iex session inside a container with production configuration 
+On the server, start an iex session inside a container with production configuration
 ```bash
+# You need to export VERSION first, this is the version from the build step
+export VERSION=xxxxxxxx
+
 docker run \
     --rm -it \
     --network peertube-index \
@@ -52,13 +61,13 @@ docker run \
     -e HTTP_API_PORT=80 \
     -v status_storage:/status_storage \
     --name peertube-index-shell \
-    peertube-index:latest iex -S mix
+    peertube-index:${VERSION} iex -S mix
 ```
 
-In the iex session 
+In the iex session
 ```elixir
 PeertubeIndex.VideoStorage.Elasticsearch.empty()
-# Not be needed if a docker volume was mounted, the directory already exists 
+# Not be needed if a docker volume was mounted, the directory already exists
 PeertubeIndex.StatusStorage.Filesystem.empty()
 ```
 
@@ -66,21 +75,20 @@ PeertubeIndex.StatusStorage.Filesystem.empty()
 On server
 ```bash
 # You need to export VERSION first, this is the version from the build step
-export VERSION=xxxxxxxx 
+export VERSION=xxxxxxxx
 
 # API
 docker run \
     -d \
     --restart always \
     --network peertube-index \
-    -p 80:80 \
     -e ELASTICSEARCH_URL='http://peertube-index-elasticsearch:9200' \
     -e STATUS_STORAGE_DIRECTORY='/status_storage' \
     -e HTTP_API_PORT=80 \
     -v status_storage:/status_storage \
     --name peertube-index \
     peertube-index:${VERSION}
-    
+
 # Scan loop
 docker run \
     -d \
@@ -93,6 +101,15 @@ docker run \
     --name peertube-index-scan-loop \
     peertube-index:${VERSION} \
     bash scan_loop.sh
+    
+# Reverse proxy
+docker run \
+    -d \
+    --restart always \
+    --network peertube-index \
+    -p 80:80 \
+    --name peertube-index-traefik \
+    peertube-index-traefik:${VERSION}
 ```
 
 # Deployments after first setup
