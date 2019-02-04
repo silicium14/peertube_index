@@ -1,17 +1,17 @@
-defmodule PeertubeIndex.WebFrontendTest do
+defmodule PeertubeIndex.WebServerTest do
   use ExUnit.Case, async: true
   use Plug.Test
 
   @moduletag :integration
 
-  @opts PeertubeIndex.WebFrontend.init([])
+  @opts PeertubeIndex.WebServer.init([])
 
   test "ping works" do
     # Create a test connection
     conn = conn(:get, "/ping")
 
     # Invoke the plug
-    conn = PeertubeIndex.WebFrontend.call(conn, @opts)
+    conn = PeertubeIndex.WebServer.call(conn, @opts)
 
     # Assert the response and status
     assert conn.state == :sent
@@ -22,7 +22,7 @@ defmodule PeertubeIndex.WebFrontendTest do
   test "unknown URL returns not found page" do
     conn = conn(:get, "/not_existing")
 
-    conn = PeertubeIndex.WebFrontend.call(conn, @opts)
+    conn = PeertubeIndex.WebServer.call(conn, @opts)
 
     assert conn.state == :sent
     assert conn.status == 404
@@ -32,7 +32,7 @@ defmodule PeertubeIndex.WebFrontendTest do
   test "user can see home page" do
     conn = conn(:get, "")
 
-    conn = PeertubeIndex.WebFrontend.call(conn, @opts)
+    conn = PeertubeIndex.WebServer.call(conn, @opts)
 
     assert conn.state == :sent
     assert conn.status == 200
@@ -53,7 +53,7 @@ defmodule PeertubeIndex.WebFrontendTest do
     end)
 
     # When a user does a search
-    conn = PeertubeIndex.WebFrontend.call(conn, @opts)
+    conn = PeertubeIndex.WebServer.call(conn, @opts)
 
     # Then the search use case is called with the user search text
     assert_received {:search_function_called, ^query}
@@ -65,5 +65,31 @@ defmodule PeertubeIndex.WebFrontendTest do
     assert conn.status == 200
     assert List.keyfind(conn.resp_headers, "content-type", 0) == {"content-type", "text/html; charset=utf-8"}
     assert conn.resp_body == "Fake search result"
+  end
+
+  test "user can search videos as JSON" do
+    query = "yet another user search text"
+    conn = conn(:get, "/api/search?text=#{query}")
+    videos = [
+      %{"name" => "Some video"},
+      %{"name" => "Some other video"}
+    ]
+    conn = assign(conn, :search_usecase_function, fn text ->
+      send self(), {:search_function_called, text}
+      videos
+    end)
+
+    # When a user does a search
+    conn = PeertubeIndex.WebServer.call(conn, @opts)
+
+    # Then the search use case is called with the user search text
+    assert_received {:search_function_called, ^query}
+
+    # Then he gets an ok reponse
+    assert conn.state == :sent
+    assert conn.status == 200
+    assert List.keyfind(conn.resp_headers, "content-type", 0) == {"content-type", "application/json; charset=utf-8"}
+    # And the response contains the search result
+    assert Poison.decode!(conn.resp_body) == videos
   end
 end

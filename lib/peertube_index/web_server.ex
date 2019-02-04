@@ -1,4 +1,4 @@
-defmodule PeertubeIndex.WebFrontend do
+defmodule PeertubeIndex.WebServer do
   @moduledoc false
 
   use Plug.Router
@@ -28,6 +28,15 @@ defmodule PeertubeIndex.WebFrontend do
 
   defp render_search_page(videos, query) do
     EEx.eval_file("templates/search.html.eex", [videos: videos, query: query])
+  end
+
+  get "/api/search" do
+    search = conn.assigns[:search_usecase_function] || &PeertubeIndex.search/1
+
+    conn = fetch_query_params(conn)
+    videos = search.(Map.get(conn.query_params, "text"))
+    conn = put_resp_content_type(conn, "application/json")
+    send_resp(conn, 200, Poison.encode!(videos))
   end
 
   match _ do
