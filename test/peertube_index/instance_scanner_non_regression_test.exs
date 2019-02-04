@@ -1,4 +1,4 @@
-defmodule InstanceApiNonRegressionTest do
+defmodule InstanceScannerNonRegressionTest do
   use ExUnit.Case, async: true
   @moduledoc """
   Non regression tests for PeerTube instance API module.
