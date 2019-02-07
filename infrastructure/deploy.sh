@@ -3,6 +3,7 @@
 # Deploy the API and the scan loop
 # Expected environment variables:
 #   MACHINE_SSH_DESTINATION: user@hostname.domain
+#   USERS_CREDENTIALS_FILE: path of user credentials in htdigest format
 
 set -e
 set -x
@@ -24,8 +25,10 @@ function deploy {
     docker build -t peertube-index-traefik:${VERSION} infrastructure/traefik
     docker image save -o infrastructure/builds/peertube-index-traefik-image-${VERSION}.tar peertube-index-traefik:${VERSION}
 
-    rsync -avz infrastructure/builds/peertube-index-image-${VERSION}.tar ${MACHINE_SSH_DESTINATION}:
-    rsync -avz infrastructure/builds/peertube-index-traefik-image-${VERSION}.tar ${MACHINE_SSH_DESTINATION}:
+    export DESTINATION_DIRECTORY=/root/
+    rsync -avz infrastructure/builds/peertube-index-image-${VERSION}.tar ${MACHINE_SSH_DESTINATION}:${DESTINATION_DIRECTORY}
+    rsync -avz infrastructure/builds/peertube-index-traefik-image-${VERSION}.tar ${MACHINE_SSH_DESTINATION}:${DESTINATION_DIRECTORY}
+    rsync -avz ${USERS_CREDENTIALS_FILE} ${MACHINE_SSH_DESTINATION}:${DESTINATION_DIRECTORY}/users_credentials.htdigest
 
     export NETWORK=peertube-index
     export ELASTICSEARCH_URL='http://peertube-index-elasticsearch:9200'
@@ -35,7 +38,7 @@ function deploy {
         set -e
         set -x
 
-        docker image load -i peertube-index-traefik-image-${VERSION}.tar
+        docker image load -i ${DESTINATION_DIRECTORY}/peertube-index-traefik-image-${VERSION}.tar
         docker tag peertube-index-traefik:${VERSION} peertube-index-traefik:latest
         docker stop peertube-index-traefik
         docker rm peertube-index-traefik
@@ -44,10 +47,11 @@ function deploy {
             --restart always \
             --network ${NETWORK} \
             -p 80:80 \
+            -v ${DESTINATION_DIRECTORY}/users_credentials.htdigest:/srv/users_credentials.htdigest \
             --name peertube-index-traefik \
             peertube-index-traefik:${VERSION}
 
-        docker image load -i peertube-index-image-${VERSION}.tar
+        docker image load -i ${DESTINATION_DIRECTORY}/peertube-index-image-${VERSION}.tar
         docker tag peertube-index:${VERSION} peertube-index:latest
         docker stop peertube-index
         docker rm peertube-index

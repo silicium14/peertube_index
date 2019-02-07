@@ -6,6 +6,8 @@
   [entryPoints.http]
     address = ":80"
     compress = true
+    [entryPoints.http.auth.digest]
+    usersFile = "/srv/users_credentials.htdigest"
 
 [backends]
   [backends.peertube-index]
