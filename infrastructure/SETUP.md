@@ -19,6 +19,7 @@ On the server
 docker network create peertube-index
 docker volume create status_storage
 docker volume create elasticsearch_data
+docker volume create elasticsearch_backups
 docker run \
     -d \
     --restart always \
@@ -26,11 +27,29 @@ docker run \
     --name peertube-index-elasticsearch \
     -e "discovery.type=single-node" \
     -e "cluster.name=peertube-index-cluster" \
+    -e "path.repo=/backups" \
     -e "ES_JAVA_OPTS=-Xms512m -Xmx512m" \
     -v elasticsearch_data:/usr/share/elasticsearch/data \
+    -v elasticsearch_backups:/backups \
     --ulimit memlock=-1:-1 \
     docker.elastic.co/elasticsearch/elasticsearch:6.5.4
 ```
+
+Configure Elasticsearch backup repository, on the server
+```bash
+docker exec -it peertube-index-elasticsearch bash
+chown -R elasticsearch:elasticsearch /backups
+# Once Elasticsearch is ready
+curl -X PUT "0.0.0.0:9200/_snapshot/videos" -H 'Content-Type: application/json' -d'
+{
+  "type": "fs",
+  "settings": {
+    "location": "videos",
+    "compress": true
+  }
+}
+'
+``` 
 
 ### Build and upload of docker images to the server
 Locally
