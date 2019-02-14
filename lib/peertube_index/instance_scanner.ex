@@ -15,6 +15,7 @@ defmodule PeertubeIndex.InstanceScanner.Http do
   def scan(host, page_size \\ 100, use_tls \\ true, request_timeout \\ 5000) do
     scheme = if use_tls, do: "https://", else: "http://"
     with {:ok, videos} <- get_all(scheme <> host <> "/api/v1/videos", page_size, request_timeout),
+         :ok <- validate_videos(videos),
          {:ok, followers} <- get_all(scheme <> host <> "/api/v1/server/followers", page_size, request_timeout),
          {:ok, following} <- get_all(scheme <> host <> "/api/v1/server/following", page_size, request_timeout) do
 
@@ -101,13 +102,102 @@ defmodule PeertubeIndex.InstanceScanner.Http do
     end
   end
 
+  defp validate_videos([videos | rest]) do
+    with true <- valid_video?(videos) do
+      validate_videos(rest)
+    else
+      _ ->
+        {:error, :invalid_video_document}
+    end
+  end
+
+  defp validate_videos([]) do
+    :ok
+  end
+
+  # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
+  def valid_video?(video) do
+    video |> Map.get("id") |> is_integer
+    && video |> Map.get("uuid") |> is_binary
+    && video |> Map.get("name") |> is_binary
+    && video |> Map.get("category") |> is_map
+    && (
+      video |> get_in(["category", "id"]) |> is_nil
+      || video |> get_in(["category", "id"]) |> is_integer
+    )
+    && video |> get_in(["category", "label"]) |> is_binary
+    && video |> Map.get("licence") |> is_map
+    && (
+      video |> get_in(["licence", "id"]) |> is_nil
+      || video |> get_in(["licence", "id"]) |> is_integer
+    )
+    && video |> get_in(["licence", "label"]) |> is_binary
+    && video |> Map.get("language") |> is_map
+    && (
+      video |> get_in(["language", "id"]) |> is_nil
+      || video |> get_in(["language", "id"]) |> is_binary
+    )
+    && video |> get_in(["language", "label"]) |> is_binary
+    && video |> Map.get("privacy") |> is_map
+    && video |> get_in(["privacy", "id"]) |> is_integer
+    && video |> get_in(["privacy", "label"]) |> is_binary
+    && video |> Map.get("nsfw") |> is_boolean
+    && (
+      video |> Map.get("description") |> is_nil
+      || video |> Map.get("description") |> is_binary
+    )
+    && video |> Map.get("isLocal") |> is_boolean
+    && video |> Map.get("duration") |> is_integer
+    && video |> Map.get("views") |> is_integer
+    && video |> Map.get("likes") |> is_integer
+    && video |> Map.get("dislikes") |> is_integer
+    && video |> Map.get("thumbnailPath") |> is_binary
+    && video |> Map.get("previewPath") |> is_binary
+    && video |> Map.get("embedPath") |> is_binary
+    && video |> Map.get("createdAt") |> is_binary # Validate date format?
+    && video |> Map.get("updatedAt") |> is_binary # Validate date format?
+    && video |> Map.get("publishedAt") |> is_binary # Validate date format?
+    && video |> Map.get("account") |> is_map
+    && video |> get_in(["account", "id"]) |> is_integer
+    && video |> get_in(["account", "uuid"]) |> is_binary
+    && video |> get_in(["account", "name"]) |> is_binary
+    && video |> get_in(["account", "displayName"]) |> is_binary
+    && video |> get_in(["account", "url"]) |> is_binary
+    && video |> get_in(["account", "host"]) |> is_binary
+    && (
+      video |> get_in(["account", "avatar"]) |> is_nil
+      || (
+        video |> get_in(["account", "avatar"]) |> is_map
+        && video |> get_in(["account", "avatar", "path"]) |> is_binary
+        && video |> get_in(["account", "avatar", "createdAt"]) |> is_binary # Validate date format?
+        && video |> get_in(["account", "avatar", "updatedAt"]) |> is_binary # Validate date format?
+      )
+    )
+    && video |> Map.get("channel") |> is_map
+    && video |> get_in(["channel", "id"]) |> is_integer
+    && video |> get_in(["channel", "uuid"]) |> is_binary
+    && video |> get_in(["channel", "name"]) |> is_binary
+    && video |> get_in(["channel", "displayName"]) |> is_binary
+    && video |> get_in(["channel", "url"]) |> is_binary
+    && video |> get_in(["channel", "host"]) |> is_binary
+    && (
+      video |> get_in(["channel", "avatar"]) |> is_nil
+      || (
+        video |> get_in(["channel", "avatar"]) |> is_map
+        && video |> get_in(["channel", "avatar", "path"]) |> is_binary
+        && video |> get_in(["channel", "avatar", "createdAt"]) |> is_binary # Validate date format?
+        && video |> get_in(["channel", "avatar", "updatedAt"]) |> is_binary # Validate date format?
+      )
+    )
+  end
+
   defp get_json(url, request_timeout) do
     Logger.debug fn -> "Getting #{url}" end
     with {:ok, httpc_result} <- request_with_timeout(url, request_timeout),
          {:ok, body} <- request_successful(httpc_result),
          {:ok, parsed} <- Poison.decode(body),
-         {:ok, validated} <- validate_page_data(parsed) do
-      {:ok, validated}
+         {:ok, parsed} <- validate_page_data(parsed) do
+      {:ok, parsed}
     end
   end
 

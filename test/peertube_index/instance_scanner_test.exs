@@ -1,6 +1,67 @@
 defmodule PeertubeIndex.InstanceScannerTest do
   use ExUnit.Case, async: true
 
+  @valid_video %{
+    "id"=> 1,
+    "uuid"=> "00000000-0000-0000-0000-000000000000",
+    "name"=> "This is the video name",
+    "category"=> %{
+      "id"=> 15,
+      "label"=> "Science & Technology"
+    },
+    "licence"=> %{
+      "id"=> 4,
+      "label"=> "Attribution - Non Commercial"
+    },
+    "language"=> %{
+      "id"=> nil,
+      "label"=> "Unknown"
+    },
+    "privacy"=> %{
+      "id"=> 1,
+      "label"=> "Public"
+    },
+    "nsfw"=> false,
+    "description"=> "This is the video description",
+    "isLocal"=> true,
+    "duration"=> 274,
+    "views"=> 1696,
+    "likes"=> 29,
+    "dislikes"=> 0,
+    "thumbnailPath"=> "/static/thumbnails/00000000-0000-0000-0000-000000000000.jpg",
+    "previewPath"=> "/static/previews/00000000-0000-0000-0000-000000000000.jpg",
+    "embedPath"=> "/videos/embed/00000000-0000-0000-0000-000000000000",
+    "createdAt"=> "2018-08-02T13:47:17.515Z",
+    "updatedAt"=> "2019-02-12T05:01:00.587Z",
+    "publishedAt"=> "2018-08-02T13:55:13.338Z",
+    "account"=> %{
+      "id"=> 501,
+      "uuid"=> "00000000-0000-0000-0000-000000000000",
+      "name"=> "user",
+      "displayName"=> "user",
+      "url"=> "https://peertube.example.com/accounts/user",
+      "host"=> "peertube.example.com",
+      "avatar"=> %{
+        "path"=> "/static/avatars/00000000-0000-0000-0000-000000000000.jpg",
+        "createdAt"=> "2018-08-02T10:56:25.627Z",
+        "updatedAt"=> "2018-08-02T10:56:25.627Z"
+      }
+    },
+    "channel"=> %{
+      "id"=> 23,
+      "uuid"=> "00000000-0000-0000-0000-000000000000",
+      "name"=> "00000000-0000-0000-0000-000000000000",
+      "displayName"=> "Default user channel",
+      "url"=> "https://peertube.example.com/video-channels/00000000-0000-0000-0000-000000000000",
+      "host"=> "peertube.example.com",
+      "avatar"=> %{
+        "path"=> "/static/avatars/00000000-0000-0000-0000-000000000000.jpg",
+        "createdAt"=> "2018-08-02T10:56:25.627Z",
+        "updatedAt"=> "2018-08-02T10:56:25.627Z"
+      }
+    }
+  }
+
   setup do
     bypass = Bypass.open
     {:ok, bypass: bypass}
@@ -99,36 +160,41 @@ defmodule PeertubeIndex.InstanceScannerTest do
   end
 
   test "gets all videos correctly with a single page", %{bypass: bypass} do
+    a_video = @valid_video |> Map.put("id", 0)
+    another_video = @valid_video |> Map.put("id", 1)
+
     empty_instance_but(bypass, :expect, "GET", "/api/v1/videos", fn conn ->
       conn = Plug.Conn.fetch_query_params(conn)
       Plug.Conn.resp(conn, 200, ~s<{
         "total": 2,
         "data": [
-          {"id": 0, "isLocal": true},
-          {"id": 1, "isLocal": true}
+          #{a_video |> Poison.encode!()},
+          #{another_video |> Poison.encode!()}
         ]
       }>)
     end)
 
     {:ok, {videos, _instances}} = PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}", 10, false)
-    assert videos == [
-      %{"id" =>  0, "isLocal" => true},
-      %{"id" =>  1, "isLocal" => true}
-    ]
+    assert videos == [a_video, another_video]
   end
 
   test "gets all videos correctly with pagination", %{bypass: bypass} do
     empty_instance_but(bypass, :expect, "GET", "/api/v1/videos", fn conn ->
       conn = Plug.Conn.fetch_query_params(conn)
-      start = Map.get(conn.query_params, "start", "0")
-      Plug.Conn.resp(conn, 200, ~s<{"total": 3, "data": [{"id": #{start}, "isLocal": true}]}>)
+      {start, ""} = conn.query_params |> Map.get("start", "0") |> Integer.parse()
+      Plug.Conn.resp(conn, 200, ~s<{
+        "total": 3,
+        "data": [
+          #{@valid_video |> Map.put("id", start) |> Poison.encode!()}
+        ]
+      }>)
     end)
 
     {:ok, {videos, _instances}} = PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}", 1, false)
     assert videos == [
-      %{"id" =>  0, "isLocal" => true},
-      %{"id" =>  1, "isLocal" => true},
-      %{"id" =>  2, "isLocal" => true}
+      @valid_video |> Map.put("id", 0),
+      @valid_video |> Map.put("id", 1),
+      @valid_video |> Map.put("id", 2)
     ]
   end
 
@@ -136,6 +202,27 @@ defmodule PeertubeIndex.InstanceScannerTest do
     empty_instance_but(bypass, :expect, "GET", "/api/v1/videos", &Plug.Conn.resp(&1, 200, "{\"not the correct format\": \"some value\"}"))
     result = PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}", 100, false)
     assert result == {:error, :page_invalid}
+  end
+
+  test "validates incoming video documents", %{bypass: bypass} do
+    invalid_video = Map.delete(@valid_video, "account")
+    empty_instance_but(bypass, :expect, "GET", "/api/v1/videos", fn conn ->
+      Plug.Conn.resp(
+        conn,
+        200,
+        ~s<
+        {
+          "total": 2,
+          "data": [
+            #{Poison.encode!(@valid_video)},
+            #{Poison.encode!(invalid_video)}
+          ]
+        }
+        >
+      )
+    end)
+    result = PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}", 100, false)
+    assert result == {:error, :invalid_video_document}
   end
 
   test "can timeout on requests", %{bypass: bypass} do

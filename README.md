@@ -1,7 +1,10 @@
 # PeertubeIndex
 
 ## Decisions
-We should not put too much pressure on instances by querying them heavily so we scan one instance sequentially.
+- We should not put too much pressure on instances by querying them heavily so we scan one instance sequentially.
+- Our validation of video documents expects fields that are not in PeerTube OpenAPI spec but that we found were provided by most instances.
+We should check monitor video document validation errors per PeerTube instance version to make sure our validation works correctly for newer versions.
+
 
 ## How to run the project
 ### Development
@@ -36,8 +39,8 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 - Sensitive content warning start page?
 - Ban instance/account/video from search results use case?
     - Report feature?
+- Scan loop optimization: first ensure compatible PeerTube version with `/api/v1/config`
 - Search frontend, HTML safe video data?
-- Handle the case of scan failure but instance has videos in video storage
 - Kubernetes
 - Seed status storage with known instance hosts list
 - Stats endpoint?
