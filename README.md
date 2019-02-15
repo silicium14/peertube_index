@@ -10,9 +10,9 @@ We should check monitor video document validation errors per PeerTube instance v
 ### Development
 - To run Elasticsearch in docker
 ```bash
-docker run -d --name peertube-index-elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:6.5.4
+docker run -d --name peertube-index-elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:6.6.0
 # For tests
-docker run -d --name peertube-index-elasticsearch-test -p 5555:9200 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:6.5.4
+docker run -d --name peertube-index-elasticsearch-test -p 5555:9200 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:6.6.0
 ```
 
 - To start iex
@@ -28,7 +28,6 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 
 ## TODO
 - Monitor invalid document errors by instance version to ensure that our validation still works correctly for new versions
-- Upgrade elasticsearch
 - Simplify infrastructure code with docker compose?
 - Make deploy not failing on container deletion if a container does not exists
 - HTTP Digest authentication for web frontend with a reverse proxy

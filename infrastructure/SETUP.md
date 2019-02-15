@@ -32,7 +32,7 @@ docker run \
     -v elasticsearch_data:/usr/share/elasticsearch/data \
     -v elasticsearch_backups:/backups \
     --ulimit memlock=-1:-1 \
-    docker.elastic.co/elasticsearch/elasticsearch:6.5.4
+    docker.elastic.co/elasticsearch/elasticsearch:6.6.0
 ```
 
 Configure Elasticsearch backup repository, on the server
