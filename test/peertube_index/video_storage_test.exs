@@ -67,4 +67,19 @@ defmodule PeertubeIndex.VideoStorageTest do
     assert PeertubeIndex.VideoStorage.Elasticsearch.search("dummy") == []
     assert PeertubeIndex.VideoStorage.Elasticsearch.search("other instance") == [other_instance_video]
   end
+
+  test "delete_instance_videos! removes videos of the given instance" do
+    # Given We have videos
+    videos = [
+      %{"name" => "A dummy video", "account" => %{"host" => "example.com"}},
+      %{"name" => "Another dummy video", "account" => %{"host" => "example.com"}}
+    ]
+    PeertubeIndex.VideoStorage.Elasticsearch.with_videos(videos)
+    Process.sleep 1_000
+    # When I delete videos of the instance
+    PeertubeIndex.VideoStorage.Elasticsearch.delete_instance_videos!("example.com")
+    Process.sleep 1_000
+    # Then
+    assert PeertubeIndex.VideoStorage.Elasticsearch.search("dummy") == []
+  end
 end

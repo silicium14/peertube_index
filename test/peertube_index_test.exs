@@ -67,8 +67,9 @@ defmodule PeertubeIndexTest do
     Mox.verify!()
   end
 
-  test "scan handles failures and reports the corresponding statuses" do
+  test "scan handles failures, reports the corresponding statuses and deletes existing videos for the failed instance" do
     Mox.stub(PeertubeIndex.InstanceScanner.Mock, :scan, fn "some-instance.example.com" -> {:error, :some_reason} end)
+    Mox.expect(PeertubeIndex.VideoStorage.Mock, :delete_instance_videos!, fn "some-instance.example.com" -> :ok end)
     {:ok, finishes_at} = NaiveDateTime.new(2018, 1, 1, 14, 15, 16)
     Mox.expect(PeertubeIndex.StatusStorage.Mock, :failed_instance, fn "some-instance.example.com", :some_reason, ^finishes_at -> :ok end)
 

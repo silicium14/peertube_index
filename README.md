@@ -27,8 +27,7 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 ```
 
 ## TODO
-- Fix HTTP 500 on http://peertube-index.net/search?text=bille
-    - requires: dump and restore prod databases locally
+- Monitor invalid document errors by instance version to ensure that our validation still works correctly for new versions
 - Upgrade elasticsearch
 - Simplify infrastructure code with docker compose?
 - Make deploy not failing on container deletion if a container does not exists

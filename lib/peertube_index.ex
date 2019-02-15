@@ -29,6 +29,7 @@ defmodule PeertubeIndex do
         {:error, reason} ->
           Logger.info "Scan failed for #{host}, reason: #{inspect(reason)}"
           @status_storage.failed_instance(host, reason, scan_end)
+          @video_storage.delete_instance_videos!(host)
       end
     end
 

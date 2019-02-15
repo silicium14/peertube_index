@@ -2,6 +2,11 @@ defmodule PeertubeIndex.VideoStorage do
   @moduledoc false
 
   @doc """
+  Removes existing videos of the given instance
+  """
+  @callback delete_instance_videos!(String.t) :: :ok
+
+  @doc """
   Updates an instance with a list of videos.
   This removes existing videos for the given instance and inserts the given videos.
   """
@@ -38,13 +43,19 @@ defmodule PeertubeIndex.VideoStorage.Elasticsearch do
   def elasticsearch_config, do: Confex.fetch_env!(:peertube_index, :elasticsearch_config)
 
   @impl true
-  def update_instance!(hostname, videos) do
+  def delete_instance_videos!(hostname) do
     Elasticsearch.post!(
       elasticsearch_config(),
       "/#{@index}/_delete_by_query",
       %{"query" => %{"term" => %{"account.host" => hostname}}}
     )
 
+    :ok
+  end
+
+  @impl true
+  def update_instance!(hostname, videos) do
+    delete_instance_videos!(hostname)
     for video <- videos do
       Elasticsearch.post!(elasticsearch_config(), "/#{@index}/#{@document_type}", video)
     end
