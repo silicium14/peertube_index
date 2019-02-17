@@ -67,6 +67,44 @@ defmodule PeertubeIndex.WebServerTest do
     assert conn.resp_body == "Fake search result"
   end
 
+  test "an empty search shows a validation error" do
+    # When a user does a search with an empty text
+    conn = conn(:get, "/search?text=")
+    conn = assign(conn, :render_missing_text_function_called, fn ->
+      send self(), {:render_missing_text_function_called}
+      "Validation error"
+    end)
+    conn = PeertubeIndex.WebServer.call(conn, @opts)
+
+    # Then the error page is rendered
+    assert_received {:render_missing_text_function_called}
+
+    # And the user sees the error
+    assert conn.state == :sent
+    assert conn.status == 400
+    assert List.keyfind(conn.resp_headers, "content-type", 0) == {"content-type", "text/html; charset=utf-8"}
+    assert conn.resp_body == "Validation error"
+  end
+
+  test "a missing search text query param shows a validation error" do
+    # When a user does a search with an empty text
+    conn = conn(:get, "/search")
+    conn = assign(conn, :render_missing_text_function_called, fn ->
+      send self(), {:render_missing_text_function_called}
+      "Validation error"
+    end)
+    conn = PeertubeIndex.WebServer.call(conn, @opts)
+
+    # Then the error page is rendered
+    assert_received {:render_missing_text_function_called}
+
+    # And the user sees the error
+    assert conn.state == :sent
+    assert conn.status == 400
+    assert List.keyfind(conn.resp_headers, "content-type", 0) == {"content-type", "text/html; charset=utf-8"}
+    assert conn.resp_body == "Validation error"
+  end
+
   test "user can search videos as JSON" do
     query = "yet another user search text"
     conn = conn(:get, "/api/search?text=#{query}")

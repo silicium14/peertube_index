@@ -27,6 +27,8 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 ```
 
 ## TODO
+- Display the number of results, and a message if there is no result
+- Bad request instead of 500 when missing search text on JSON search API
 - Monitor invalid document errors by instance version to ensure that our validation still works correctly for new versions
 - Simplify infrastructure code with docker compose?
 - Make deploy not failing on container deletion if a container does not exists

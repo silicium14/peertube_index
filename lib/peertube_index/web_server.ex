@@ -18,16 +18,30 @@ defmodule PeertubeIndex.WebServer do
   get "/search" do
     search = conn.assigns[:search_usecase_function] || &PeertubeIndex.search/1
     render = conn.assigns[:render_page_function] || &render_search_page/2
+    error_page = conn.assigns[:render_missing_text_function_called] || &render_missing_text_page/0
 
     conn = fetch_query_params(conn)
     query = conn.query_params["text"]
-    videos = search.(query)
-    conn = put_resp_content_type(conn, "text/html")
-    send_resp(conn, 200, render.(videos, query))
+    case query do
+      "" ->
+        conn = put_resp_content_type(conn, "text/html")
+        send_resp(conn, 400, error_page.())
+      nil ->
+        conn = put_resp_content_type(conn, "text/html")
+        send_resp(conn, 400, error_page.())
+      _ ->
+        videos = search.(query)
+        conn = put_resp_content_type(conn, "text/html")
+        send_resp(conn, 200, render.(videos, query))
+    end
   end
 
   defp render_search_page(videos, query) do
     EEx.eval_file("templates/search.html.eex", [videos: videos, query: query])
+  end
+
+  defp render_missing_text_page() do
+    EEx.eval_file("templates/missing_text.html.eex")
   end
 
   get "/api/search" do
