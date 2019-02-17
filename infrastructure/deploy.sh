@@ -25,6 +25,9 @@ function deploy {
     docker build -t peertube-index-traefik:${VERSION} infrastructure/traefik
     docker image save -o infrastructure/builds/peertube-index-traefik-image-${VERSION}.tar peertube-index-traefik:${VERSION}
 
+    docker build -t peertube-index-error-pages:${VERSION} infrastructure/error_pages
+    docker image save -o infrastructure/builds/peertube-index-error-pages-image-${VERSION}.tar peertube-index-error-pages:${VERSION}
+
     export DESTINATION_DIRECTORY=/root/
     rsync -avz infrastructure/builds/peertube-index-image-${VERSION}.tar ${MACHINE_SSH_DESTINATION}:${DESTINATION_DIRECTORY}
     rsync -avz infrastructure/builds/peertube-index-traefik-image-${VERSION}.tar ${MACHINE_SSH_DESTINATION}:${DESTINATION_DIRECTORY}
@@ -37,6 +40,17 @@ function deploy {
     ssh ${MACHINE_SSH_DESTINATION} << END_OF_REMOTE_SCRIPT
         set -e
         set -x
+
+        docker image load -i ${DESTINATION_DIRECTORY}/peertube-index-error-pages-image-${VERSION}.tar
+        docker tag peertube-index-error-pages:${VERSION} peertube-index-error-pages:latest
+        docker stop peertube-index-error-pages
+        docker rm peertube-index-error-pages
+        docker run \
+            -d \
+            --restart always \
+            --network ${NETWORK} \
+            --name peertube-index-error-pages \
+            peertube-index-error-pages:${VERSION}
 
         docker image load -i ${DESTINATION_DIRECTORY}/peertube-index-traefik-image-${VERSION}.tar
         docker tag peertube-index-traefik:${VERSION} peertube-index-traefik:latest

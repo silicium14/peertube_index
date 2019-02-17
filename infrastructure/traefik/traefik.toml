@@ -13,9 +13,21 @@
   [backends.peertube-index]
     [backends.peertube-index.servers.server1]
     url = "http://peertube-index:80"
+  [backends.errors]
+    [backends.errors.servers.error]
+    url = "http://peertube-index-error-pages:80"
 
 [frontends]
   [frontends.peertube-index]
   backend = "peertube-index"
+  [frontends.peertube-index.errors]
+    [frontends.peertube-index.errors.5xx]
+    status = ["500-599"]
+    backend = "errors"
+    query = "/5xx.html"
+    [frontends.peertube-index.errors.404]
+    status = ["404"]
+    backend = "errors"
+    query = "/404.html"
   [frontends.peertube-index.routes.get]
     rule = "Method: GET"

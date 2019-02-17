@@ -30,14 +30,13 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 - Monitor invalid document errors by instance version to ensure that our validation still works correctly for new versions
 - Simplify infrastructure code with docker compose?
 - Make deploy not failing on container deletion if a container does not exists
-- HTTP Digest authentication for web frontend with a reverse proxy
 - Use Hackney instead of httpc (waiting for https://github.com/PSPDFKit-labs/bypass/issues/75)
 - Figure why httpc truncates response in some cases or change http client
 - respect `/robots.txt`?
 - Sensitive content warning start page?
 - Ban instance/account/video from search results use case?
     - Report feature?
-- Scan loop optimization: first ensure compatible PeerTube version with `/api/v1/config`
+- Scan loop optimization: check node compatibility with Nodeinfo
 - Search frontend, HTML safe video data?
 - Kubernetes
 - Seed status storage with known instance hosts list
