@@ -31,6 +31,7 @@ function deploy {
     export DESTINATION_DIRECTORY=/root/
     rsync -avz infrastructure/builds/peertube-index-image-${VERSION}.tar ${MACHINE_SSH_DESTINATION}:${DESTINATION_DIRECTORY}
     rsync -avz infrastructure/builds/peertube-index-traefik-image-${VERSION}.tar ${MACHINE_SSH_DESTINATION}:${DESTINATION_DIRECTORY}
+    rsync -avz infrastructure/builds/peertube-index-error-pages-image-${VERSION}.tar ${MACHINE_SSH_DESTINATION}:${DESTINATION_DIRECTORY}
     rsync -avz ${USERS_CREDENTIALS_FILE} ${MACHINE_SSH_DESTINATION}:${DESTINATION_DIRECTORY}/users_credentials.htdigest
 
     export NETWORK=peertube-index
