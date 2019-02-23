@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+#background {
+    left: 0;
+    top: 0;
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-image: url("/static/background.jpg");
+    background-size: cover;
+    z-index: -1;
+    opacity: 0.3;
+}
+
+#warning {
+    left: 0;
+    bottom: 0;
+    position: fixed;
+    width: 100%;
+    text-align: center;
+    background-color: #333333;
+    color: white;
+    z-index: 1;
+    font-size: 14px;
+    font-family: Verdana, sans-serif;
+}
+
+form {
+    margin: 7% auto 0 auto;
+    width: 50%;
+    min-width: 310px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+form input, form button {
+    width: 63%;
+    min-width: 288px;
+    box-sizing: border-box;
+    height: 50px;
+    font-size: medium;
+    border: none;
+    border-radius: 8px;
+    font-family: Verdana, sans-serif;
+}
+
+h1 {
+    margin-bottom: 135px;
+    font-weight: normal;
+    font-family: Verdana, sans-serif;
+}
+
+input {
+    padding: 10px 10px;
+    margin-bottom: 12px;
+    background: url("/static/search_icon.svg") 98.1% 50% no-repeat white;
+}
+
+button {
+    padding: 10px 0px;
+    color: white;
+    background-color: #333333;
+    cursor: pointer;
+}
+
+</style>
+<title>PeerTube Index</title>
+</head>
+<body>
+<div id="background"></div>
+<form action="search">
+    <h1>PeerTube Index</h1>
+    <input name="text" placeholder="Search something" type="text" value="" required="">
+    <button type="submit">Search</button>
+</form>
+<div id="warning">
+    <p>ⓘ Unsafe content (violence, pornography...) may be displayed, <a style="color: inherit;" href="warning.html">click here to see why.</a></p>
+</div>
+</body>
+</html>

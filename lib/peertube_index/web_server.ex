@@ -3,6 +3,10 @@ defmodule PeertubeIndex.WebServer do
 
   use Plug.Router
 
+  plug Plug.Logger
+  plug Plug.Static,
+    at: "/static",
+    from: "frontend/static"
   plug :match
   plug :dispatch
 
@@ -12,7 +16,7 @@ defmodule PeertubeIndex.WebServer do
 
   get "" do
     conn = put_resp_content_type(conn, "text/html")
-    send_resp(conn, 200, EEx.eval_file("templates/home.html.eex", []))
+    send_resp(conn, 200, EEx.eval_file("frontend/home.html.eex", []))
   end
 
   get "/search" do
