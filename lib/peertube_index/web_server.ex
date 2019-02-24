@@ -41,7 +41,7 @@ defmodule PeertubeIndex.WebServer do
   end
 
   defp render_search_page(videos, query) do
-    EEx.eval_file("templates/search.html.eex", [videos: videos, query: query])
+    EEx.eval_file("frontend/search.html.eex", [videos: videos, query: query])
   end
 
   defp render_missing_text_page() do

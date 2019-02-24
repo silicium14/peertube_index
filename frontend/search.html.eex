@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+body {
+    margin: 0;
+    font-family: Verdana, sans-serif
+}
+
+.searchBar {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    position: fixed;
+    width: 100%;
+    min-width: 320px;
+}
+.searchBar-field {
+    box-sizing: border-box;
+    font-size: medium;
+    width: 30%;
+    min-width: 288px;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+    background: url("/static/search_icon.svg") 98.1% 50% no-repeat white;
+}
+
+.topSpacer {
+    height: 100px;
+}
+
+.main {
+    width: 267px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.video {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 50px;
+}
+.video-thumbnail {
+    object-fit: contain;
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid;
+}
+.video-details {
+    margin-left: 2px;
+    margin-right: 2px;
+}
+.video-title {
+    color: black;
+    text-decoration: none;
+}
+.video-title p {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+.video-date,
+.video-views,
+.video-account {
+    color: gray;
+    font-size: smaller;
+    margin: 0;
+    text-decoration: none;
+}
+
+.warning {
+    left: 0;
+    bottom: 0;
+    position: fixed;
+    width: 100%;
+    min-width: 320px;
+    text-align: center;
+    background-color: #333333;
+    color: white;
+    z-index: 1;
+    font-size: 14px;
+    font-family: Verdana, sans-serif;
+    margin: 0;
+    position: sticky;
+}
+.warning p {
+    margin: 0;
+    padding: 10px 0;
+}
+.warning p a {
+    color: inherit;
+}
+</style>
+</head>
+
+<body>
+    <form class=searchBar>
+        <%= Phoenix.HTML.Tag.tag("input", type: "text", name: "text", class: "searchBar-field", value: query, placeholder: "Search something", required: true) |> Phoenix.HTML.safe_to_string() %>
+    </form>
+    <div class="topSpacer"></div>
+    <div class="main"><%= for video <- videos do %>
+        <article class="video">
+            <%=
+                Phoenix.HTML.Tag.content_tag(
+                    :a,
+                    Phoenix.HTML.Tag.img_tag(
+                        "https://" <> video["account"]["host"] <> video["previewPath"],
+                        class: "video-thumbnail",
+                    ),
+                    href: "https://" <> video["account"]["host"] <> "/videos/watch/" <> video["uuid"]
+                ) |> Phoenix.HTML.safe_to_string()
+            %>
+            <div class="video-details">
+                <%=
+                    Phoenix.HTML.Tag.content_tag(
+                        :a,
+                        Phoenix.HTML.Tag.content_tag(
+                            :p,
+                            video["name"]
+                        ),
+                        href: "https://" <> video["account"]["host"] <> "/videos/watch/" <> video["uuid"],
+                        class: "video-title"
+                    )|> Phoenix.HTML.safe_to_string()
+                %>
+                <%=
+                    Phoenix.HTML.Tag.content_tag(
+                        :p,
+                        "Published #{video["publishedAt"] |> NaiveDateTime.from_iso8601!() |> NaiveDateTime.truncate(:second)}",
+                        class: "video-date"
+                    ) |> Phoenix.HTML.safe_to_string()
+                %>
+                <%=
+                    Phoenix.HTML.Tag.content_tag(
+                        :p,
+                        "#{video["views"]} views",
+                        class: "video-views"
+                    ) |> Phoenix.HTML.safe_to_string()
+                %>
+                <%=
+                    Phoenix.HTML.Tag.content_tag(
+                        :a,
+                        "#{video["account"]["name"]}@#{video["account"]["host"]}",
+                        class: "video-account",
+                        href: video["account"]["url"]
+                    ) |> Phoenix.HTML.safe_to_string()
+                %>
+            </div>
+
+        </article>
+    <%end%></div>
+    <div class="warning">
+        <p>⚠️ Unsafe content (violence, pornography...) may be displayed, <a href="warning">click here to see why.</a></p>
+    </div>
+</body>
+
+</html>

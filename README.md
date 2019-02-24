@@ -27,7 +27,9 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 ```
 
 ## TODO
-- Better look
+- Search bar icon also a button?
+- Video title truncated if too long
+- Thumnails placeholder during loading OR pagination
 - Display the number of results, and a message if there is no result
 - Explain ordering of results
 - Bad request instead of 500 when missing search text on JSON search API
