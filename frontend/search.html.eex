@@ -18,13 +18,18 @@ body {
 .searchBar-field {
     box-sizing: border-box;
     font-size: medium;
-    width: 30%;
-    min-width: 288px;
+    width: 288px;
     padding: 0.8rem;
     border: none;
     border-radius: 8px;
     box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
     background: url("/static/search_icon.svg") 98.1% 50% no-repeat white;
+}
+@media (min-width: 900px) {
+    .searchBar-field {
+        width: 572px;
+        align-items: stretch;
+    }
 }
 
 .topSpacer {
@@ -36,6 +41,14 @@ body {
     margin: 0 auto;
     display: flex;
     flex-direction: column;
+    align-items: center;
+}
+@media (min-width: 900px) {
+    .main {
+        width: auto;
+        max-width: 768px;
+        align-items: stretch;
+    }
 }
 
 .video {
@@ -43,15 +56,31 @@ body {
     flex-direction: column;
     margin-bottom: 50px;
 }
+@media (min-width: 900px) {
+    .video {
+        flex-direction: row;
+    }
+}
+
 .video-thumbnail {
     object-fit: contain;
-    width: 100%;
+    width: 267px;
     border-radius: 10px;
     border: 1px solid;
+}
+@media (min-width: 900px) {
+    .video-thumbnail {
+        margin-right: 20px;
+    }
 }
 .video-details {
     margin-left: 2px;
     margin-right: 2px;
+}
+@media (min-width: 900px) {
+    .video {
+        flex-direction: row;
+    }
 }
 .video-title {
     color: black;
