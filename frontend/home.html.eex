@@ -2,6 +2,11 @@
 <html>
 <head>
 <style>
+body {
+    margin: 0;
+    font-family: Verdana, sans-serif
+}
+
 #background {
     left: 0;
     top: 0;
@@ -14,6 +19,38 @@
     opacity: 0.3;
 }
 
+.searchForm {
+    margin-top: 7%;
+    width: 100%;
+    min-width: 320px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.searchForm-title {
+    margin-bottom: 135px;
+    font-weight: normal;
+    font-family: Verdana, sans-serif;
+}
+.searchForm-button {
+    box-sizing: border-box;
+    margin-top: 15px;
+    width: 288px;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 8px;
+    font-size: medium;
+    color: white;
+    background-color: #333333;
+    cursor: pointer;
+}
+@media (min-width: 900px) {
+    .searchForm-button {
+        width: 572px;
+        align-items: stretch;
+    }
+}
+
 #warning {
     left: 0;
     bottom: 0;
@@ -24,60 +61,22 @@
     color: white;
     z-index: 1;
     font-size: 14px;
-    font-family: Verdana, sans-serif;
 }
-
-form {
-    margin: 7% auto 0 auto;
-    width: 50%;
-    min-width: 310px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-form input, form button {
-    width: 63%;
-    min-width: 288px;
-    box-sizing: border-box;
-    height: 50px;
-    font-size: medium;
-    border: none;
-    border-radius: 8px;
-    font-family: Verdana, sans-serif;
-}
-
-h1 {
-    margin-bottom: 135px;
-    font-weight: normal;
-    font-family: Verdana, sans-serif;
-}
-
-input {
-    padding: 10px 10px;
-    margin-bottom: 12px;
-    background: url("/static/search_icon.svg") 98.1% 50% no-repeat white;
-}
-
-button {
-    padding: 10px 0px;
-    color: white;
-    background-color: #333333;
-    cursor: pointer;
-}
-
 </style>
+
+<link rel="stylesheet" href="/static/search_bar.css">
 <title>PeerTube Index</title>
 </head>
+
 <body>
 <div id="background"></div>
-<form action="search">
-    <h1>PeerTube Index</h1>
-    <input name="text" placeholder="Search something" type="text" value="" required="">
-    <button type="submit">Search</button>
+<form class="searchForm" action="search">
+    <h1 class="searchForm-title">PeerTube Index</h1>
+    <%= EEx.eval_file("frontend/search_bar.html.eex", fixed: false, query: "") %>
+    <button class="searchForm-button" type="submit">Search</button>
 </form>
 <div id="warning">
-    <p>ⓘ Unsafe content (violence, pornography...) may be displayed, <a style="color: inherit;" href="warning.html">click here to see why.</a></p>
+    <p>⚠️ Unsafe content (violence, pornography...) may be displayed, <a style="color: inherit;" href="warning.html">click here to see why.</a></p>
 </div>
 </body>
 </html>

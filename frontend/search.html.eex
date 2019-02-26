@@ -7,29 +7,13 @@ body {
     font-family: Verdana, sans-serif
 }
 
-.searchBar {
-    margin-top: 20px;
+.searchForm {
     display: flex;
     justify-content: center;
-    position: fixed;
     width: 100%;
     min-width: 320px;
-}
-.searchBar-field {
-    box-sizing: border-box;
-    font-size: medium;
-    width: 288px;
-    padding: 0.8rem;
-    border: none;
-    border-radius: 8px;
-    box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
-    background: url("/static/search_icon.svg") 98.1% 50% no-repeat white;
-}
-@media (min-width: 900px) {
-    .searchBar-field {
-        width: 572px;
-        align-items: stretch;
-    }
+    margin-top: 20px;
+    position: fixed;
 }
 
 .topSpacer {
@@ -122,11 +106,12 @@ body {
     color: inherit;
 }
 </style>
+<link rel="stylesheet" href="/static/search_bar.css">
 </head>
 
 <body>
-    <form class=searchBar>
-        <%= Phoenix.HTML.Tag.tag("input", type: "text", name: "text", class: "searchBar-field", value: query, placeholder: "Search something", required: true) |> Phoenix.HTML.safe_to_string() %>
+    <form class="searchForm">
+        <%= EEx.eval_file("frontend/search_bar.html.eex", fixed: true, query: query) %>
     </form>
     <div class="topSpacer"></div>
     <div class="main"><%= for video <- videos do %>
@@ -176,7 +161,6 @@ body {
                     ) |> Phoenix.HTML.safe_to_string()
                 %>
             </div>
-
         </article>
     <%end%></div>
     <div class="warning">

@@ -1,0 +1,18 @@
+<%
+classes = if fixed do
+    "searchBar searchBar--fixed"
+else
+    "searchBar"
+end
+%>
+<%=
+Phoenix.HTML.Tag.tag(
+    "input",
+    type: "text",
+    name: "text",
+    class: classes,
+    value: query,
+    placeholder: "Search something",
+    required: true
+) |> Phoenix.HTML.safe_to_string()
+%>
