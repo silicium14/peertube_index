@@ -22,7 +22,8 @@ body {
 
 .main {
     width: 267px;
-    margin: 0 auto;
+    /* The bottom margin leaves room for the fixed warning footer */
+    margin: 0 auto 20px auto;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -82,31 +83,9 @@ body {
     margin: 0;
     text-decoration: none;
 }
-
-.warning {
-    left: 0;
-    bottom: 0;
-    position: fixed;
-    width: 100%;
-    min-width: 320px;
-    text-align: center;
-    background-color: #333333;
-    color: white;
-    z-index: 1;
-    font-size: 14px;
-    font-family: Verdana, sans-serif;
-    margin: 0;
-    position: sticky;
-}
-.warning p {
-    margin: 0;
-    padding: 10px 0;
-}
-.warning p a {
-    color: inherit;
-}
 </style>
 <link rel="stylesheet" href="/static/search_bar.css">
+<link rel="stylesheet" href="/static/warning_footer.css">
 </head>
 
 <body>
@@ -163,9 +142,7 @@ body {
             </div>
         </article>
     <%end%></div>
-    <div class="warning">
-        <p>⚠️ Unsafe content (violence, pornography...) may be displayed, <a href="warning">click here to see why.</a></p>
-    </div>
+    <%= EEx.eval_file("frontend/warning_footer.html.eex") %>
 </body>
 
 </html>

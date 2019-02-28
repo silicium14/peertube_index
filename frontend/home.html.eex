@@ -51,20 +51,12 @@ body {
     }
 }
 
-#warning {
-    left: 0;
-    bottom: 0;
-    position: fixed;
-    width: 100%;
-    text-align: center;
-    background-color: #333333;
-    color: white;
-    z-index: 1;
-    font-size: 14px;
-}
+
 </style>
 
 <link rel="stylesheet" href="/static/search_bar.css">
+<link rel="stylesheet" href="/static/warning_footer.css">
+
 <title>PeerTube Index</title>
 </head>
 
@@ -75,8 +67,6 @@ body {
     <%= EEx.eval_file("frontend/search_bar.html.eex", fixed: false, query: "") %>
     <button class="searchForm-button" type="submit">Search</button>
 </form>
-<div id="warning">
-    <p>⚠️ Unsafe content (violence, pornography...) may be displayed, <a style="color: inherit;" href="warning.html">click here to see why.</a></p>
-</div>
+<%= EEx.eval_file("frontend/warning_footer.html.eex") %>
 </body>
 </html>

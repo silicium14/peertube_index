@@ -1,0 +1,19 @@
+.warningFooter {
+    position: fixed;
+    bottom: 0;
+    margin: 0;
+    width: 100%;
+    z-index: 1;
+    min-width: 320px;
+    text-align: center;
+    background-color: #333333;
+    color: white;
+    font-size: 14px;
+}
+.warningFooter p {
+    margin: 0;
+    padding: 10px 0;
+}
+.warningFooter p a {
+    color: inherit;
+}
