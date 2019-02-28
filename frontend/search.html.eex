@@ -49,9 +49,9 @@ body {
 
 .video-thumbnail {
     object-fit: contain;
-    width: 267px;
+    width: 268px;
     border-radius: 10px;
-    border: 1px solid;
+    border: none;
 }
 @media (min-width: 900px) {
     .video-thumbnail {
