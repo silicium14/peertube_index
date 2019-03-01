@@ -27,6 +27,11 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 ```
 
 ## TODO
+- Background image credits
+- Duration in thumbnail
+- Home page link on every page
+- About page?
+- Warning page text
 - Search bar icon also a button?
 - Video title truncated if too long
 - Thumnails placeholder during loading OR pagination
@@ -40,7 +45,6 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 - Use Hackney instead of httpc (waiting for https://github.com/PSPDFKit-labs/bypass/issues/75)
 - Figure why httpc truncates response in some cases or change http client
 - respect `/robots.txt`?
-- Sensitive content warning start page?
 - Ban instance/account/video from search results use case?
     - Report feature?
 - Scan loop optimization: check node compatibility with Nodeinfo

@@ -30,7 +30,7 @@ defmodule PeertubeIndex.WebServerTest do
   end
 
   test "user can see home page" do
-    conn = conn(:get, "")
+    conn = conn(:get, "/")
 
     conn = PeertubeIndex.WebServer.call(conn, @opts)
 
@@ -103,6 +103,16 @@ defmodule PeertubeIndex.WebServerTest do
     assert conn.status == 400
     assert List.keyfind(conn.resp_headers, "content-type", 0) == {"content-type", "text/html; charset=utf-8"}
     assert conn.resp_body == "Validation error"
+  end
+
+  test "use can see unsafe content warning page" do
+    conn = conn(:get, "/unsafe-content-warning")
+
+    conn = PeertubeIndex.WebServer.call(conn, @opts)
+
+    assert conn.state == :sent
+    assert conn.status == 200
+    assert List.keyfind(conn.resp_headers, "content-type", 0) == {"content-type", "text/html; charset=utf-8"}
   end
 
   test "user can search videos as JSON" do

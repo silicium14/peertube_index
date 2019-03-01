@@ -14,7 +14,7 @@ defmodule PeertubeIndex.WebServer do
     send_resp(conn, 200, "pong")
   end
 
-  get "" do
+  get "/" do
     conn = put_resp_content_type(conn, "text/html")
     send_resp(conn, 200, EEx.eval_file("frontend/home.html.eex", []))
   end
@@ -44,7 +44,7 @@ defmodule PeertubeIndex.WebServer do
     EEx.eval_file("frontend/search.html.eex", [videos: videos, query: query])
   end
 
-  defp render_missing_text_page() do
+  defp render_missing_text_page do
     EEx.eval_file("templates/missing_text.html.eex")
   end
 
@@ -55,6 +55,11 @@ defmodule PeertubeIndex.WebServer do
     videos = search.(Map.get(conn.query_params, "text"))
     conn = put_resp_content_type(conn, "application/json")
     send_resp(conn, 200, Poison.encode!(videos))
+  end
+
+  get "/unsafe-content-warning" do
+    conn = put_resp_content_type(conn, "text/html")
+    send_resp(conn, 200, EEx.eval_file("frontend/unsafe_content_warning.html.eex", []))
   end
 
   match _ do
