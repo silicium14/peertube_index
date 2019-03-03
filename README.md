@@ -28,14 +28,13 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 
 ## TODO
 - Background image credits
-- Duration in thumbnail
+- Display the number of results, and a message if there is no result
 - Home page link on every page
 - About page?
 - Warning page text
 - Search bar icon also a button?
 - Video title truncated if too long
-- Thumnails placeholder during loading OR pagination
-- Display the number of results, and a message if there is no result
+- Thumbnails placeholder during loading OR pagination
 - Explain ordering of results
 - Bad request instead of 500 when missing search text on JSON search API
 - Replace `EEx.eval_file` with `EEx.function_from_file` at compile time?

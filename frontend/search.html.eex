@@ -15,6 +15,7 @@ body {
     min-width: 320px;
     margin-top: 20px;
     position: fixed;
+    z-index: 1000;
 }
 
 .topSpacer {
@@ -47,17 +48,33 @@ body {
         flex-direction: row;
     }
 }
-
 .video-thumbnail {
-    object-fit: contain;
-    width: 268px;
-    border-radius: 10px;
-    border: none;
+    position: relative;
+    z-index: 0;
 }
 @media (min-width: 900px) {
     .video-thumbnail {
         margin-right: 20px;
     }
+}
+.video-thumbnail img {
+    width: 268px;
+    object-fit: contain;
+    border-radius: 10px;
+    border: none;
+    /* https://stackoverflow.com/a/11126701 */
+    display: block;
+}
+.video-duration {
+    position: absolute;
+    right: 5px;
+    bottom: 5px;
+    border: none;
+    border-radius: 5px;
+    background-color: rgba(0,0,0,.8);
+    color: white;
+    padding: 2px 5px;
+    font-size: 12px;
 }
 .video-details {
     margin-left: 2px;
@@ -99,10 +116,20 @@ body {
             <%=
                 Phoenix.HTML.Tag.content_tag(
                     :a,
-                    Phoenix.HTML.Tag.img_tag(
-                        "https://" <> video["account"]["host"] <> video["previewPath"],
-                        class: "video-thumbnail",
-                    ),
+                    [
+                        Phoenix.HTML.Tag.content_tag(
+                            :div,
+                            [
+                                Phoenix.HTML.Tag.img_tag("https://" <> video["account"]["host"] <> video["previewPath"]),
+                                Phoenix.HTML.Tag.content_tag(
+                                    :span,
+                                    PeertubeIndex.FrontendHelpers.format_duration(video["duration"]),
+                                    class: "video-duration"
+                                )
+                            ],
+                            class: "video-thumbnail"
+                        )
+                    ],
                     href: "https://" <> video["account"]["host"] <> "/videos/watch/" <> video["uuid"]
                 ) |> Phoenix.HTML.safe_to_string()
             %>
@@ -116,7 +143,7 @@ body {
                         ),
                         href: "https://" <> video["account"]["host"] <> "/videos/watch/" <> video["uuid"],
                         class: "video-title"
-                    )|> Phoenix.HTML.safe_to_string()
+                    ) |> Phoenix.HTML.safe_to_string()
                 %>
                 <%=
                     Phoenix.HTML.Tag.content_tag(
