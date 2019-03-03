@@ -32,7 +32,7 @@ defmodule PeertubeIndex.StatusStorage do
   @callback ok_instance(String.t, NaiveDateTime.t) :: :ok
 
   @doc """
-  Notify a failed instance scan at the given datetime
+  Notify a failed instance scan, with a reason, at the given datetime
   """
   @callback failed_instance(String.t, any(), NaiveDateTime.t) :: :ok
 
@@ -41,6 +41,11 @@ defmodule PeertubeIndex.StatusStorage do
   This will not override any previously existing status for the same instance.
   """
   @callback discovered_instance(String.t, NaiveDateTime.t) :: :ok
+
+  @doc """
+  Notify a banned instance, with a reason, at the given datetime
+  """
+  @callback banned_instance(String.t, String.t, NaiveDateTime.t) :: :ok
 end
 
 defmodule PeertubeIndex.StatusStorage.Filesystem do
@@ -66,6 +71,8 @@ defmodule PeertubeIndex.StatusStorage.Filesystem do
           write_status_map(host, %{"host" => host, "status" => "error", "reason" => inspect(reason), "date" => date})
         {host, :discovered, date} ->
           write_status_map(host, %{"host" => host, "status" => "discovered", "date" => date})
+        {host, {:banned, reason}, date} ->
+          write_status_map(host, %{"host" => host, "status" => "banned", "reason" => reason, "date" => date})
       end
     end
 
@@ -84,6 +91,8 @@ defmodule PeertubeIndex.StatusStorage.Filesystem do
           {host, :ok, NaiveDateTime.from_iso8601!(date_string)}
         %{"host" => host, "status" => "error", "reason" => reason_string, "date" => date_string} ->
           {host, {:error, reason_string}, NaiveDateTime.from_iso8601!(date_string)}
+        %{"host" => host, "status" => "banned", "reason" => reason_string, "date" => date_string} ->
+          {host, {:banned, reason_string}, NaiveDateTime.from_iso8601!(date_string)}
       end
     end
   end
@@ -128,9 +137,14 @@ defmodule PeertubeIndex.StatusStorage.Filesystem do
 
   @impl true
   def discovered_instance(host, date) do
-    if has_no_already_existing_status(host) do
+    if has_no_already_existing_status_except_banned(host) do
       write_status_map(host, %{"host" => host, "status" => "discovered", "date" => date})
     end
+  end
+
+  @impl true
+  def banned_instance(host, reason, date) do
+    write_status_map(host, %{"host" => host, "status" => "banned", "reason" => reason, "date" => date})
   end
 
   defp write_status_map(host, status_map) do
@@ -139,11 +153,23 @@ defmodule PeertubeIndex.StatusStorage.Filesystem do
     :file.close(file)
   end
 
-  def has_no_already_existing_status(host) do
-    host
-    |> host_file()
-    |> File.exists?()
-    |> Kernel.not()
+  # TODO: this is ugly, change it
+  defp has_no_already_existing_status_except_banned(host) do
+    (
+      host
+      |> host_file()
+      |> File.exists?()
+      |> Kernel.not()
+    ) or (
+      {:ok, bytes} = host |> host_file() |> :file.read_file()
+      status_map = Poison.decode!(bytes)
+      case status_map do
+        %{"status" => "banned"} ->
+          true
+        _ ->
+          false
+      end
+    )
   end
 
   defp host_file(host) do

@@ -54,6 +54,7 @@ defmodule PeertubeIndex.VideoStorageTest do
     assert PeertubeIndex.VideoStorage.Elasticsearch.search("interesting") == [another_video]
   end
 
+  # TODO: maybe this is business logic that should be implemented in a use case
   test "update_instance! deletes existing instance videos" do
     # Given We have videos from two instances
     video = %{"name" => "A dummy video", "account" => %{"host" => "example.com"}}

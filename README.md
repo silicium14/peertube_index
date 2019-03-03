@@ -34,7 +34,11 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 - Warning page text
 - Search bar icon also a button?
 - Video title truncated if too long
+- Functions in StatusStorage have no exclamation mark but functions in VideoStorage have one
+- Some functions in StatusStorage may not return :ok as required by their spec
+- Use case tests have a lot of mocking that may not be about the tested behaviour, see if we can fix it
 - Thumbnails placeholder during loading OR pagination
+- Handle instance timezone it such a thing exists?
 - Explain ordering of results
 - Bad request instead of 500 when missing search text on JSON search API
 - Replace `EEx.eval_file` with `EEx.function_from_file` at compile time?
