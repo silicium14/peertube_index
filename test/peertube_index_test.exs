@@ -82,6 +82,16 @@ defmodule PeertubeIndexTest do
     Mox.verify!()
   end
 
+  test "scan skips banned instances" do
+    Mox.expect(PeertubeIndex.StatusStorage.Mock, :find_instances, fn :banned -> ["banned-instance.example.com"] end)
+    # We should not scan
+    Mox.expect(PeertubeIndex.InstanceScanner.Mock, :scan, 0, fn instance -> {:error, :some_reason} end)
+
+    PeertubeIndex.scan(["banned-instance.example.com"])
+
+    Mox.verify!()
+  end
+
   test "rescan" do
     {:ok, current_time} = NaiveDateTime.new(2018, 2, 2, 14, 15, 16)
     {:ok, maximum_date} = NaiveDateTime.new(2018, 2, 1, 14, 15, 16)

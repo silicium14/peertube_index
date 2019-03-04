@@ -18,23 +18,27 @@ defmodule PeertubeIndex do
   def scan(hostnames, get_local_time \\ &get_current_time_naivedatetime/0) do
     banned_instances = @status_storage.find_instances(:banned)
     for host <- hostnames do
-      Logger.info "Scanning instance #{host}"
-      result = @instance_api.scan(host)
-      scan_end = get_local_time.()
-      case result do
-        {:ok, {videos, found_instances}} ->
-          Logger.info "Scan successful for #{host} with #{length(videos)} videos and #{MapSet.size(found_instances)} instances"
-          @video_storage.update_instance!(host, videos)
-          @status_storage.ok_instance(host, scan_end)
-          for instance <- found_instances do
-            if not Enum.member?(banned_instances, instance) do
-              @status_storage.discovered_instance(instance, scan_end)
+      if Enum.member?(banned_instances, host) do
+        Logger.info "Skipping banned instance #{host}"
+      else
+        Logger.info "Scanning instance #{host}"
+        result = @instance_api.scan(host)
+        scan_end = get_local_time.()
+        case result do
+          {:ok, {videos, found_instances}} ->
+            Logger.info "Scan successful for #{host} with #{length(videos)} videos and #{MapSet.size(found_instances)} instances"
+            @video_storage.update_instance!(host, videos)
+            @status_storage.ok_instance(host, scan_end)
+            for instance <- found_instances do
+              if not Enum.member?(banned_instances, instance) do
+                @status_storage.discovered_instance(instance, scan_end)
+              end
             end
-          end
-        {:error, reason} ->
-          Logger.info "Scan failed for #{host}, reason: #{inspect(reason)}"
-          @status_storage.failed_instance(host, reason, scan_end)
-          @video_storage.delete_instance_videos!(host)
+          {:error, reason} ->
+            Logger.info "Scan failed for #{host}, reason: #{inspect(reason)}"
+            @status_storage.failed_instance(host, reason, scan_end)
+            @video_storage.delete_instance_videos!(host)
+        end
       end
     end
 
