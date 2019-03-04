@@ -46,6 +46,12 @@ defmodule PeertubeIndex.StatusStorage do
   Notify a banned instance, with a reason, at the given datetime
   """
   @callback banned_instance(String.t, String.t, NaiveDateTime.t) :: :ok
+
+  @doc """
+  Returns true if a instance (identified by it's hostname) has a status in the database,
+  and false otherwise
+  """
+  @callback has_a_status(String.t) :: boolean()
 end
 
 defmodule PeertubeIndex.StatusStorage.Filesystem do
@@ -137,9 +143,7 @@ defmodule PeertubeIndex.StatusStorage.Filesystem do
 
   @impl true
   def discovered_instance(host, date) do
-    if has_no_already_existing_status_except_banned(host) do
-      write_status_map(host, %{"host" => host, "status" => "discovered", "date" => date})
-    end
+    write_status_map(host, %{"host" => host, "status" => "discovered", "date" => date})
   end
 
   @impl true
@@ -147,29 +151,14 @@ defmodule PeertubeIndex.StatusStorage.Filesystem do
     write_status_map(host, %{"host" => host, "status" => "banned", "reason" => reason, "date" => date})
   end
 
+  def has_a_status(host) do
+    host |> host_file() |> File.exists?()
+  end
+
   defp write_status_map(host, status_map) do
     {:ok, file} = :file.open(host_file(host), [:raw, :write])
     :file.write(file, Poison.encode!(status_map, pretty: true))
     :file.close(file)
-  end
-
-  # TODO: this is ugly, change it
-  defp has_no_already_existing_status_except_banned(host) do
-    (
-      host
-      |> host_file()
-      |> File.exists?()
-      |> Kernel.not()
-    ) or (
-      {:ok, bytes} = host |> host_file() |> :file.read_file()
-      status_map = Poison.decode!(bytes)
-      case status_map do
-        %{"status" => "banned"} ->
-          true
-        _ ->
-          false
-      end
-    )
   end
 
   defp host_file(host) do

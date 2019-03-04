@@ -19,28 +19,6 @@ defmodule PeertubeIndex.StatusStorageTest do
            ])
   end
 
-  # TODO: maybe this is business logic that should be implemented in a use case
-  test "discover instance does not override an existing status except banned" do
-    :ok = PeertubeIndex.StatusStorage.Filesystem.with_statuses([
-      {"example.com", :ok, ~N[2018-03-11 20:10:31]},
-      {"failed.example.com", {:error, :some_reason}, ~N[2018-03-12 09:01:22]},
-      {"discovered.example.com", :discovered, ~N[2018-03-13 11:55:14]},
-      {"banned-at-some-point.example.com", {:banned, "Some reason for a ban"}, ~N[2018-03-14 12:41:33]}
-    ])
-
-    PeertubeIndex.StatusStorage.Filesystem.discovered_instance("example.com", ~N[2018-03-11 20:10:32])
-    PeertubeIndex.StatusStorage.Filesystem.discovered_instance("failed.example.com", ~N[2018-03-12 09:01:23])
-    PeertubeIndex.StatusStorage.Filesystem.discovered_instance("discovered.example.com", ~N[2018-03-13 11:55:15])
-    PeertubeIndex.StatusStorage.Filesystem.discovered_instance("banned-at-some-point.example.com", ~N[2018-04-01 09:00:00])
-
-    assert MapSet.new(PeertubeIndex.StatusStorage.Filesystem.all()) == MapSet.new([
-             {"example.com", :ok, ~N[2018-03-11 20:10:31]},
-             {"failed.example.com", {:error, ":some_reason"}, ~N[2018-03-12 09:01:22]},
-             {"discovered.example.com", :discovered, ~N[2018-03-13 11:55:14]},
-             {"banned-at-some-point.example.com", :discovered, ~N[2018-04-01 09:00:00]},
-           ])
-  end
-
   test "find_instances with status" do
     :ok = PeertubeIndex.StatusStorage.Filesystem.with_statuses([
       {"discovered1.example.com", :discovered, ~N[2018-03-11 20:10:31]},
@@ -94,6 +72,7 @@ defmodule PeertubeIndex.StatusStorageTest do
     assert MapSet.new(instances) == MapSet.new(["failed-old-enough.example.com"])
   end
 
+  # TODO: refactor into a parameterized test and add the banned_instance case
   test "failed_instance overrides existing status" do
     :ok = PeertubeIndex.StatusStorage.Filesystem.with_statuses([{"example.com", :ok, ~N[2018-03-11 20:10:31]}])
 
@@ -108,5 +87,20 @@ defmodule PeertubeIndex.StatusStorageTest do
     PeertubeIndex.StatusStorage.Filesystem.ok_instance("example.com", ~N[2018-04-01 12:40:00])
 
     assert PeertubeIndex.StatusStorage.Filesystem.all() == [{"example.com", :ok, ~N[2018-04-01 12:40:00]}]
+  end
+
+  test "discovered_instance overrides existing status" do
+    :ok = PeertubeIndex.StatusStorage.Filesystem.with_statuses([{"example.com", :ok, ~N[2019-03-03 21:23:44]}])
+
+    PeertubeIndex.StatusStorage.Filesystem.discovered_instance("example.com", ~N[2019-03-04 04:05:29])
+
+    assert PeertubeIndex.StatusStorage.Filesystem.all() == [{"example.com", :discovered, ~N[2019-03-04 04:05:29]}]
+  end
+
+  test "has_a_status" do
+    known_instance = "known-instance.example.com"
+    :ok = PeertubeIndex.StatusStorage.Filesystem.with_statuses([{known_instance, :ok, ~N[2018-03-11 20:10:31]}])
+    assert PeertubeIndex.StatusStorage.Filesystem.has_a_status(known_instance) == true
+    assert PeertubeIndex.StatusStorage.Filesystem.has_a_status("unknown-instance.example.com") == false
   end
 end

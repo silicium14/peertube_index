@@ -30,7 +30,7 @@ defmodule PeertubeIndex do
             @video_storage.update_instance!(host, videos)
             @status_storage.ok_instance(host, scan_end)
             for instance <- found_instances do
-              if not Enum.member?(banned_instances, instance) do
+              if not @status_storage.has_a_status(instance) do
                 @status_storage.discovered_instance(instance, scan_end)
               end
             end

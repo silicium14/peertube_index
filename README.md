@@ -27,45 +27,46 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 ```
 
 ## TODO
+### Features
 - Background image credits
 - Display the number of results, and a message if there is no result
 - Home page link on every page
-- About page?
 - Warning page text
+- Explain ordering of results
+- About page?
+    - This project is not related to the PeerTube project and its creator is not related to Framasoft
 - Search bar icon also a button?
 - Video title truncated if too long
+- Thumbnails placeholder during loading OR pagination
+- Respect `/robots.txt`?
+- Handle instance timezone it such a thing exists?
+- Monitor invalid document errors by instance version to ensure that our validation still works correctly for new versions
+- Seed status storage with known instance hosts list
+- Scan loop optimization: check node compatibility with Nodeinfo
+- Monitoring
+- Rate limiting
+- Better looking error and not found pages
+- Search bad request that matches the look
+- Status frontend
+- Provide search for unsafe content
+
+### Code enhancements
+- Measure test coverage
+- Better function names for StatusStorage functions to change the status?
 - Functions in StatusStorage have no exclamation mark but functions in VideoStorage have one
 - Some functions in StatusStorage may not return :ok as required by their spec
 - Use case tests have a lot of mocking that may not be about the tested behaviour, see if we can fix it
-- Thumbnails placeholder during loading OR pagination
-- Handle instance timezone it such a thing exists?
-- Explain ordering of results
 - Bad request instead of 500 when missing search text on JSON search API
 - Replace `EEx.eval_file` with `EEx.function_from_file` at compile time?
-- Monitor invalid document errors by instance version to ensure that our validation still works correctly for new versions
 - Simplify infrastructure code with docker compose?
 - Make deploy not failing on container deletion if a container does not exists
 - Use Hackney instead of httpc (waiting for https://github.com/PSPDFKit-labs/bypass/issues/75)
 - Figure why httpc truncates response in some cases or change http client
-- respect `/robots.txt`?
-- Ban instance/account/video from search results use case?
-    - Report feature?
-- Scan loop optimization: check node compatibility with Nodeinfo
-- Search frontend, HTML safe video data?
-- Kubernetes
-- Seed status storage with known instance hosts list
-- Stats endpoint?
 - More automated Instance API non regression tests: use our own instance?
 - Deployment
     - HTTPS
-- Log incoming requests
-- Monitoring
-- Rate limiting
-- Error and not found pages
 - Add an end to end test
 - Scan multiple instances concurrently
-- HTTP API: pagination: add number of pages to response, search use case pagination
-- Status frontend
 - Isolate and handle failures of the steps in scan function
 - Use document type from Elasticsearch library?
 - Remember that in the domain we directly use the objects returned by the storage without any conversion, we are coupled to the storage format for now
