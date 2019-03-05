@@ -151,14 +151,15 @@ defmodule PeertubeIndex.StatusStorage.Filesystem do
     write_status_map(host, %{"host" => host, "status" => "banned", "reason" => reason, "date" => date})
   end
 
+  @impl true
   def has_a_status(host) do
     host |> host_file() |> File.exists?()
   end
 
   defp write_status_map(host, status_map) do
     {:ok, file} = :file.open(host_file(host), [:raw, :write])
-    :file.write(file, Poison.encode!(status_map, pretty: true))
-    :file.close(file)
+    :ok = :file.write(file, Poison.encode!(status_map, pretty: true))
+    :ok = :file.close(file)
   end
 
   defp host_file(host) do

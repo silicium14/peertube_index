@@ -54,7 +54,6 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 - Measure test coverage
 - Better function names for StatusStorage functions to change the status?
 - Functions in StatusStorage have no exclamation mark but functions in VideoStorage have one
-- Some functions in StatusStorage may not return :ok as required by their spec
 - Use case tests have a lot of mocking that may not be about the tested behaviour, see if we can fix it
 - Bad request instead of 500 when missing search text on JSON search API
 - Replace `EEx.eval_file` with `EEx.function_from_file` at compile time?
