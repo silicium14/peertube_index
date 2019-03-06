@@ -41,13 +41,13 @@ defmodule PeertubeIndex.VideoStorageTest do
     assert length(PeertubeIndex.VideoStorage.Elasticsearch.search("video")) == 100
   end
 
-  test "update_instance! adds videos and we can search them" do
+  test "insert_videos! adds videos and we can search them" do
     # Given I have an empty index
     PeertubeIndex.VideoStorage.Elasticsearch.empty()
     # When I update an instance with some videos
     a_video = %{"name" => "A dummy video"}
     another_video = %{"name" => "An interesting video"}
-    PeertubeIndex.VideoStorage.Elasticsearch.update_instance!("example.com", [a_video, another_video])
+    PeertubeIndex.VideoStorage.Elasticsearch.insert_videos!([a_video, another_video])
     Process.sleep 1_000
     # Then
     assert PeertubeIndex.VideoStorage.Elasticsearch.search("dummy") == [a_video]

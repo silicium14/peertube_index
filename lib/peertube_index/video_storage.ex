@@ -7,11 +7,9 @@ defmodule PeertubeIndex.VideoStorage do
   @callback delete_instance_videos!(String.t) :: :ok
 
   @doc """
-  Updates an instance with a list of videos.
-  This removes existing videos for the given instance and inserts the given videos.
+  Inserts a list of videos.
   """
-  # TODO: rename to insert_videos and remove the hostname parameter
-  @callback update_instance!(String.t, [map]) :: :ok
+  @callback insert_videos!([map]) :: :ok
 
   @doc """
   Search for a video by its name
@@ -55,7 +53,7 @@ defmodule PeertubeIndex.VideoStorage.Elasticsearch do
   end
 
   @impl true
-  def update_instance!(hostname, videos) do
+  def insert_videos!(videos) do
     for video <- videos do
       Elasticsearch.post!(elasticsearch_config(), "/#{@index}/#{@document_type}", video)
     end
