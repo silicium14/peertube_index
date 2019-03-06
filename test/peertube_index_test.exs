@@ -1,6 +1,19 @@
 defmodule PeertubeIndexTest do
   use ExUnit.Case, async: true
 
+  def scan_mocks do
+    Mox.stub(PeertubeIndex.InstanceScanner.Mock, :scan, fn hostname -> {:ok, {[], MapSet.new()}} end)
+
+    Mox.stub(PeertubeIndex.VideoStorage.Mock, :delete_instance_videos!, fn hostname -> :ok end)
+    Mox.stub(PeertubeIndex.VideoStorage.Mock, :update_instance!, fn hostname, _videos -> :ok end)
+
+    Mox.stub(PeertubeIndex.StatusStorage.Mock, :find_instances, fn status -> [] end)
+    Mox.stub(PeertubeIndex.StatusStorage.Mock, :ok_instance, fn hostname, datetime -> :ok end)
+    Mox.stub(PeertubeIndex.StatusStorage.Mock, :discovered_instance, fn hostname, datetime -> :ok end)
+    Mox.stub(PeertubeIndex.StatusStorage.Mock, :failed_instance, fn hostname, reason, datetime -> :ok end)
+    Mox.stub(PeertubeIndex.StatusStorage.Mock, :has_a_status, fn hostname -> false end)
+  end
+
   test "we can search safe videos by their name using storage" do
     # Given there are videos
     a_video = %{"name" => "A video about a cat"}
@@ -23,9 +36,7 @@ defmodule PeertubeIndexTest do
   end
 
   test "scan uses instance api, deletes existing instance videos and inserts new ones in video storage" do
-    Mox.stub(PeertubeIndex.StatusStorage.Mock, :find_instances, fn :banned -> [] end)
-    Mox.stub(PeertubeIndex.StatusStorage.Mock, :ok_instance, fn _host, _date -> :ok end)
-
+    scan_mocks()
     videos = [%{"name" => "some video"}]
     Mox.expect(PeertubeIndex.InstanceScanner.Mock, :scan, fn "some-instance.example.com" -> {:ok, {videos, MapSet.new()}} end)
     Mox.expect(PeertubeIndex.VideoStorage.Mock, :delete_instance_videos!, fn "some-instance.example.com" -> :ok end)
@@ -42,10 +53,7 @@ defmodule PeertubeIndexTest do
   end
 
   test "scan updates instance status" do
-    Mox.stub(PeertubeIndex.StatusStorage.Mock, :find_instances, fn :banned -> [] end)
-    Mox.stub(PeertubeIndex.InstanceScanner.Mock, :scan, fn "some-instance.example.com" -> {:ok, {[], MapSet.new()}} end)
-    Mox.stub(PeertubeIndex.VideoStorage.Mock, :delete_instance_videos!, fn hostname -> :ok end)
-    Mox.stub(PeertubeIndex.VideoStorage.Mock, :update_instance!, fn "some-instance.example.com", _videos -> :ok end)
+    scan_mocks()
     {:ok, finishes_at} = NaiveDateTime.new(2018, 1, 1, 14, 15, 16)
     Mox.expect(PeertubeIndex.StatusStorage.Mock, :ok_instance, fn "some-instance.example.com", ^finishes_at -> :ok end)
 
@@ -55,20 +63,14 @@ defmodule PeertubeIndexTest do
   end
 
   test "scan reports the appropriate status for discovered instances" do
-    Mox.stub(PeertubeIndex.StatusStorage.Mock, :find_instances, fn :banned -> [] end)
+    scan_mocks()
     Mox.stub(
       PeertubeIndex.InstanceScanner.Mock, :scan,
       fn "some-instance.example.com" ->
         {:ok, {[], MapSet.new(["found-instance.example.com", "another-found-instance.example.com"])}}
       end
     )
-    Mox.stub(PeertubeIndex.VideoStorage.Mock, :delete_instance_videos!, fn hostname -> :ok end)
-    Mox.stub(PeertubeIndex.VideoStorage.Mock, :update_instance!, fn hostname, videos -> :ok end)
     {:ok, finishes_at} = NaiveDateTime.new(2018, 1, 1, 14, 15, 16)
-    Mox.expect(PeertubeIndex.StatusStorage.Mock, :ok_instance, fn "some-instance.example.com", ^finishes_at -> :ok end)
-    # Discovered instances do not have a status yet
-    Mox.stub(PeertubeIndex.StatusStorage.Mock, :has_a_status, fn hostname -> false end)
-
     # Then we set the status for the discovered instances
     Mox.expect(PeertubeIndex.StatusStorage.Mock, :discovered_instance, fn "another-found-instance.example.com", ^finishes_at -> :ok end)
     Mox.expect(PeertubeIndex.StatusStorage.Mock, :discovered_instance, fn "found-instance.example.com", ^finishes_at -> :ok end)
@@ -78,8 +80,27 @@ defmodule PeertubeIndexTest do
     Mox.verify!()
   end
 
+  test "scan does not override an existing status with the discovered status" do
+    scan_mocks()
+    # Given we have some instances with a status
+    instances_with_a_status = ["known-instance-1.example.com",  "known-instance-2.example.com"]
+    Mox.expect(PeertubeIndex.StatusStorage.Mock, :has_a_status, 2, fn hostname -> Enum.member?(instances_with_a_status, hostname) end)
+
+    # When we discover those instances during a scan
+    Mox.expect(
+      PeertubeIndex.InstanceScanner.Mock, :scan,
+      fn "some-instance.example.com" -> {:ok, {[], MapSet.new(instances_with_a_status)}} end
+    )
+
+    # Then We must not change the status of instances discovered instances
+    Mox.expect(PeertubeIndex.StatusStorage.Mock, :discovered_instance, 0, fn hostname, date -> :ok end)
+
+    PeertubeIndex.scan(["some-instance.example.com"])
+    Mox.verify!()
+  end
+
   test "scan handles failures, reports the corresponding statuses and deletes existing videos for the failed instance" do
-    Mox.stub(PeertubeIndex.StatusStorage.Mock, :find_instances, fn :banned -> [] end)
+    scan_mocks()
     Mox.stub(PeertubeIndex.InstanceScanner.Mock, :scan, fn "some-instance.example.com" -> {:error, :some_reason} end)
     Mox.expect(PeertubeIndex.VideoStorage.Mock, :delete_instance_videos!, fn "some-instance.example.com" -> :ok end)
     {:ok, finishes_at} = NaiveDateTime.new(2018, 1, 1, 14, 15, 16)
@@ -93,7 +114,7 @@ defmodule PeertubeIndexTest do
   test "scan skips banned instances" do
     Mox.expect(PeertubeIndex.StatusStorage.Mock, :find_instances, fn :banned -> ["banned-instance.example.com"] end)
     # We should not scan
-    Mox.expect(PeertubeIndex.InstanceScanner.Mock, :scan, 0, fn instance -> {:error, :some_reason} end)
+    Mox.expect(PeertubeIndex.InstanceScanner.Mock, :scan, 0, fn instance -> nil end)
 
     PeertubeIndex.scan(["banned-instance.example.com"])
 
@@ -126,30 +147,6 @@ defmodule PeertubeIndexTest do
     Mox.expect(PeertubeIndex.StatusStorage.Mock, :banned_instance, fn "instance-to-ban.example.com", "Provides illegal content", ^current_time -> :ok end)
 
     PeertubeIndex.ban_instance("instance-to-ban.example.com", "Provides illegal content", fn -> current_time end)
-
-    Mox.verify!()
-  end
-
-  test "scan does not override an existing status with the discovered status" do
-    # Given we have some instances with a status
-    instances_with_a_status = ["known-instance-1.example.com",  "known-instance-2.example.com"]
-
-    # When we discover those instances during a scan
-    Mox.expect(
-      PeertubeIndex.InstanceScanner.Mock, :scan,
-      fn "some-instance.example.com" -> {:ok, {[], MapSet.new(instances_with_a_status)}} end
-    )
-
-    Mox.stub(PeertubeIndex.StatusStorage.Mock, :find_instances, fn :banned -> [] end)
-    Mox.stub(PeertubeIndex.VideoStorage.Mock, :delete_instance_videos!, fn hostname -> :ok end)
-    Mox.stub(PeertubeIndex.VideoStorage.Mock, :update_instance!, fn hostname, videos -> :ok end)
-    Mox.stub(PeertubeIndex.StatusStorage.Mock, :ok_instance, fn "some-instance.example.com", date -> :ok end)
-    Mox.expect(PeertubeIndex.StatusStorage.Mock, :has_a_status, 2, fn hostname -> Enum.member?(instances_with_a_status, hostname) end)
-
-    # Then We must not change the status of instances discovered instances
-    Mox.expect(PeertubeIndex.StatusStorage.Mock, :discovered_instance, 0, fn hostname, date -> :ok end)
-
-    PeertubeIndex.scan(["some-instance.example.com"])
 
     Mox.verify!()
   end

@@ -6,7 +6,7 @@ defmodule PeertubeIndex do
   require Logger
 
   @video_storage Application.fetch_env!(:peertube_index, :video_storage)
-  @instance_api Application.fetch_env!(:peertube_index, :instance_api)
+  @instance_scanner Application.fetch_env!(:peertube_index, :instance_scanner)
   @status_storage Application.fetch_env!(:peertube_index, :status_storage)
 
   @spec search(String.t) :: [map]
@@ -22,7 +22,7 @@ defmodule PeertubeIndex do
         Logger.info "Skipping banned instance #{host}"
       else
         Logger.info "Scanning instance #{host}"
-        result = @instance_api.scan(host)
+        result = @instance_scanner.scan(host)
         scan_end = get_local_time.()
         case result do
           {:ok, {videos, found_instances}} ->

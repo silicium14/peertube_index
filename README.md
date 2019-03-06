@@ -29,12 +29,12 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 ## TODO
 ### Features
 - Background image credits
-- Display the number of results, and a message if there is no result
-- Home page link on every page
+- Display the number of results, and a message if there is no result / Explain ordering of results
+- Bigger title
 - Warning page text
-- Explain ordering of results
 - About page?
     - This project is not related to the PeerTube project and its creator is not related to Framasoft
+- Home page link on every page
 - Search bar icon also a button?
 - Video title truncated if too long
 - Thumbnails placeholder during loading OR pagination
