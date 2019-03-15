@@ -29,11 +29,18 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 ## TODO
 ### Features
 - Background image credits
-- Display the number of results, and a message if there is no result / Explain ordering of results
 - Bigger title
 - Warning page text
 - About page?
     - This project is not related to the PeerTube project and its creator is not related to Framasoft
+    - Background image credits
+- Fix invalid request
+- Display the number of results, and a message if there is no result / Explain ordering of results
+- HTTPS
+- Monitoring
+    - Node Exporter on the host + documentation in infrastructure/SETUP.md
+    - Dashboard
+- Error reporting
 - Home page link on every page
 - Search bar icon also a button?
 - Video title truncated if too long
@@ -43,26 +50,25 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 - Monitor invalid document errors by instance version to ensure that our validation still works correctly for new versions
 - Seed status storage with known instance hosts list
 - Scan loop optimization: check node compatibility with Nodeinfo
-- Monitoring
 - Rate limiting
 - Better looking error and not found pages
-- Search bad request that matches the look
 - Status frontend
 - Provide search for unsafe content
+- Zero downtime deploy
 
 ### Code enhancements
+- Install script should `cd` into the appropriate directory to work
 - Measure test coverage
 - Better function names for StatusStorage functions to change the status?
 - Functions in StatusStorage have no exclamation mark but functions in VideoStorage have one
 - Bad request instead of 500 when missing search text on JSON search API
 - Replace `EEx.eval_file` with `EEx.function_from_file` at compile time?
 - Simplify infrastructure code with docker compose?
+- Update setup procecure
 - Make deploy not failing on container deletion if a container does not exists
 - Use Hackney instead of httpc (waiting for https://github.com/PSPDFKit-labs/bypass/issues/75)
 - Figure why httpc truncates response in some cases or change http client
 - More automated Instance API non regression tests: use our own instance?
-- Deployment
-    - HTTPS
 - Add an end to end test
 - Scan multiple instances concurrently
 - Isolate and handle failures of the steps in scan function

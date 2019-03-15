@@ -4,6 +4,7 @@
 # Expected environment variables:
 #   MACHINE_SSH_DESTINATION: user@hostname.domain
 #   USERS_CREDENTIALS_FILE: path of user credentials in htdigest format
+#   MONITORING_USERS_CREDENTIALS_FILE: path of monitoring user credentials in htdigest format
 
 set -e
 set -x
@@ -33,6 +34,8 @@ function deploy {
     rsync -avz infrastructure/builds/peertube-index-traefik-image-${VERSION}.tar ${MACHINE_SSH_DESTINATION}:${DESTINATION_DIRECTORY}
     rsync -avz infrastructure/builds/peertube-index-error-pages-image-${VERSION}.tar ${MACHINE_SSH_DESTINATION}:${DESTINATION_DIRECTORY}
     rsync -avz ${USERS_CREDENTIALS_FILE} ${MACHINE_SSH_DESTINATION}:${DESTINATION_DIRECTORY}/users_credentials.htdigest
+    rsync -avz ${MONITORING_USERS_CREDENTIALS_FILE} ${MACHINE_SSH_DESTINATION}:${DESTINATION_DIRECTORY}/monitoring_users_credentials.htdigest
+    rsync -avz infrastructure/prometheus.yml ${MACHINE_SSH_DESTINATION}:${DESTINATION_DIRECTORY}/prometheus.yml
 
     export NETWORK=peertube-index
     export ELASTICSEARCH_URL='http://peertube-index-elasticsearch:9200'
@@ -41,6 +44,27 @@ function deploy {
     ssh ${MACHINE_SSH_DESTINATION} << END_OF_REMOTE_SCRIPT
         set -e
         set -x
+
+        docker stop peertube-index-prometheus
+        docker rm peertube-index-prometheus
+        docker run \
+            -d \
+            --restart always \
+            --network ${NETWORK} \
+            -v prometheus_data:/prometheus \
+            -v "${DESTINATION_DIRECTORY}/prometheus.yml":/etc/prometheus/prometheus.yml \
+            --name peertube-index-prometheus \
+            prom/prometheus:v2.8.0
+
+        docker stop peertube-index-grafana
+        docker rm peertube-index-grafana
+        docker run \
+            -d \
+            --restart always \
+            --network ${NETWORK} \
+            -v grafana_data:/var/lib/grafana \
+            --name peertube-index-grafana \
+            grafana/grafana:6.0.1
 
         docker image load -i ${DESTINATION_DIRECTORY}/peertube-index-error-pages-image-${VERSION}.tar
         docker tag peertube-index-error-pages:${VERSION} peertube-index-error-pages:latest
@@ -63,6 +87,7 @@ function deploy {
             --network ${NETWORK} \
             -p 80:80 \
             -v ${DESTINATION_DIRECTORY}/users_credentials.htdigest:/srv/users_credentials.htdigest \
+            -v ${DESTINATION_DIRECTORY}/monitoring_users_credentials.htdigest:/srv/monitoring_users_credentials.htdigest \
             --name peertube-index-traefik \
             peertube-index-traefik:${VERSION}
 

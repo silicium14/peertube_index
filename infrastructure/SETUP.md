@@ -18,6 +18,8 @@ On the server
 ```bash
 docker network create peertube-index
 docker volume create status_storage
+docker volume create grafana_data
+docker volume create prometheus_data
 docker volume create elasticsearch_data
 docker volume create elasticsearch_backups
 docker run \
@@ -133,5 +135,20 @@ docker run \
 
 # Deployments after first setup
 ```bash
-MACHINE_SSH_DESTINATION=user@hostname.domain ./infrastructre/deploy.sh
+MACHINE_SSH_DESTINATION="user@hostname.domain" \
+USERS_CREDENTIALS_FILE="users_credentials_file.htdigest" \
+MONITORING_USERS_CREDENTIALS_FILE="monitoring_users_credentials_file.htdigest" \
+./infrastructre/deploy.sh
 ```
+
+## Manage monitoring users digest authentication
+- Create empty htdigest file
+```bash
+touch monitoring_users_credentials.htdigest
+``` 
+- Add a user, the second parameter to `htdigest` must be `traefik`
+```bash
+htdigest monitoring_users_credentials.htdigest traefik username
+``` 
+- Remove a user
+Edit the htdigest file and remove the line corresponding to the user

@@ -2,12 +2,24 @@
 
 [accessLog]
 
+defaultEntryPoints = []
 [entryPoints]
-  [entryPoints.http]
+  [entryPoints.http-public]
     address = ":80"
     compress = true
-    [entryPoints.http.auth.digest]
+    [entryPoints.http-public.auth.digest]
     usersFile = "/srv/users_credentials.htdigest"
+    removeHeader = true
+
+  [entryPoints.http-metrics]
+    address = ":9090"
+
+  [entryPoints.http-monitoring]
+    address = ":8080"
+    compress = true
+    [entryPoints.http-monitoring.auth.digest]
+    usersFile = "/srv/monitoring_users_credentials.htdigest"
+    removeHeader = true
 
 [backends]
   [backends.peertube-index]
@@ -16,9 +28,14 @@
   [backends.errors]
     [backends.errors.servers.error]
     url = "http://peertube-index-error-pages:80"
+  [backends.monitoring]
+    [backends.monitoring.servers.server1]
+    url = "http://peertube-index-grafana:3000"
 
 [frontends]
+  # App
   [frontends.peertube-index]
+  entryPoints = ["http-public"]
   backend = "peertube-index"
   [frontends.peertube-index.errors]
     [frontends.peertube-index.errors.5xx]
@@ -29,5 +46,16 @@
     status = ["404"]
     backend = "errors"
     query = "/404.html"
-  [frontends.peertube-index.routes.get]
-    rule = "Method: GET"
+  [frontends.peertube-index.routes.default]
+    rule = "HostRegexp: {hostname:.*}"
+
+  # Monitoring
+  [frontends.monitoring]
+  entryPoints = ["http-monitoring"]
+  backend = "monitoring"
+  [frontends.monitoring.routes.default]
+    rule = "HostRegexp: {hostname:.*}"
+
+[metrics]
+  [metrics.prometheus]
+    entryPoint = "http-metrics"
