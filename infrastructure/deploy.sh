@@ -16,26 +16,30 @@ function die {
 
 function deploy {
     export VERSION=$(git rev-parse --short --verify HEAD)
+    export ARTIFACTS_DIRECTORY="infrastructure/builds/${VERSION}/"
     echo "# Starting deploy for version ${VERSION}"
 
     [[ -n "$(git status --porcelain)" ]] && die "working directory not clean"
 
+    mkdir "${ARTIFACTS_DIRECTORY}"
+
     docker build -t peertube-index:${VERSION} .
-    docker image save -o infrastructure/builds/peertube-index-image-${VERSION}.tar peertube-index:${VERSION}
+    docker image save -o "${ARTIFACTS_DIRECTORY}/peertube-index-image-${VERSION}.tar" peertube-index:${VERSION}
 
     docker build -t peertube-index-traefik:${VERSION} infrastructure/traefik
-    docker image save -o infrastructure/builds/peertube-index-traefik-image-${VERSION}.tar peertube-index-traefik:${VERSION}
+    docker image save -o "${ARTIFACTS_DIRECTORY}/peertube-index-traefik-image-${VERSION}.tar" peertube-index-traefik:${VERSION}
 
     docker build -t peertube-index-error-pages:${VERSION} infrastructure/error_pages
-    docker image save -o infrastructure/builds/peertube-index-error-pages-image-${VERSION}.tar peertube-index-error-pages:${VERSION}
+    docker image save -o "${ARTIFACTS_DIRECTORY}/peertube-index-error-pages-image-${VERSION}.tar" peertube-index-error-pages:${VERSION}
 
-    export DESTINATION_DIRECTORY=/root/
-    rsync -avz infrastructure/builds/peertube-index-image-${VERSION}.tar ${MACHINE_SSH_DESTINATION}:${DESTINATION_DIRECTORY}
-    rsync -avz infrastructure/builds/peertube-index-traefik-image-${VERSION}.tar ${MACHINE_SSH_DESTINATION}:${DESTINATION_DIRECTORY}
-    rsync -avz infrastructure/builds/peertube-index-error-pages-image-${VERSION}.tar ${MACHINE_SSH_DESTINATION}:${DESTINATION_DIRECTORY}
-    rsync -avz ${USERS_CREDENTIALS_FILE} ${MACHINE_SSH_DESTINATION}:${DESTINATION_DIRECTORY}/users_credentials.htdigest
-    rsync -avz ${MONITORING_USERS_CREDENTIALS_FILE} ${MACHINE_SSH_DESTINATION}:${DESTINATION_DIRECTORY}/monitoring_users_credentials.htdigest
-    rsync -avz infrastructure/prometheus.yml ${MACHINE_SSH_DESTINATION}:${DESTINATION_DIRECTORY}/prometheus.yml
+    cp "${USERS_CREDENTIALS_FILE}" "${ARTIFACTS_DIRECTORY}/users_credentials.htdigest"
+    cp "${MONITORING_USERS_CREDENTIALS_FILE}" "${ARTIFACTS_DIRECTORY}/monitoring_users_credentials.htdigest"
+    cp infrastructure/prometheus.yml "${ARTIFACTS_DIRECTORY}/prometheus.yml"
+
+    # local artifacts directory must not have a trailing slash to send the directory and not just the files inside
+    rsync -rtvz "infrastructure/builds/${VERSION}" ${MACHINE_SSH_DESTINATION}:"/root/"
+    export SERVER_ARTIFACTS_DIRECTORY="/root/${VERSION}/"
+
 
     export NETWORK=peertube-index
     export ELASTICSEARCH_URL='http://peertube-index-elasticsearch:9200'
@@ -52,7 +56,7 @@ function deploy {
             --restart always \
             --network ${NETWORK} \
             -v prometheus_data:/prometheus \
-            -v "${DESTINATION_DIRECTORY}/prometheus.yml":/etc/prometheus/prometheus.yml \
+            -v "${SERVER_ARTIFACTS_DIRECTORY}/prometheus.yml":/etc/prometheus/prometheus.yml \
             --name peertube-index-prometheus \
             prom/prometheus:v2.8.0
 
@@ -66,7 +70,7 @@ function deploy {
             --name peertube-index-grafana \
             grafana/grafana:6.0.1
 
-        docker image load -i ${DESTINATION_DIRECTORY}/peertube-index-error-pages-image-${VERSION}.tar
+        docker image load -i ${SERVER_ARTIFACTS_DIRECTORY}/peertube-index-error-pages-image-${VERSION}.tar
         docker tag peertube-index-error-pages:${VERSION} peertube-index-error-pages:latest
         docker stop peertube-index-error-pages
         docker rm peertube-index-error-pages
@@ -77,7 +81,7 @@ function deploy {
             --name peertube-index-error-pages \
             peertube-index-error-pages:${VERSION}
 
-        docker image load -i ${DESTINATION_DIRECTORY}/peertube-index-traefik-image-${VERSION}.tar
+        docker image load -i ${SERVER_ARTIFACTS_DIRECTORY}/peertube-index-traefik-image-${VERSION}.tar
         docker tag peertube-index-traefik:${VERSION} peertube-index-traefik:latest
         docker stop peertube-index-traefik
         docker rm peertube-index-traefik
@@ -86,12 +90,13 @@ function deploy {
             --restart always \
             --network ${NETWORK} \
             -p 80:80 \
-            -v ${DESTINATION_DIRECTORY}/users_credentials.htdigest:/srv/users_credentials.htdigest \
-            -v ${DESTINATION_DIRECTORY}/monitoring_users_credentials.htdigest:/srv/monitoring_users_credentials.htdigest \
+            -p 8080:8080 \
+            -v ${SERVER_ARTIFACTS_DIRECTORY}/users_credentials.htdigest:/srv/users_credentials.htdigest \
+            -v ${SERVER_ARTIFACTS_DIRECTORY}/monitoring_users_credentials.htdigest:/srv/monitoring_users_credentials.htdigest \
             --name peertube-index-traefik \
             peertube-index-traefik:${VERSION}
 
-        docker image load -i ${DESTINATION_DIRECTORY}/peertube-index-image-${VERSION}.tar
+        docker image load -i ${SERVER_ARTIFACTS_DIRECTORY}/peertube-index-image-${VERSION}.tar
         docker tag peertube-index:${VERSION} peertube-index:latest
         docker stop peertube-index
         docker rm peertube-index
