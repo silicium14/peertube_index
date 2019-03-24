@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PeerTube Index</title>
+<style>
+body {
+    min-width: 320px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px auto;
+    font-family: Verdana, sans-serif;
+}
+@media (min-width: 900px) {
+    body {
+        width: auto;
+    }
+}
+.aboutSection {
+    box-sizing: border-box;
+    width: 267px;
+    padding: 10px;
+    border-radius: 8px;
+}
+.aboutSection a {
+    color: black;
+}
+@media (min-width: 900px) {
+    .aboutSection {
+        width: 768px;
+    }
+}
+.aboutSection:target {
+    color: white;
+    background-color: #333333;
+}
+.aboutSection:target a {
+    color: white;
+}
+
+.quefaireaparisLogo {
+    display: flex;
+    border-radius: 50%;
+    background-color: white;
+    height: 196px;
+    width: 196px;
+    margin: 16px 16px;
+}
+.quefaireaparisLogo img {
+    width: 140px;
+    object-fit: contain;
+    margin: 28px;
+}
+.navigationLinks {
+    text-align: center;
+    margin-top: 30px;
+}
+.navigationLinks a {
+    color: black
+}
+</style>
+</head>
+
+<body>
+
+<article id="this-site" class="aboutSection">
+    <h2>About this site</h2>
+    <p>
+        This site crawls the PeerTube federation to discover PeerTube instances,
+        scans every PeerTube instance found for their videos,
+        and make all found videos searchable by their name,
+        excluding videos marked as Not Safe For Work (NSFW).
+    </p>
+    <p>
+        This site is not affiliated to Framasoft.
+    </p>
+</article>
+
+<article id="unsafe-content" class="aboutSection">
+    <h2>⚠️ Unsafe content warning</h2>
+    <p>
+        Unsafe content (such as pornography, violence...) may be displayed on search results even with unrelated search terms.
+    </p>
+    <p>
+        PeerTube allows video publishers to tag their videos either as safe or unsafe.
+        When we discover and scan PeerTube instances for their videos, we get this information for each video, we are therefore able to exclude the videos marked as unsafe.
+        This tagging is the only information we have to exclude unsafe videos. However, this tagging is out of our control.
+        Because anybody can host a PeerTube instance (which is the very purpose of PeerTube), anybody can choose to ignore the tagging on their own instance and publish unsafe videos not tagged as such.
+    </p>
+    <p>
+        As PeerTube Index discovers PeerTube instances and scans them in an automatic fashion in order to find as many instances and videos as possible,
+        PeerTube Index cannot be responsible for the not properly tagged unsafe content that it discovers and displays on search results.
+    </p>
+</article>
+
+<article id="photo" class="aboutSection">
+    <h2>Photo credits</h2>
+    <p>
+        Backgound image published on <a href="https://quefaire.paris.fr/11510/reouverture-de-la-bnf-richelieu">quefaire.paris.fr</a>
+    </p>
+    <span class="quefaireaparisLogo"><img src="https://quefaire.paris.fr/logo.png"></span>
+</article>
+
+<nav class="navigationLinks"><a href="/">home page</a> - <a href="javascript:history.back()">go back</a></nav>
+</body>
+
+</html>

@@ -28,15 +28,12 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 
 ## TODO
 ### Features
-- Background image credits
-- Bigger title
-- Warning page text
-- About page?
-    - This project is not related to the PeerTube project and its creator is not related to Framasoft
-    - Background image credits
-- Fix invalid request
-- Display the number of results, and a message if there is no result / Explain ordering of results
 - HTTPS
+- Fix invalid request
+- Logo and home page link on search page
+- SEO metadata
+- Bigger title
+- Display the number of results, and a message if there is no result / Explain ordering of results
 - Monitoring
     - Node Exporter on the host + documentation in infrastructure/SETUP.md
     - Dashboard

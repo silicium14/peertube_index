@@ -51,6 +51,14 @@ body {
         align-items: stretch;
     }
 }
+.aboutLinks {
+    margin-top: 40px;
+    width: 100%;
+    text-align: center;
+}
+.aboutLinks a {
+    color: black;
+}
 </style>
 
 <link rel="stylesheet" href="/static/search_bar.css">
@@ -66,6 +74,9 @@ body {
     <%= EEx.eval_file("frontend/search_bar.html.eex", fixed: false, query: "") %>
     <button class="searchForm-button" type="submit">Search</button>
 </form>
+<div class="aboutLinks">
+<a href="/about#this-site">about this site</a> - <a href="/about#photo">photo credits</a>
+</div>
 <%= EEx.eval_file("frontend/warning_footer.html.eex") %>
 </body>
 </html>

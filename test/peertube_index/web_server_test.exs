@@ -105,8 +105,8 @@ defmodule PeertubeIndex.WebServerTest do
     assert conn.resp_body == "Validation error"
   end
 
-  test "use can see unsafe content warning page" do
-    conn = conn(:get, "/unsafe-content-warning")
+  test "user can see about page" do
+    conn = conn(:get, "/about")
 
     conn = PeertubeIndex.WebServer.call(conn, @opts)
 

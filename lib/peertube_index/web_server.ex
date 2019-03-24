@@ -57,9 +57,9 @@ defmodule PeertubeIndex.WebServer do
     send_resp(conn, 200, Poison.encode!(videos))
   end
 
-  get "/unsafe-content-warning" do
+  get "/about" do
     conn = put_resp_content_type(conn, "text/html")
-    send_resp(conn, 200, EEx.eval_file("frontend/unsafe_content_warning.html.eex", []))
+    send_resp(conn, 200, EEx.eval_file("frontend/about.html.eex", []))
   end
 
   match _ do
