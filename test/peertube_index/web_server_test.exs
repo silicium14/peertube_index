@@ -70,39 +70,25 @@ defmodule PeertubeIndex.WebServerTest do
   test "an empty search shows a validation error" do
     # When a user does a search with an empty text
     conn = conn(:get, "/search?text=")
-    conn = assign(conn, :render_missing_text_function_called, fn ->
-      send self(), {:render_missing_text_function_called}
-      "Validation error"
-    end)
     conn = PeertubeIndex.WebServer.call(conn, @opts)
 
-    # Then the error page is rendered
-    assert_received {:render_missing_text_function_called}
-
-    # And the user sees the error
+    # Then the user is redirected to home page
     assert conn.state == :sent
-    assert conn.status == 400
+    assert conn.status == 302
     assert List.keyfind(conn.resp_headers, "content-type", 0) == {"content-type", "text/html; charset=utf-8"}
-    assert conn.resp_body == "Validation error"
+    assert List.keyfind(conn.resp_headers, "location", 0) == {"location", "/"}
   end
 
-  test "a missing search text query param shows a validation error" do
-    # When a user does a search with an empty text
+  test "a missing search text query param redirects to home page" do
+    # When a user does a search without the query parameter
     conn = conn(:get, "/search")
-    conn = assign(conn, :render_missing_text_function_called, fn ->
-      send self(), {:render_missing_text_function_called}
-      "Validation error"
-    end)
     conn = PeertubeIndex.WebServer.call(conn, @opts)
 
-    # Then the error page is rendered
-    assert_received {:render_missing_text_function_called}
-
-    # And the user sees the error
+    # Then the user is redirected to the home page
     assert conn.state == :sent
-    assert conn.status == 400
+    assert conn.status == 302
     assert List.keyfind(conn.resp_headers, "content-type", 0) == {"content-type", "text/html; charset=utf-8"}
-    assert conn.resp_body == "Validation error"
+    assert List.keyfind(conn.resp_headers, "location", 0) == {"location", "/"}
   end
 
   test "user can see about page" do

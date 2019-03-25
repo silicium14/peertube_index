@@ -29,10 +29,12 @@ defmodule PeertubeIndex.WebServer do
     case query do
       "" ->
         conn = put_resp_content_type(conn, "text/html")
-        send_resp(conn, 400, error_page.())
+        conn = put_resp_header(conn, "location", "/")
+        send_resp(conn, 302, "")
       nil ->
         conn = put_resp_content_type(conn, "text/html")
-        send_resp(conn, 400, error_page.())
+        conn = put_resp_header(conn, "location", "/")
+        send_resp(conn, 302, "")
       _ ->
         videos = search.(query)
         conn = put_resp_content_type(conn, "text/html")
