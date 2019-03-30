@@ -29,7 +29,6 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 ## TODO
 ### Features
 - HTTPS
-- Fix invalid request
 - Logo and home page link on search page
 - SEO metadata
 - Bigger title
@@ -43,7 +42,7 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 - Video title truncated if too long
 - Thumbnails placeholder during loading OR pagination
 - Respect `/robots.txt`?
-- Handle instance timezone it such a thing exists?
+- Handle instance timezone if such a thing exists?
 - Monitor invalid document errors by instance version to ensure that our validation still works correctly for new versions
 - Seed status storage with known instance hosts list
 - Scan loop optimization: check node compatibility with Nodeinfo

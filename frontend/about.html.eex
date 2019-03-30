@@ -39,7 +39,37 @@ body {
 .aboutSection:target a {
     color: white;
 }
-
+.reportForm .reportForm-item:first-of-type {
+    margin-top: 0;
+}
+.reportForm {
+    max-width: 500px;
+}
+.reportForm-item {
+    margin-top: 20px;
+}
+.reportForm-inputWithLabel {
+    display: block;
+    font-size: medium;
+    box-sizing: border-box;
+    width: 100%;
+    margin-top: 10px;
+    border-radius: 8px;
+    border: 1px solid lightgray;
+    padding: 0.8rem;
+}
+.reportForm-reason {
+    height: 150px;
+    resize: none;
+    font-family: inherit;
+}
+.reportForm-submitButton {
+    padding: 0.8rem;
+    border-radius: 8px;
+    border: 1px solid lightgray;
+    font-size: medium;
+    cursor: pointer;
+}
 .quefaireaparisLogo {
     display: flex;
     border-radius: 50%;
@@ -71,17 +101,20 @@ body {
         This site crawls the PeerTube federation to discover PeerTube instances,
         scans every PeerTube instance found for their videos,
         and make all found videos searchable by their name,
-        excluding videos marked as Not Safe For Work (NSFW).
+        excluding videos marked as Not Safe For Work (NSFW) for now.
     </p>
     <p>
-        This site is not affiliated to Framasoft.
+
+    </p>
+    <p>
+        This site is not affiliated to Framasoft, the maintainer of the PeerTube software.
     </p>
 </article>
 
 <article id="unsafe-content" class="aboutSection">
     <h2>⚠️ Unsafe content warning</h2>
     <p>
-        Unsafe content (such as pornography, violence...) may be displayed on search results even with unrelated search terms.
+        Unsafe content (such as pornography, violence...) may be displayed on search results, even with normal or "safe" search terms.
     </p>
     <p>
         PeerTube allows video publishers to tag their videos either as safe or unsafe.
@@ -93,6 +126,43 @@ body {
         As PeerTube Index discovers PeerTube instances and scans them in an automatic fashion in order to find as many instances and videos as possible,
         PeerTube Index cannot be responsible for the not properly tagged unsafe content that it discovers and displays on search results.
     </p>
+    <p>
+        If you find a video on PeerTube Index that is unsafe and should not be displayed,
+        you should contact the corresponding instance's administrators to ask them to properly tag their videos.
+        You can also report it to us using the <a href="#report-form">form below</a> so we may exclude it from our search results.
+    </p>
+</article>
+
+<article id="report-form" class="aboutSection">
+    <h2>Report a video</h2>
+    <p>
+        You can use the form below to report a video referenced on PeerTube Index that is illegal according to European Union law or that is unsafe.
+        There is no guarantee that we will remove a video from our search results by submitting this form, this is at our discretion.
+    </p>
+    <p>
+        For unsafe but legal videos, you should first contact the corresponding instance's administrators to ask them to properly tag their videos.
+    </p>
+    <form class="reportForm" accept-charset="UTF-8" action="https://usebasin.com/f/080553025681" method="POST" target="_blank">
+        <div class="reportForm-item">
+            <label for="reportform-videotitle">The title of the video</label>
+            <input class="reportForm-inputWithLabel" id="reportform-videolink" type="text" name="video_title" required>
+        </div>
+        <div class="reportForm-item">
+            <label for="reportform-videolink">The video URL</label>
+            <input class="reportForm-inputWithLabel" id="reportform-videolink" type="url" name="video_link" required>
+        </div>
+        <div class="reportForm-item">
+            <label for="reportform-searchlink">The URL of the PeerTube Index search showing the video</label>
+            <input class="reportForm-inputWithLabel" id="reportform-searchlink" type="url" name="search_link" placeholder="http://peertube-index.net/search?text=example" required>
+        </div>
+        <div class="reportForm-item">
+            <label for="reportform-reason">Why do you report this video?</label>
+            <textarea class="reportForm-inputWithLabel reportForm-reason" id="reportform-reason" name="reason" required></textarea>
+        </div>
+        <div class="reportForm-item">
+            <button class="reportForm-submitButton" type="submit">Submit</button>
+        </div>
+    </form>
 </article>
 
 <article id="photo" class="aboutSection">

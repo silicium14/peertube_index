@@ -12,7 +12,7 @@ Phoenix.HTML.Tag.tag(
     name: "text",
     class: classes,
     value: query,
-    placeholder: "Search something",
+    placeholder: "Search videos by name",
     required: true
 ) |> Phoenix.HTML.safe_to_string()
 %>

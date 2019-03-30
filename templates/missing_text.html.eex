@@ -1,9 +1,0 @@
-<html>
-<style><%= EEx.eval_file("templates/search_component.css.eex") %></style>
-<body>
-<main>
-    <%= EEx.eval_file("templates/search_component.html.eex", [query: ""]) %>
-</main>
-<p>Type some text to search videos</p>
-</body>
-</html>
