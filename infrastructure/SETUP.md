@@ -136,7 +136,6 @@ docker run \
 # Deployments after first setup
 ```bash
 MACHINE_SSH_DESTINATION="user@hostname.domain" \
-USERS_CREDENTIALS_FILE="users_credentials_file.htdigest" \
 MONITORING_USERS_CREDENTIALS_FILE="monitoring_users_credentials_file.htdigest" \
 ./infrastructre/deploy.sh
 ```

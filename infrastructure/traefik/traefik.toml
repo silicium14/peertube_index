@@ -7,9 +7,6 @@ defaultEntryPoints = []
   [entryPoints.http-public]
     address = ":80"
     compress = true
-    [entryPoints.http-public.auth.digest]
-    usersFile = "/srv/users_credentials.htdigest"
-    removeHeader = true
 
   [entryPoints.http-metrics]
     address = ":9090"

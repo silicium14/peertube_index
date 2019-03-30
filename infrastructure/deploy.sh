@@ -3,7 +3,6 @@
 # Deploy the API and the scan loop
 # Expected environment variables:
 #   MACHINE_SSH_DESTINATION: user@hostname.domain
-#   USERS_CREDENTIALS_FILE: path of user credentials in htdigest format
 #   MONITORING_USERS_CREDENTIALS_FILE: path of monitoring user credentials in htdigest format
 
 set -e
@@ -32,7 +31,6 @@ function deploy {
     docker build -t peertube-index-error-pages:${VERSION} infrastructure/error_pages
     docker image save -o "${ARTIFACTS_DIRECTORY}/peertube-index-error-pages-image-${VERSION}.tar" peertube-index-error-pages:${VERSION}
 
-    cp "${USERS_CREDENTIALS_FILE}" "${ARTIFACTS_DIRECTORY}/users_credentials.htdigest"
     cp "${MONITORING_USERS_CREDENTIALS_FILE}" "${ARTIFACTS_DIRECTORY}/monitoring_users_credentials.htdigest"
     cp infrastructure/prometheus.yml "${ARTIFACTS_DIRECTORY}/prometheus.yml"
 
@@ -91,7 +89,6 @@ function deploy {
             --network ${NETWORK} \
             -p 80:80 \
             -p 8080:8080 \
-            -v ${SERVER_ARTIFACTS_DIRECTORY}/users_credentials.htdigest:/srv/users_credentials.htdigest \
             -v ${SERVER_ARTIFACTS_DIRECTORY}/monitoring_users_credentials.htdigest:/srv/monitoring_users_credentials.htdigest \
             --name peertube-index-traefik \
             peertube-index-traefik:${VERSION}
