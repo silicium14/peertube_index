@@ -28,7 +28,6 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 
 ## TODO
 ### Features
-- HTTPS
 - Logo and home page link on search page
 - SEO metadata
 - Bigger title
@@ -53,6 +52,10 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 - Zero downtime deploy
 
 ### Code enhancements
+- Build script and upload script
+- Try smaller heap size for Elasticsearch in order to use a cheaper VM
+- Setup may not need to create docker volumes explicitly, see https://docs.docker.com/storage/volumes/#start-a-container-with-a-volume
+- Separate infrastructure before making code public?
 - Install script should `cd` into the appropriate directory to work
 - Measure test coverage
 - Better function names for StatusStorage functions to change the status?

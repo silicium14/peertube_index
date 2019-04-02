@@ -5,8 +5,14 @@
 defaultEntryPoints = []
 [entryPoints]
   [entryPoints.http-public]
-    address = ":80"
-    compress = true
+  address = ":80"
+  compress = true
+    [entryPoints.http-public.redirect]
+    entryPoint = "https-public"
+  [entryPoints.https-public]
+  address = ":443"
+  compress = true
+  [entryPoints.https-public.tls]
 
   [entryPoints.http-metrics]
     address = ":9090"
@@ -32,7 +38,7 @@ defaultEntryPoints = []
 [frontends]
   # App
   [frontends.peertube-index]
-  entryPoints = ["http-public"]
+  entryPoints = ["https-public"]
   backend = "peertube-index"
   [frontends.peertube-index.errors]
     [frontends.peertube-index.errors.5xx]
@@ -56,3 +62,11 @@ defaultEntryPoints = []
 [metrics]
   [metrics.prometheus]
     entryPoint = "http-metrics"
+
+[acme]
+storage = "/acme_certs/acme.json"
+entryPoint = "https-public"
+[acme.httpChallenge]
+entryPoint = "http-public"
+[[acme.domains]]
+  main = "peertube-index.net"

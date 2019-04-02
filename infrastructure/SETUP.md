@@ -17,6 +17,7 @@ Add this to root crontab to apply sysctl settings on boot
 On the server
 ```bash
 docker network create peertube-index
+# TODO: explicit volume creation may not be needed, see if we can remove it
 docker volume create status_storage
 docker volume create grafana_data
 docker volume create prometheus_data
@@ -53,20 +54,7 @@ curl -X PUT "0.0.0.0:9200/_snapshot/videos" -H 'Content-Type: application/json' 
 '
 ``` 
 
-### Build and upload of docker images to the server
-Locally
-```bash
-export VERSION=$(git rev-parse --short --verify HEAD)
-
-docker build -t peertube-index:${VERSION} .
-docker image save -o infrastructure/builds/peertube-index-image-${VERSION}.tar peertube-index:${VERSION}
-
-docker build -t peertube-index-traefik:${VERSION} infrastructure/traefik
-docker image save -o infrastructure/builds/peertube-index-traefik-image-${VERSION}.tar peertube-index-traefik:${VERSION}
-
-rsync -avz infrastructure/builds/peertube-index-traefik-image-${VERSION}.tar user@machine-hostname.domain:
-rsync -avz infrastructure/builds/peertube-index-image-${VERSION}.tar user@machine-hostname.domain:
-```
+### Build and upload of docker images to the server - TODO: create build and upload script and use it here and in deploy script
 
 ### Creation of the Elasticsearch index and the status storage directory
 On the server, start an iex session inside a container with production configuration

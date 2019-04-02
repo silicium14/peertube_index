@@ -88,8 +88,10 @@ function deploy {
             --restart always \
             --network ${NETWORK} \
             -p 80:80 \
+            -p 443:443 \
             -p 8080:8080 \
             -v ${SERVER_ARTIFACTS_DIRECTORY}/monitoring_users_credentials.htdigest:/srv/monitoring_users_credentials.htdigest \
+            -v traefik_acme_certs:/acme_certs \
             --name peertube-index-traefik \
             peertube-index-traefik:${VERSION}
 
