@@ -43,6 +43,7 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 - Respect `/robots.txt`?
 - Handle instance timezone if such a thing exists?
 - Monitor invalid document errors by instance version to ensure that our validation still works correctly for new versions
+- Scan metrics
 - Seed status storage with known instance hosts list
 - Scan loop optimization: check node compatibility with Nodeinfo
 - Rate limiting
@@ -50,9 +51,13 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 - Status frontend
 - Provide search for unsafe content
 - Zero downtime deploy
+- Staging configuration and provisioning for a prod backup
 
 ### Code enhancements
+- Send config file instead of docker image for traefik?
 - Build script and upload script
+- HTTPS on Grafana
+- Elasticsearch metrics
 - Try smaller heap size for Elasticsearch in order to use a cheaper VM
 - Setup may not need to create docker volumes explicitly, see https://docs.docker.com/storage/volumes/#start-a-container-with-a-volume
 - Separate infrastructure before making code public?
@@ -60,7 +65,6 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 - Measure test coverage
 - Better function names for StatusStorage functions to change the status?
 - Functions in StatusStorage have no exclamation mark but functions in VideoStorage have one
-- Bad request instead of 500 when missing search text on JSON search API
 - Replace `EEx.eval_file` with `EEx.function_from_file` at compile time?
 - Simplify infrastructure code with docker compose?
 - Update setup procecure
@@ -70,7 +74,6 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 - More automated Instance API non regression tests: use our own instance?
 - Add an end to end test
 - Scan multiple instances concurrently
-- Isolate and handle failures of the steps in scan function
 - Use document type from Elasticsearch library?
 - Remember that in the domain we directly use the objects returned by the storage without any conversion, we are coupled to the storage format for now
 - Analysis tool check matching of collaboration and contract tests
