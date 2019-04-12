@@ -54,6 +54,18 @@ curl -X PUT "0.0.0.0:9200/_snapshot/videos" -H 'Content-Type: application/json' 
 '
 ``` 
 
+### Creation of status monitoring database container
+On the server 
+```bash
+docker run \
+    -d \
+    --restart always \
+    --network peertube-index \
+    -v status_monitoring_data:/var/lib/postgresql/data \
+    --name peertube-index-status-monitoring-db \
+    postgres:10
+```
+
 ### Build and upload of docker images to the server - TODO: create build and upload script and use it here and in deploy script
 
 ### Creation of the Elasticsearch index and the status storage directory
@@ -80,7 +92,7 @@ PeertubeIndex.VideoStorage.Elasticsearch.empty()
 PeertubeIndex.StatusStorage.Filesystem.empty()
 ```
 
-## Starting application containers
+## Starting application containers, FIXME: this is not up to date, there are more containers to start 
 On server
 ```bash
 # You need to export VERSION first, this is the version from the build step

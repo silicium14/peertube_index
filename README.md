@@ -32,9 +32,7 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 - SEO metadata
 - Bigger title
 - Display the number of results, and a message if there is no result / Explain ordering of results
-- Monitoring
-    - Node Exporter on the host + documentation in infrastructure/SETUP.md
-    - Dashboard
+- Monitoring: Node Exporter on the host + documentation in infrastructure/SETUP.md, Dashboard - 
 - Error reporting
 - Home page link on every page
 - Search bar icon also a button?
@@ -46,14 +44,17 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 - Scan metrics
 - Seed status storage with known instance hosts list
 - Scan loop optimization: check node compatibility with Nodeinfo
+- Prevent out of memory when scanning instances with many videos
 - Rate limiting
 - Better looking error and not found pages
 - Status frontend
 - Provide search for unsafe content
 - Zero downtime deploy
 - Staging configuration and provisioning for a prod backup
+- Healthchecks in monitoring
 
 ### Code enhancements
+- Use alpine linux for docker images
 - Send config file instead of docker image for traefik?
 - Build script and upload script
 - HTTPS on Grafana
@@ -71,7 +72,7 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 - Make deploy not failing on container deletion if a container does not exists
 - Use Hackney instead of httpc (waiting for https://github.com/PSPDFKit-labs/bypass/issues/75)
 - Figure why httpc truncates response in some cases or change http client
-- More automated Instance API non regression tests: use our own instance?
+- Instance scanner non regression tests with a cassette that replays a real payload in tests
 - Add an end to end test
 - Scan multiple instances concurrently
 - Use document type from Elasticsearch library?

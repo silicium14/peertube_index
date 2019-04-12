@@ -31,6 +31,9 @@ function deploy {
     docker build -t peertube-index-error-pages:${VERSION} infrastructure/error_pages
     docker image save -o "${ARTIFACTS_DIRECTORY}/peertube-index-error-pages-image-${VERSION}.tar" peertube-index-error-pages:${VERSION}
 
+    docker build -t peertube-index-status-monitoring-updater:${VERSION} status_monitoring
+    docker image save -o "${ARTIFACTS_DIRECTORY}/peertube-index-status-monitoring-updater-image-${VERSION}.tar" peertube-index-status-monitoring-updater:${VERSION}
+
     cp "${MONITORING_USERS_CREDENTIALS_FILE}" "${ARTIFACTS_DIRECTORY}/monitoring_users_credentials.htdigest"
     cp infrastructure/prometheus.yml "${ARTIFACTS_DIRECTORY}/prometheus.yml"
 
@@ -46,6 +49,18 @@ function deploy {
     ssh ${MACHINE_SSH_DESTINATION} << END_OF_REMOTE_SCRIPT
         set -e
         set -x
+
+        docker image load -i ${SERVER_ARTIFACTS_DIRECTORY}/peertube-index-status-monitoring-updater-image-${VERSION}.tar
+        docker tag peertube-index-status-monitoring-updater:${VERSION} peertube-index-status-monitoring-updater:latest
+        docker stop peertube-index-status-monitoring-updater
+        docker rm peertube-index-status-monitoring-updater
+        docker run \
+            -d \
+            --restart always \
+            --network ${NETWORK} \
+            -v status_storage:/status_storage:ro \
+            --name peertube-index-status-monitoring-updater \
+            peertube-index-status-monitoring-updater:${VERSION}
 
         docker stop peertube-index-prometheus
         docker rm peertube-index-prometheus
