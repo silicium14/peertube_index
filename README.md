@@ -52,7 +52,8 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 - Staging configuration and provisioning for a prod backup
 - Healthchecks in monitoring
 
-### Code enhancements
+### Enhancements
+- Upgrade Elasticsearch
 - Send config file instead of docker image for traefik?
 - Simplify infrastructure code with docker compose?
 - Keep track of all updatable components (containers and dependencies)

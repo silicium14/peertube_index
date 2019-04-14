@@ -121,7 +121,7 @@ docker run \
     -v status_storage:/status_storage \
     --name peertube-index-scan-loop \
     peertube-index:${VERSION} \
-    bash scan_loop.sh
+    sh scan_loop.sh
     
 # Reverse proxy
 docker run \

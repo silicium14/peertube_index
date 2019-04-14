@@ -137,7 +137,7 @@ function deploy {
             -v status_storage:/status_storage \
             --name peertube-index-scan-loop \
             peertube-index:${VERSION} \
-            bash scan_loop.sh
+            sh scan_loop.sh
 END_OF_REMOTE_SCRIPT
 
     echo "# Finished, deploy successful for version ${VERSION}"

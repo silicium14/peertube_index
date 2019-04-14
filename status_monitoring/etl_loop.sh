@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 function load {
     elixir join_statuses.exs
@@ -14,5 +14,4 @@ while [ 1 ]; do
     load
     echo "$(date) Finished loading"
     sleep 300
-    test $? -gt 128 && break
 done

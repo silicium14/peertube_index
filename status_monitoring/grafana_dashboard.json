@@ -19,7 +19,7 @@
   "links": [],
   "panels": [
     {
-      "content": "# This dashboard shows aggregations on the current set of statuses. Statuses are updated every 15 minutes.\n\n",
+      "content": "# This dashboard shows aggregations on the current set of statuses. Statuses are updated every 5 minutes.\n\n",
       "gridPos": {
         "h": 2,
         "w": 24,
@@ -336,7 +336,7 @@
     "list": []
   },
   "time": {
-    "from": "now-2d",
+    "from": "now-7d",
     "to": "now"
   },
   "timepicker": {
@@ -367,5 +367,5 @@
   "timezone": "",
   "title": "Instances",
   "uid": "owa5wX6ik",
-  "version": 4
+  "version": 5
 }
