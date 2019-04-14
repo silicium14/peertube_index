@@ -1,5 +1,5 @@
 defmodule InstanceScannerNonRegressionTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
   @moduledoc """
   Non regression tests for PeerTube instance scanner module.
   The state of the reference PeerTube instance we use changes frequently,
@@ -19,6 +19,7 @@ defmodule InstanceScannerNonRegressionTest do
 
   setup_all do
     {:ok, {videos, instances}} = PeertubeIndex.InstanceScanner.Http.scan("peertube.cpy.re", 5)
+    videos = Enum.to_list(videos)
 
     # Save results for debugging
     File.write!(

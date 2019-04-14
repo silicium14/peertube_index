@@ -1,9 +1,9 @@
 defmodule PeertubeIndex.InstanceScanner do
   @moduledoc false
 
-  @callback scan(String.t, integer, boolean) :: {:ok, {[map], MapSet.t}} | {:error, any()}
+  @callback scan(String.t, integer, boolean, integer) :: {:ok, {Enumerable.t, MapSet.t}} | {:error, any()}
   # With default arguments
-  @callback scan(String.t) :: {:ok, {[map], MapSet.t}} | {:error, any()}
+  @callback scan(String.t) :: {:ok, {Enumerable.t, MapSet.t}} | {:error, any()}
 end
 
 defmodule PeertubeIndex.InstanceScanner.Http do
@@ -14,57 +14,120 @@ defmodule PeertubeIndex.InstanceScanner.Http do
   @impl true
   def scan(host, page_size \\ 100, use_tls \\ true, request_timeout \\ 5000) do
     scheme = if use_tls, do: "https://", else: "http://"
-    with {:ok, videos} <- get_all(scheme <> host <> "/api/v1/videos", page_size, request_timeout),
-         :ok <- validate_videos(videos),
-         {:ok, followers} <- get_all(scheme <> host <> "/api/v1/server/followers", page_size, request_timeout),
-         {:ok, following} <- get_all(scheme <> host <> "/api/v1/server/following", page_size, request_timeout) do
+    api_base_url = scheme <> host <> "/api/v1/"
+    with {:ok, instances_from_followers} <- get_instances_from_followers(api_base_url <> "server/followers", page_size, request_timeout),
+         {:ok, instances_from_following} <- get_instances_from_following(api_base_url <> "server/following", page_size, request_timeout),
+         {:ok, videos, instances_from_videos} <- get_videos(api_base_url <> "videos", page_size, request_timeout) do
 
-      videos = Enum.filter(videos, fn video -> video["isLocal"] end)
+      instances =
+      instances_from_videos
+      |> MapSet.union(instances_from_followers)
+      |> MapSet.union(instances_from_following)
+      |> MapSet.delete(host)
 
-      instances_from_videos = Enum.map(videos, fn video -> video["account"]["host"] end)
-      instances_from_followers = Enum.map(followers, fn item -> item["follower"]["host"] end)
-      instances_from_following = Enum.map(following, fn item -> item["following"]["host"] end)
-      all_instances = instances_from_videos ++ instances_from_followers ++ instances_from_following
-
-      unique_instances =
-        all_instances
-        |> MapSet.new()
-        |> MapSet.delete(host)
-
-      {:ok, {videos, unique_instances}}
+      {:ok, {videos, instances}}
     end
   end
 
-  defp get_all(paginated_resource_url, page_size, request_timeout) do
-    common_params = %{
-      "count" => page_size,
-      "sort" => "createdAt"
-    }
-    with {:ok, first_page_data} <- get_json(url_with_params(paginated_resource_url, common_params), request_timeout) do
-      # credo:disable-for-next-line Credo.Check.Refactor.PipeChainStart
-      number_of_pages = (first_page_data["total"] / page_size) |> Float.ceil() |> trunc()
-      Logger.debug fn -> "Getting #{paginated_resource_url} that has #{first_page_data["total"]} items, using #{number_of_pages} pages" end
-      if number_of_pages > 1 do
-        urls = for page_number <- 2..number_of_pages do
-          url_with_params(
-            paginated_resource_url,
-            Map.put(common_params, "start", (page_number - 1) * page_size)
-          )
-        end
-        get_recursive(urls, request_timeout, first_page_data["data"])
-      else
-        {:ok, first_page_data["data"]}
-      end
+  defp get_instances_from_following(following_url, page_size, request_timeout) do
+    following_url
+    |> get_collection(page_size, request_timeout)
+    |> Enum.reduce_while(
+         {:ok, MapSet.new()},
+         reducer_while_no_error(fn following, set_of_instances ->
+           MapSet.put(set_of_instances, following["following"]["host"])
+         end)
+       )
+  end
+
+  defp get_instances_from_followers(followers_url, page_size, request_timeout) do
+    followers_url
+    |> get_collection(page_size, request_timeout)
+    |> reduce_enum_while_no_error(MapSet.new(), fn follower, set_of_instances -> MapSet.put(set_of_instances, follower["follower"]["host"]) end)
+  end
+
+  @doc """
+  Fetches videos with streaming, saves the result on a file on disk
+  and returns a stream to read the videos from disk.
+  Also returns a set instances found in the videos.
+  """
+  @spec get_videos(String.t, integer, integer) :: {:ok, Stream.t, MapSet.t}
+  defp get_videos(videos_url, page_size, request_timeout) do
+    buffer_file_path = "video_buffer"
+    buffer_file = File.open!(buffer_file_path, [:binary, :write])
+
+    result_of_processing =
+    videos_url
+    |> get_collection(page_size, request_timeout) # {:ok, video} or {:error, page_error}
+    |> Stream.map(&validate_one_video_and_keep_errors/1) # {:ok, video} or {:error, page_error} or :error, :invalid_video_document}
+    |> reduce_enum_while_no_error({buffer_file, MapSet.new()}, &save_videos_and_reduce_instances/2)
+
+    File.close(buffer_file)
+
+    case result_of_processing do
+      {:ok, {_buffer_file, instances}} ->
+        {
+          :ok,
+          Stream.resource(
+            fn -> File.open!(buffer_file_path, [:binary, :read]) end,
+            &read_next_video/1,
+            fn buffer_file ->
+              :ok = File.close(buffer_file)
+              :ok = File.rm(buffer_file_path)
+            end
+          ),
+          instances
+        }
+      {:error, reason} ->
+        File.rm(buffer_file_path)
+        {:error, reason}
     end
   end
 
-  defp get_recursive([next_url | rest], request_timeout, results) do
-    with {:ok, page_data} <- get_json(next_url, request_timeout) do
-      get_recursive(rest, request_timeout, results ++ page_data["data"])
-    end
+  @doc """
+  Iterate over the stream of videos and
+  - compute the set of instances found from the videos
+  - save videos to disk, excluding non local videos
+
+  The following format is used for serializing the collection of videos
+  start_of_file
+  [size_as_text,newline
+  term_as_binary,newline] repeated as many times as needed
+  end_of_file
+
+  size_as_text: the string representation of the binary size of term_as_binary, if term_as_binary is 152 bytes long, then size_as_text is the string 152
+  newline: a line jump character, \n
+  term_as_binary: the bytes given by :erlang.term_to_binary
+  """
+  defp save_videos_and_reduce_instances(video = %{"isLocal" => true}, {buffer_file, instances}) do
+    # Save video to disk
+    term_binary = :erlang.term_to_binary(video)
+    size_field = term_binary |> byte_size() |> Integer.to_string()
+    IO.binwrite(buffer_file, size_field <> "\n" <> term_binary <> "\n")
+
+    # Add instance
+    instances = MapSet.put(instances, video["account"]["host"])
+
+    {buffer_file, instances}
   end
 
-  defp get_recursive([], _request_timeout, results), do: {:ok, results}
+  defp save_videos_and_reduce_instances(video = %{"isLocal" => false}, {buffer_file, instances}) do
+    # Just add instance
+    instances = MapSet.put(instances, video["account"]["host"])
+    {buffer_file, instances}
+  end
+
+  defp read_next_video(buffer_file) do
+    case IO.binread(buffer_file, :line) do
+      line when is_binary(line) ->
+        {size, _} = Integer.parse(line)
+        item = buffer_file |> IO.binread(size) |> :erlang.binary_to_term()
+        IO.binread(buffer_file, 1) # Read newline
+        {[item], buffer_file}
+      :eof ->
+        {:halt, buffer_file}
+    end
+  end
 
   defp request_with_timeout(url, timeout) do
     request = Task.async(fn ->
@@ -102,21 +165,8 @@ defmodule PeertubeIndex.InstanceScanner.Http do
     end
   end
 
-  defp validate_videos([videos | rest]) do
-    with true <- valid_video?(videos) do
-      validate_videos(rest)
-    else
-      _ ->
-        {:error, :invalid_video_document}
-    end
-  end
-
-  defp validate_videos([]) do
-    :ok
-  end
-
   # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
-  def valid_video?(video) do
+  defp valid_video?(video) do
     video |> Map.get("id") |> is_integer
     && video |> Map.get("uuid") |> is_binary
     && video |> Map.get("name") |> is_binary
@@ -191,7 +241,7 @@ defmodule PeertubeIndex.InstanceScanner.Http do
     )
   end
 
-  defp get_json(url, request_timeout) do
+  defp get_page(url, request_timeout) do
     Logger.debug fn -> "Getting #{url}" end
     with {:ok, httpc_result} <- request_with_timeout(url, request_timeout),
          {:ok, body} <- request_successful(httpc_result),
@@ -209,5 +259,116 @@ defmodule PeertubeIndex.InstanceScanner.Http do
       |> Enum.join("&")
 
     url <> "?" <> params_fragment
+  end
+
+  defp generate_urls_after_first_page(paginated_collection_url, common_params, page_size, number_of_pages) do
+    for page_number <- 2..number_of_pages do
+      url_with_params(
+        paginated_collection_url,
+        Map.put(common_params, "start", (page_number - 1) * page_size)
+      )
+    end
+  end
+
+  defp validate_one_video_and_keep_errors({:ok, video}) do
+    if valid_video?(video) do
+      {:ok, video}
+    else
+      {:error, :invalid_video_document}
+    end
+  end
+
+  defp validate_one_video_and_keep_errors({:error, reason}) do
+    {:error, reason}
+  end
+
+  @doc """
+  Returns an stream of ok/error tuples for each item of the collection: {:ok, item} or {:error, reason}.
+  The errors that my be present are about the page fetching steps.
+  For example, with a page size of 2 items and 3 pages, if there was an http error on the second page, the output would be :
+  `[{:ok, item}, {:ok, item}, {:error, :http_error}, {:ok, item}, {:ok, item}]`
+  """
+  @spec get_collection(String.t, integer(), integer()) :: Stream.t
+  defp get_collection(paginated_collection_url, page_size, request_timeout) do
+    paginated_collection_url
+    |> get_pages(page_size, request_timeout) # {:ok, page} or {:error, reason}
+    |> Stream.flat_map(&extract_page_items_and_keep_errors/1) # {:ok, video} or {:error, reason}
+  end
+
+  @doc """
+  Returns an enumerable of ok/error tuples for each page: {:ok, page_data} or {:error, reason}
+  If there is a single page the result is a list.
+  If there is more than one page the result is a stream.
+  """
+  @spec get_pages(String.t, integer(), integer()) :: Enum.t
+  defp get_pages(paginated_collection_url, page_size, request_timeout) do
+    common_params = %{
+      "count" => page_size,
+      "sort" => "createdAt"
+    }
+    with {:ok, first_page} <- get_page(url_with_params(paginated_collection_url, common_params), request_timeout) do
+      # credo:disable-for-next-line Credo.Check.Refactor.PipeChainStart
+      number_of_pages = (first_page["total"] / page_size) |> Float.ceil() |> trunc()
+      Logger.debug fn -> "#{paginated_collection_url} has #{first_page["total"]} items, using #{number_of_pages} pages" end
+      if number_of_pages > 1 do
+        urls = generate_urls_after_first_page(paginated_collection_url, common_params, page_size, number_of_pages)
+        Stream.concat(
+          [{:ok, first_page}],
+          Stream.map(urls, fn url -> get_page(url, request_timeout) end)
+        )
+      else
+        [{:ok, first_page}]
+      end
+    else
+      {:error, reason} ->
+        [{:error, reason}]
+    end
+  end
+
+  defp extract_page_items_and_keep_errors({:ok, page}) do
+    for item <- page["data"] do
+      {:ok, item}
+    end
+  end
+
+  defp extract_page_items_and_keep_errors({:error, reason}) do
+    [{:error, reason}]
+  end
+
+  #####
+
+  # The accumulator is {:ok, real_accumulator} because the expected output is
+  # {:ok, value} or {:error, reason}
+  defp reduce_while_no_error({:ok, element}, {:ok, accumulator}, reducer) do
+    {
+      :cont,
+      {:ok, reducer.(element, accumulator)}
+    }
+  end
+
+  defp reduce_while_no_error({:error, reason}, {:ok, _accumulator}, _reducer) do
+    {:halt, {:error, reason}}
+  end
+
+  # reducer: (element, accumulator -> accumulator)
+  @spec reducer_while_no_error(
+          (any(), any() -> any())
+  ) :: ({:ok, any()} | {:error, any()}, {:ok, any()} -> {:cont, {:ok, any()}} | {:halt, {:error, any()}})
+  defp reducer_while_no_error(reducer) do
+    fn element, accumulator -> reduce_while_no_error(element, accumulator, reducer) end
+  end
+
+  @doc """
+  Reduces an enumerable whose elements are either {:ok, element} or {:error, reason}
+  and stops if at the first {:error, reason} found.
+
+  The reducer function receives the second element of each tuple.
+
+  If an error is found, is is returned as is.
+  If no error is found, the returned value is {:ok, accumulator}.
+  """
+  @spec reduce_enum_while_no_error(Enumerable.t, any(), (any(), any() -> any())) :: {:ok, any()} | {:error, any()}
+  defp reduce_enum_while_no_error(enum, acc, fun) do
+    Enum.reduce_while(enum, {:ok, acc}, reducer_while_no_error(fun))
   end
 end

@@ -27,6 +27,6 @@ docker run \
 
 docker exec \
     ${DESTINATION_CONTAINER} \
-    curl --fail -X POST "localhost:9200/_snapshot/videos/${SNAPSHOT}/_restore?wait_for_completion=true&pretty=true"
+    curl -v --fail -X POST "localhost:9200/_snapshot/videos/${SNAPSHOT}/_restore?wait_for_completion=true&pretty=true"
 
 echo "Finished restoring snapshot ${SNAPSHOT}"

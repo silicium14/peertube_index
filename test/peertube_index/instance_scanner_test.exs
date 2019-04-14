@@ -1,5 +1,5 @@
 defmodule PeertubeIndex.InstanceScannerTest do
-  use ExUnit.Case, async: false
+  use ExUnit.Case, async: true
 
   @valid_video %{
     "id"=> 1,
@@ -178,7 +178,7 @@ defmodule PeertubeIndex.InstanceScannerTest do
     end)
 
     {:ok, {videos, _instances}} = PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}", 10, false)
-    assert videos == [a_video, another_video]
+    assert Enum.to_list(videos) == [a_video, another_video]
   end
 
   test "gets all videos correctly with pagination", %{bypass: bypass} do
@@ -194,7 +194,7 @@ defmodule PeertubeIndex.InstanceScannerTest do
     end)
 
     {:ok, {videos, _instances}} = PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}", 1, false)
-    assert videos == [
+    assert Enum.to_list(videos) == [
       @valid_video |> Map.put("id", 0),
       @valid_video |> Map.put("id", 1),
       @valid_video |> Map.put("id", 2)
@@ -238,7 +238,6 @@ defmodule PeertubeIndex.InstanceScannerTest do
     result = PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}", 100, false, reponse_delay - 100)
     assert result == {:error, :timeout}
   end
-
 
   test "discovers new instances from videos", %{bypass: bypass} do
     hostname = "localhost:#{bypass.port}"
@@ -323,9 +322,8 @@ defmodule PeertubeIndex.InstanceScannerTest do
     end)
 
     {:ok, {videos, _instances}} = PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}", 10, false)
-    assert videos == [local_video]
+    assert Enum.to_list(videos) == [local_video]
   end
-
 
   @tag skip: "TODO"
   test "ensures TLS validity"

@@ -11,6 +11,7 @@ defmodule Mix.Tasks.RefreshInstanceScannerNonRegressionReference do
   """
   def run(_) do
     {:ok, {videos, instances}} = PeertubeIndex.InstanceScanner.Http.scan("peertube.cpy.re", 100)
+    videos = Enum.to_list(videos)
 
     File.write!(
       "test/peertube_index/instance_api_non_regression_test_data/reference_videos.json",

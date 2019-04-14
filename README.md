@@ -44,7 +44,6 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 - Scan metrics
 - Seed status storage with known instance hosts list
 - Scan loop optimization: check node compatibility with Nodeinfo
-- Prevent out of memory when scanning instances with many videos
 - Rate limiting
 - Better looking error and not found pages
 - Status frontend
@@ -56,6 +55,8 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 ### Code enhancements
 - Use alpine linux for docker images
 - Send config file instead of docker image for traefik?
+- Simplify infrastructure code with docker compose?
+- Keep track of all updatable components (containers and dependencies)
 - Build script and upload script
 - HTTPS on Grafana
 - Elasticsearch metrics
@@ -67,7 +68,6 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 - Better function names for StatusStorage functions to change the status?
 - Functions in StatusStorage have no exclamation mark but functions in VideoStorage have one
 - Replace `EEx.eval_file` with `EEx.function_from_file` at compile time?
-- Simplify infrastructure code with docker compose?
 - Update setup procecure
 - Make deploy not failing on container deletion if a container does not exists
 - Use Hackney instead of httpc (waiting for https://github.com/PSPDFKit-labs/bypass/issues/75)

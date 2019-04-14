@@ -26,7 +26,7 @@ defmodule PeertubeIndex do
         scan_end = get_local_time.()
         case result do
           {:ok, {videos, found_instances}} ->
-            Logger.info "Scan successful for #{host} with #{length(videos)} videos and #{MapSet.size(found_instances)} instances"
+            Logger.info "Scan successful for #{host}"
             @video_storage.delete_instance_videos!(host)
             @video_storage.insert_videos!(videos)
             @status_storage.ok_instance(host, scan_end)
