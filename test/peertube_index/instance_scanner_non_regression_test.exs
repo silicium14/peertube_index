@@ -1,12 +1,12 @@
 defmodule InstanceScannerNonRegressionTest do
   use ExUnit.Case, async: true
   @moduledoc """
-  Non regression tests for PeerTube instance API module.
+  Non regression tests for PeerTube instance scanner module.
   The state of the reference PeerTube instance we use changes frequently,
   to take this this into account we suggest the following workflow:
-  - checkout to a known working version of the instance API module
+  - checkout to a known working version of the instance scanner module
   - update reference dataset with `mix refresh_instance_scanner_non_regression_reference`
-  - checkout to the instance API module version to test
+  - checkout to the instance scanner module version to test
   - run this test
   """
 

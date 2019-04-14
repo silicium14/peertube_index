@@ -19,10 +19,10 @@
   "links": [],
   "panels": [
     {
-      "content": "# Statuses are updated every 15 minutes\n\n",
+      "content": "# This dashboard shows aggregations on the current set of statuses. Statuses are updated every 15 minutes.\n\n",
       "gridPos": {
         "h": 2,
-        "w": 7,
+        "w": 24,
         "x": 0,
         "y": 0
       },
@@ -85,7 +85,7 @@
       ],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Current status distribution",
+      "title": "Status distribution",
       "transform": "table",
       "type": "table"
     },
@@ -290,7 +290,7 @@
       "timeFrom": null,
       "timeRegions": [],
       "timeShift": null,
-      "title": "Status distribution over time",
+      "title": "History of status distribution",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -336,7 +336,7 @@
     "list": []
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-2d",
     "to": "now"
   },
   "timepicker": {
@@ -367,5 +367,5 @@
   "timezone": "",
   "title": "Instances",
   "uid": "owa5wX6ik",
-  "version": 2
+  "version": 3
 }

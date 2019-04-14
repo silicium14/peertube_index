@@ -3,11 +3,11 @@ defmodule Mix.Tasks.RefreshInstanceScannerNonRegressionReference do
 
   @moduledoc """
   Scans reference Peertube instance with the current version of the code
-  and save result as the reference for instance API non regression tests
+  and save result as the reference for instance scanner non regression tests
   """
 
   @shortdoc """
-  Update reference data for instance API non regression tests
+  Update reference data for instance scanner non regression tests
   """
   def run(_) do
     {:ok, {videos, instances}} = PeertubeIndex.InstanceScanner.Http.scan("peertube.cpy.re", 100)

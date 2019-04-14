@@ -1,5 +1,5 @@
 defmodule PeertubeIndex.InstanceScannerTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
 
   @valid_video %{
     "id"=> 1,
@@ -114,6 +114,9 @@ defmodule PeertubeIndex.InstanceScannerTest do
     end
   end
 
+  @doc """
+  Create bypass responses for an empty instance and overwrite one route with the given arguments
+  """
   defp empty_instance_but(bypass, expect_function, method, path, function) do
     empty_instance()
     |> overwrite_expectation(expect_function, method, path, function)
@@ -236,8 +239,73 @@ defmodule PeertubeIndex.InstanceScannerTest do
     assert result == {:error, :timeout}
   end
 
+
+  test "discovers new instances from videos", %{bypass: bypass} do
+    hostname = "localhost:#{bypass.port}"
+    a_video =
+    @valid_video
+    |>Map.put("id", 0)
+    |> put_in(["account", "host"], hostname)
+    |> put_in(["channel", "host"], hostname)
+
+    another_video =
+    @valid_video
+    |> Map.put("id", 1)
+    |> put_in(["account", "host"], "new-instance.example.com")
+    |> put_in(["channel", "host"], "new-instance.example.com")
+
+    empty_instance_but(bypass, :expect, "GET", "/api/v1/videos", fn conn ->
+      conn = Plug.Conn.fetch_query_params(conn)
+      Plug.Conn.resp(conn, 200, ~s<{
+        "total": 2,
+        "data": [
+          #{a_video |> Poison.encode!()},
+          #{another_video |> Poison.encode!()}
+        ]
+      }>)
+    end)
+
+    {:ok, {_videos, instances}} = PeertubeIndex.InstanceScanner.Http.scan(hostname, 10, false)
+    # The returned instances does not contain the instance being scanned
+    assert instances == MapSet.new(["new-instance.example.com"])
+  end
+
+  test "discovers new instances from following", %{bypass: bypass} do
+    empty_instance_but(bypass, :expect, "GET", "/api/v1/server/following", fn conn ->
+      conn = Plug.Conn.fetch_query_params(conn)
+      Plug.Conn.resp(conn, 200, ~s<{
+        "total": 1,
+        "data": [
+          {"following": {"host": "new-instance.example.com"}},
+          {"following": {"host": "another-new-instance.example.com"}}
+        ]
+      }>)
+    end)
+
+    {:ok, {_videos, instances}} = PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}", 10, false)
+    assert instances == MapSet.new(["new-instance.example.com", "another-new-instance.example.com"])
+  end
+
+  test "discovers new instances from followers", %{bypass: bypass} do
+    empty_instance_but(bypass, :expect, "GET", "/api/v1/server/followers", fn conn ->
+      conn = Plug.Conn.fetch_query_params(conn)
+      Plug.Conn.resp(conn, 200, ~s<{
+        "total": 1,
+        "data": [
+          {"follower": {"host": "new-instance.example.com"}},
+          {"follower": {"host": "another-new-instance.example.com"}}
+        ]
+      }>)
+    end)
+
+    {:ok, {_videos, instances}} = PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}", 10, false)
+    assert instances == MapSet.new(["new-instance.example.com", "another-new-instance.example.com"])
+  end
+
+  @tag skip: "TODO"
+  test "excludes non local videos"
+
+
   @tag skip: "TODO"
   test "ensures TLS validity"
-  @tag skip: "TODO"
-  test "discover new instances"
 end

@@ -35,7 +35,7 @@ defmodule PeertubeIndexTest do
     assert videos == [a_video, another_video]
   end
 
-  test "scan uses instance api, deletes existing instance videos and inserts new ones in video storage" do
+  test "scan uses instance scanner, deletes existing instance videos and inserts new ones in video storage" do
     scan_mocks()
     videos = [%{"name" => "some video"}]
     Mox.expect(PeertubeIndex.InstanceScanner.Mock, :scan, fn "some-instance.example.com" -> {:ok, {videos, MapSet.new()}} end)
