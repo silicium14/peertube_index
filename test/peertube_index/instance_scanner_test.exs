@@ -302,8 +302,29 @@ defmodule PeertubeIndex.InstanceScannerTest do
     assert instances == MapSet.new(["new-instance.example.com", "another-new-instance.example.com"])
   end
 
-  @tag skip: "TODO"
-  test "excludes non local videos"
+  test "excludes non local videos", %{bypass: bypass} do
+    local_video = @valid_video |> Map.put("id", 0)
+    non_local_video =
+    @valid_video
+    |> Map.put("id", 1)
+    |> Map.put("isLocal", false)
+    |> put_in(["channel", "host"], "other-instance.example.com")
+    |> put_in(["account", "host"], "other-instance.example.com")
+
+    empty_instance_but(bypass, :expect, "GET", "/api/v1/videos", fn conn ->
+      conn = Plug.Conn.fetch_query_params(conn)
+      Plug.Conn.resp(conn, 200, ~s<{
+        "total": 2,
+        "data": [
+          #{local_video |> Poison.encode!()},
+          #{non_local_video |> Poison.encode!()}
+        ]
+      }>)
+    end)
+
+    {:ok, {videos, _instances}} = PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}", 10, false)
+    assert videos == [local_video]
+  end
 
 
   @tag skip: "TODO"
