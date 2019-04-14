@@ -13,6 +13,6 @@ while [ 1 ]; do
     echo "$(date) Start loading"
     load
     echo "$(date) Finished loading"
-    sleep 900
+    sleep 300
     test $? -gt 128 && break
 done

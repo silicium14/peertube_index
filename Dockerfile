@@ -1,4 +1,4 @@
-FROM elixir:1.8
+FROM elixir:1.8-alpine
 
 ENV MIX_ENV prod
 WORKDIR /srv

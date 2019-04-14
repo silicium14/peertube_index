@@ -53,14 +53,12 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 - Healthchecks in monitoring
 
 ### Code enhancements
-- Use alpine linux for docker images
 - Send config file instead of docker image for traefik?
 - Simplify infrastructure code with docker compose?
 - Keep track of all updatable components (containers and dependencies)
 - Build script and upload script
 - HTTPS on Grafana
 - Elasticsearch metrics
-- Try smaller heap size for Elasticsearch in order to use a cheaper VM
 - Setup may not need to create docker volumes explicitly, see https://docs.docker.com/storage/volumes/#start-a-container-with-a-volume
 - Separate infrastructure before making code public?
 - Install script should `cd` into the appropriate directory to work

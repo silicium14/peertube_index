@@ -31,7 +31,7 @@ docker run \
     -e "discovery.type=single-node" \
     -e "cluster.name=peertube-index-cluster" \
     -e "path.repo=/backups" \
-    -e "ES_JAVA_OPTS=-Xms512m -Xmx512m" \
+    -e "ES_JAVA_OPTS=-Xms256m -Xmx256m" \
     -v elasticsearch_data:/usr/share/elasticsearch/data \
     -v elasticsearch_backups:/backups \
     --ulimit memlock=-1:-1 \
