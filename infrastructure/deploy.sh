@@ -25,15 +25,13 @@ function deploy {
     docker build -t peertube-index:${VERSION} .
     docker image save -o "${ARTIFACTS_DIRECTORY}/peertube-index-image-${VERSION}.tar" peertube-index:${VERSION}
 
-    docker build -t peertube-index-traefik:${VERSION} infrastructure/traefik
-    docker image save -o "${ARTIFACTS_DIRECTORY}/peertube-index-traefik-image-${VERSION}.tar" peertube-index-traefik:${VERSION}
-
     docker build -t peertube-index-error-pages:${VERSION} infrastructure/error_pages
     docker image save -o "${ARTIFACTS_DIRECTORY}/peertube-index-error-pages-image-${VERSION}.tar" peertube-index-error-pages:${VERSION}
 
     docker build -t peertube-index-status-monitoring-updater:${VERSION} status_monitoring
     docker image save -o "${ARTIFACTS_DIRECTORY}/peertube-index-status-monitoring-updater-image-${VERSION}.tar" peertube-index-status-monitoring-updater:${VERSION}
 
+    cp infrastructure/traefik.toml "${ARTIFACTS_DIRECTORY}/traefik.toml"
     cp "${MONITORING_USERS_CREDENTIALS_FILE}" "${ARTIFACTS_DIRECTORY}/monitoring_users_credentials.htdigest"
     cp infrastructure/prometheus.yml "${ARTIFACTS_DIRECTORY}/prometheus.yml"
 
@@ -94,8 +92,6 @@ function deploy {
             --name peertube-index-error-pages \
             peertube-index-error-pages:${VERSION}
 
-        docker image load -i ${SERVER_ARTIFACTS_DIRECTORY}/peertube-index-traefik-image-${VERSION}.tar
-        docker tag peertube-index-traefik:${VERSION} peertube-index-traefik:latest
         docker stop peertube-index-traefik
         docker rm peertube-index-traefik
         docker run \
@@ -105,10 +101,11 @@ function deploy {
             -p 80:80 \
             -p 443:443 \
             -p 8080:8080 \
+            -v ${SERVER_ARTIFACTS_DIRECTORY}/traefik.toml:/etc/traefik/traefik.toml \
             -v ${SERVER_ARTIFACTS_DIRECTORY}/monitoring_users_credentials.htdigest:/srv/monitoring_users_credentials.htdigest \
             -v traefik_acme_certs:/acme_certs \
             --name peertube-index-traefik \
-            peertube-index-traefik:${VERSION}
+            traefik:1.7-alpine
 
         docker image load -i ${SERVER_ARTIFACTS_DIRECTORY}/peertube-index-image-${VERSION}.tar
         docker tag peertube-index:${VERSION} peertube-index:latest

@@ -28,22 +28,21 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 
 ## TODO
 ### Features
+- Display the number of results, and a message if there is no result / Explain ordering of results
+- Respect `/robots.txt`?
+- Seed status storage with known instance hosts list
+- Scan loop optimization + scheme detection: check node compatibility with Nodeinfo
 - Logo and home page link on search page
 - SEO metadata
 - Bigger title
-- Display the number of results, and a message if there is no result / Explain ordering of results
 - Monitoring: Node Exporter on the host + documentation in infrastructure/SETUP.md, Dashboard - 
 - Error reporting
 - Home page link on every page
 - Search bar icon also a button?
 - Video title truncated if too long
 - Thumbnails placeholder during loading OR pagination
-- Respect `/robots.txt`?
 - Handle instance timezone if such a thing exists?
 - Monitor invalid document errors by instance version to ensure that our validation still works correctly for new versions
-- Scan metrics
-- Seed status storage with known instance hosts list
-- Scan loop optimization: check node compatibility with Nodeinfo
 - Rate limiting
 - Better looking error and not found pages
 - Status frontend
@@ -54,14 +53,15 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 
 ### Enhancements
 - Upgrade Elasticsearch
-- Send config file instead of docker image for traefik?
 - Simplify infrastructure code with docker compose?
-- Keep track of all updatable components (containers and dependencies)
 - Build script and upload script
+- Move use cases from lib/peertube_index.ex to lib/peertube_index/use_cases.ex for clarity?
+- Better code organization: web server in its own app using core peertube-index with a path dependency?
+- Keep track of all updatable components (containers and dependencies)
 - HTTPS on Grafana
 - Elasticsearch metrics
 - Setup may not need to create docker volumes explicitly, see https://docs.docker.com/storage/volumes/#start-a-container-with-a-volume
-- Separate infrastructure before making code public?
+- Separate infrastructure before making code public open source?
 - Install script should `cd` into the appropriate directory to work
 - Measure test coverage
 - Better function names for StatusStorage functions to change the status?
