@@ -11,11 +11,17 @@ defmodule PeertubeIndex.InstanceScanner.Http do
   @behaviour PeertubeIndex.InstanceScanner
   require Logger
 
+  @user_agent "PeertubeIndex"
+
   @impl true
   def scan(host, page_size \\ 100, use_tls \\ true, request_timeout \\ 5000) do
     scheme = if use_tls, do: "https://", else: "http://"
     api_base_url = scheme <> host <> "/api/v1/"
-    with {:ok, instances_from_followers} <- get_instances_from_followers(api_base_url <> "server/followers", page_size, request_timeout),
+
+    with true <- crawlable?(api_base_url <> "videos"),
+         true <- crawlable?(api_base_url <> "server/followers"),
+         true <- crawlable?(api_base_url <> "server/following"),
+         {:ok, instances_from_followers} <- get_instances_from_followers(api_base_url <> "server/followers", page_size, request_timeout),
          {:ok, instances_from_following} <- get_instances_from_following(api_base_url <> "server/following", page_size, request_timeout),
          {:ok, videos, instances_from_videos} <- get_videos(api_base_url <> "videos", page_size, request_timeout) do
 
@@ -26,6 +32,17 @@ defmodule PeertubeIndex.InstanceScanner.Http do
       |> MapSet.delete(host)
 
       {:ok, {videos, instances}}
+    end
+  end
+
+  defp crawlable?(url) do
+    case Gollum.crawlable?(@user_agent, url) do
+      :uncrawlable ->
+        {:error, :robots_txt_disallowed}
+      :crawlable ->
+        true
+      :undefined ->
+        true
     end
   end
 
@@ -51,7 +68,7 @@ defmodule PeertubeIndex.InstanceScanner.Http do
   and returns a stream to read the videos from disk.
   Also returns a set instances found in the videos.
   """
-  @spec get_videos(String.t, integer, integer) :: {:ok, Stream.t, MapSet.t}
+  @spec get_videos(String.t, integer, integer) :: {:ok, Enumerable.t, MapSet.t}
   defp get_videos(videos_url, page_size, request_timeout) do
     buffer_file_path = "video_buffer"
     buffer_file = File.open!(buffer_file_path, [:binary, :write])
@@ -133,7 +150,7 @@ defmodule PeertubeIndex.InstanceScanner.Http do
     request = Task.async(fn ->
       :httpc.request(
         :get,
-        {String.to_charlist(url), []},
+        {String.to_charlist(url), [{String.to_charlist("User-Agent"), String.to_charlist(@user_agent)}]},
         [],
         body_format: :binary)
     end)
@@ -288,7 +305,7 @@ defmodule PeertubeIndex.InstanceScanner.Http do
   For example, with a page size of 2 items and 3 pages, if there was an http error on the second page, the output would be :
   `[{:ok, item}, {:ok, item}, {:error, :http_error}, {:ok, item}, {:ok, item}]`
   """
-  @spec get_collection(String.t, integer(), integer()) :: Stream.t
+  @spec get_collection(String.t, integer(), integer()) :: Enumerable.t
   defp get_collection(paginated_collection_url, page_size, request_timeout) do
     paginated_collection_url
     |> get_pages(page_size, request_timeout) # {:ok, page} or {:error, reason}
@@ -300,7 +317,7 @@ defmodule PeertubeIndex.InstanceScanner.Http do
   If there is a single page the result is a list.
   If there is more than one page the result is a stream.
   """
-  @spec get_pages(String.t, integer(), integer()) :: Enum.t
+  @spec get_pages(String.t, integer(), integer()) :: Enumerable.t
   defp get_pages(paginated_collection_url, page_size, request_timeout) do
     common_params = %{
       "count" => page_size,

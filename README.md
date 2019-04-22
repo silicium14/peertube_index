@@ -29,7 +29,6 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 ## TODO
 ### Features
 - Display the number of results, and a message if there is no result / Explain ordering of results
-- Respect `/robots.txt`?
 - Seed status storage with known instance hosts list
 - Scan loop optimization + scheme detection: check node compatibility with Nodeinfo
 - Logo and home page link on search page
@@ -52,13 +51,14 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 - Healthchecks in monitoring
 
 ### Enhancements
+- Upgrade :elasticsearch dependency
 - Upgrade Elasticsearch
 - Simplify infrastructure code with docker compose?
 - Build script and upload script
 - Move use cases from lib/peertube_index.ex to lib/peertube_index/use_cases.ex for clarity?
 - Better code organization: web server in its own app using core peertube-index with a path dependency?
 - Keep track of all updatable components (containers and dependencies)
-- HTTPS on Grafana
+- Grafana on monitoring.peertube-index.net with HTTPS
 - Elasticsearch metrics
 - Setup may not need to create docker volumes explicitly, see https://docs.docker.com/storage/volumes/#start-a-container-with-a-volume
 - Separate infrastructure before making code public open source?

@@ -27,6 +27,7 @@ defmodule PeertubeIndex.MixProject do
     [
       {:confex, "~> 3.3"},
       {:elasticsearch, "~> 0.6.0"},
+      {:gollum, github: "silicium14/gollum", branch: "use_port_to_differentiate_hosts"},
       {:phoenix_html, "~> 2.13"},
       {:plug, "~> 1.7"},
       {:plug_cowboy, "~> 2.0"},

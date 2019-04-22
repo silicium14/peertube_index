@@ -1,4 +1,5 @@
 FROM elixir:1.8-alpine
+RUN apk update && apk add git
 
 ENV MIX_ENV prod
 WORKDIR /srv
