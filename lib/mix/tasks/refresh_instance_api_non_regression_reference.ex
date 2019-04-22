@@ -10,6 +10,7 @@ defmodule Mix.Tasks.RefreshInstanceScannerNonRegressionReference do
   Update reference data for instance scanner non regression tests
   """
   def run(_) do
+    Application.ensure_all_started :gollum
     {:ok, {videos, instances}} = PeertubeIndex.InstanceScanner.Http.scan("peertube.cpy.re", 100)
     videos = Enum.to_list(videos)
 
