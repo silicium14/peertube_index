@@ -19,7 +19,7 @@ body {
 }
 
 .topSpacer {
-    height: 100px;
+    height: 80px;
 }
 
 .main {
@@ -36,6 +36,14 @@ body {
         max-width: 768px;
         align-items: stretch;
     }
+}
+.resultsMessage {
+    margin-bottom: 10px;
+    font-size: small;
+    color: gray;
+}
+.resultsMessage--noresult {
+    text-align: center;
 }
 
 .video {
@@ -111,7 +119,23 @@ body {
         <%= EEx.eval_file("frontend/search_bar.html.eex", fixed: true, query: query) %>
     </form>
     <div class="topSpacer"></div>
-    <div class="main"><%= for video <- videos do %>
+    <div class="main">
+
+        <div class="resultsMessage<%= if length(videos) == 0, do: " resultsMessage--noresult"%>">
+            <p>
+            <%= case length(videos) do
+                0 ->
+                    "No result found for your query, sorry"
+                1 ->
+                    "1 result found"
+                n when n >= 100 ->
+                    "100 or more results found, showing only the first 100"
+                n ->
+                    "#{n} results found"
+            end%>
+            </p>
+        </div>
+        <%= for video <- videos do %>
         <article class="video">
             <%=
                 Phoenix.HTML.Tag.content_tag(

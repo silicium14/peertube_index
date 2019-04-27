@@ -28,13 +28,13 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 
 ## TODO
 ### Features
-- Display the number of results, and a message if there is no result / Explain ordering of results
 - Seed status storage with known instance hosts list
 - Scan loop optimization + scheme detection: check node compatibility with Nodeinfo
 - Logo and home page link on search page
 - SEO metadata
 - Bigger title
-- Monitoring: Node Exporter on the host + documentation in infrastructure/SETUP.md, Dashboard - 
+- Monitoring: measure scanning duration
+- Monitoring: Node Exporter on the host + documentation in infrastructure/SETUP.md, Dashboard
 - Error reporting
 - Home page link on every page
 - Search bar icon also a button?
@@ -51,11 +51,12 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 - Healthchecks in monitoring
 
 ### Enhancements
+- Use master branch of gollum fork after syncing with upstream
+- Move use cases from lib/peertube_index.ex to lib/peertube_index/use_cases.ex for clarity?
 - Upgrade :elasticsearch dependency
 - Upgrade Elasticsearch
 - Simplify infrastructure code with docker compose?
 - Build script and upload script
-- Move use cases from lib/peertube_index.ex to lib/peertube_index/use_cases.ex for clarity?
 - Better code organization: web server in its own app using core peertube-index with a path dependency?
 - Keep track of all updatable components (containers and dependencies)
 - Grafana on monitoring.peertube-index.net with HTTPS
@@ -73,6 +74,7 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 - Figure why httpc truncates response in some cases or change http client
 - Instance scanner non regression tests with a cassette that replays a real payload in tests
 - Add an end to end test
+- See if we can reduce duplication of `@media (min-width: 900px)` in CSS code
 - Scan multiple instances concurrently
 - Use document type from Elasticsearch library?
 - Remember that in the domain we directly use the objects returned by the storage without any conversion, we are coupled to the storage format for now
