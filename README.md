@@ -51,7 +51,6 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 - Healthchecks in monitoring
 
 ### Enhancements
-- Use master branch of gollum fork after syncing with upstream
 - Move use cases from lib/peertube_index.ex to lib/peertube_index/use_cases.ex for clarity?
 - Upgrade :elasticsearch dependency
 - Upgrade Elasticsearch
