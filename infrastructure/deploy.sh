@@ -135,6 +135,20 @@ function deploy {
             --name peertube-index-scan-loop \
             peertube-index:${VERSION} \
             sh scan_loop.sh
+
+        docker stop peertube-index-seed-loop
+        docker rm peertube-index-seed-loop
+        docker run \
+            -d \
+            --restart always \
+            --network ${NETWORK} \
+            -e ELASTICSEARCH_URL=${ELASTICSEARCH_URL} \
+            -e STATUS_STORAGE_DIRECTORY='/status_storage' \
+            -e HTTP_API_PORT=${HTTP_API_PORT} \
+            -v status_storage:/status_storage \
+            --name peertube-index-seed-loop \
+            peertube-index:${VERSION} \
+            sh seed_loop.sh
 END_OF_REMOTE_SCRIPT
 
     echo "# Finished, deploy successful for version ${VERSION}"

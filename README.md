@@ -28,7 +28,10 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 
 ## TODO
 ### Features
-- Seed status storage with known instance hosts list
+- Add created by info on about page
+- Advertise it on disussion threads about Peertube global search
+- Make the code public
+- Update report form explanation to include spam?
 - Scan loop optimization + scheme detection: check node compatibility with Nodeinfo
 - Logo and home page link on search page
 - SEO metadata

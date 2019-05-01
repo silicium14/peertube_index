@@ -30,11 +30,7 @@ defmodule PeertubeIndex do
             @video_storage.delete_instance_videos!(host)
             @video_storage.insert_videos!(videos)
             @status_storage.ok_instance(host, scan_end)
-            for instance <- found_instances do
-              if not @status_storage.has_a_status(instance) do
-                @status_storage.discovered_instance(instance, scan_end)
-              end
-            end
+            add_instances(found_instances, fn -> scan_end end)
           {:error, reason} ->
             Logger.info "Scan failed for #{host}, reason: #{inspect(reason)}"
             @status_storage.failed_instance(host, reason, scan_end)
@@ -70,6 +66,16 @@ defmodule PeertubeIndex do
   def remove_ban(hostname, get_local_time \\ &get_current_time_naivedatetime/0) do
     @status_storage.discovered_instance(hostname, get_local_time.())
     :ok
+  end
+
+  @spec add_instances([String.t], (-> NaiveDateTime.t)) :: :ok
+  def add_instances(hostnames, get_local_time \\ &get_current_time_naivedatetime/0) do
+    current_time = get_local_time.()
+    for hostname <- hostnames do
+      if not @status_storage.has_a_status(hostname) do
+        @status_storage.discovered_instance(hostname, current_time)
+      end
+    end
   end
 
   @spec get_current_time_naivedatetime :: NaiveDateTime.t

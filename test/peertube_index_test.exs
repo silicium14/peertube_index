@@ -157,4 +157,35 @@ defmodule PeertubeIndexTest do
     PeertubeIndex.remove_ban("unbanned-instance.example.com", fn -> current_time end)
     Mox.verify!()
   end
+
+  test "add_instances adds not yet known instances with the discovered status" do
+    {:ok, current_time} = NaiveDateTime.new(2019, 5, 1, 17, 41, 55)
+
+    # Given We do no know the instances
+    Mox.stub(PeertubeIndex.StatusStorage.Mock, :has_a_status, fn _hostname -> false end)
+
+    # Then We set the status for the discovered instances
+    Mox.expect(PeertubeIndex.StatusStorage.Mock, :discovered_instance, fn "an-instance.example.com", ^current_time -> :ok end)
+    Mox.expect(PeertubeIndex.StatusStorage.Mock, :discovered_instance, fn "another-instance.example.com", ^current_time -> :ok end)
+
+    # When We add the instances
+    PeertubeIndex.add_instances(["an-instance.example.com", "another-instance.example.com"], fn -> current_time end)
+
+    Mox.verify!()
+  end
+
+  test "add_instances does not override an existing status" do
+    {:ok, current_time} = NaiveDateTime.new(2019, 5, 1, 17, 48, 55)
+
+    # Given We already have a status for an instance
+    Mox.stub(PeertubeIndex.StatusStorage.Mock, :has_a_status, fn "already-known-instance.example.com" -> true end)
+
+    # Then We do not change the status of the existing instance
+    Mox.expect(PeertubeIndex.StatusStorage.Mock, :discovered_instance, 0, fn _hostname, _date -> :ok end)
+
+    # When We try to add the instance
+    PeertubeIndex.add_instances(["already-known-instance.example.com"], fn -> current_time end)
+
+    Mox.verify!()
+  end
 end
