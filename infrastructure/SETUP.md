@@ -13,16 +13,10 @@ Add this to root crontab to apply sysctl settings on boot
 `@reboot sleep 15; /sbin/sysctl -p`
 
 ## Infrastructure setup
-### Creation of docker network and volumes, and startup of Elasticsearch
+### Creation of docker network and startup of Elasticsearch
 On the server
 ```bash
 docker network create peertube-index
-# TODO: explicit volume creation may not be needed, see if we can remove it
-docker volume create status_storage
-docker volume create grafana_data
-docker volume create prometheus_data
-docker volume create elasticsearch_data
-docker volume create elasticsearch_backups
 docker run \
     -d \
     --restart always \
@@ -151,3 +145,6 @@ htdigest monitoring_users_credentials.htdigest traefik username
 ``` 
 - Remove a user
 Edit the htdigest file and remove the line corresponding to the user
+
+# Host metrics exporter
+See `infrastructure/node_exporter/setup_node_exporter.md`

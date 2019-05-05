@@ -37,7 +37,6 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 - SEO metadata
 - Bigger title
 - Monitoring: measure scanning duration
-- Monitoring: Node Exporter on the host + documentation in infrastructure/SETUP.md, Dashboard
 - Error reporting
 - Home page link on every page
 - Search bar icon also a button?
@@ -63,7 +62,6 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 - Keep track of all updatable components (containers and dependencies)
 - Grafana on monitoring.peertube-index.net with HTTPS
 - Elasticsearch metrics
-- Setup may not need to create docker volumes explicitly, see https://docs.docker.com/storage/volumes/#start-a-container-with-a-volume
 - Separate infrastructure before making code public open source?
 - Install script should `cd` into the appropriate directory to work
 - Measure test coverage

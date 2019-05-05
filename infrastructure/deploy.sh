@@ -31,6 +31,9 @@ function deploy {
     docker build -t peertube-index-status-monitoring-updater:${VERSION} status_monitoring
     docker image save -o "${ARTIFACTS_DIRECTORY}/peertube-index-status-monitoring-updater-image-${VERSION}.tar" peertube-index-status-monitoring-updater:${VERSION}
 
+    docker build -t peertube-index-node-exporter-relay:${VERSION} infrastructure/node_exporter
+    docker image save -o "${ARTIFACTS_DIRECTORY}/peertube-index-node-exporter-relay-image-${VERSION}.tar" peertube-index-node-exporter-relay:${VERSION}
+
     cp infrastructure/traefik.toml "${ARTIFACTS_DIRECTORY}/traefik.toml"
     cp "${MONITORING_USERS_CREDENTIALS_FILE}" "${ARTIFACTS_DIRECTORY}/monitoring_users_credentials.htdigest"
     cp infrastructure/prometheus.yml "${ARTIFACTS_DIRECTORY}/prometheus.yml"
@@ -47,6 +50,18 @@ function deploy {
     ssh ${MACHINE_SSH_DESTINATION} << END_OF_REMOTE_SCRIPT
         set -e
         set -x
+
+        docker image load -i ${SERVER_ARTIFACTS_DIRECTORY}/peertube-index-node-exporter-relay-image-${VERSION}.tar
+        docker tag peertube-index-node-exporter-relay:${VERSION} peertube-index-node-exporter-relay:latest
+        docker stop peertube-index-node-exporter-relay
+        docker rm peertube-index-node-exporter-relay
+        docker run \
+            -d \
+            --restart always \
+            --network ${NETWORK} \
+            -v /tmp/node_exporter:/node_exporter \
+            --name peertube-index-node-exporter-relay \
+            peertube-index-node-exporter-relay:${VERSION}
 
         docker image load -i ${SERVER_ARTIFACTS_DIRECTORY}/peertube-index-status-monitoring-updater-image-${VERSION}.tar
         docker tag peertube-index-status-monitoring-updater:${VERSION} peertube-index-status-monitoring-updater:latest

@@ -9,3 +9,7 @@ scrape_configs:
   - job_name: 'traefik'
     static_configs:
     - targets: ['peertube-index-traefik:9090']
+
+  - job_name: 'host-node-exporter-relay'
+    static_configs:
+    - targets: ['peertube-index-node-exporter-relay:9100']
