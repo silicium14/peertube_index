@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
-# Backup elasticsearch data on a server and download the backup to a local directory
+# Backup the entire elasticsearch snapshot repository to a tar file on the server and download it to a local directory
 
 # Example usage:
 # infrastructure/elasticsearch_snapshot.sh user@hostname.domain destination_directory
 
 # Arguments:
-#  First argument: machine ssh destination, example: user@hostname.domain
-#  Second argument: local backup destination directory
+#  First argument: ssh destination for the server running docker compose stack, example: user@hostname.domain
+#  Second argument: local destination directory for the tar backup file
 
 set -e
 set -x
@@ -21,20 +21,13 @@ ssh ${MACHINE_SSH_DESTINATION} << END_OF_REMOTE_SCRIPT
     set -e
     set -x
 
-    docker exec \
-        peertube-index-elasticsearch \
-        curl -X PUT "localhost:9200/_snapshot/videos/${SNAPSHOT}?wait_for_completion=true"
+    docker-compose exec \
+        elasticsearch \
+        curl -v --fail -X PUT "localhost:9200/_snapshot/videos/${SNAPSHOT}?wait_for_completion=true"l
 
-    docker run \
-        --rm \
-        --network peertube-index \
-        -v elasticsearch_backups:/backup_volume \
-        -v /root/elasticsearch_backups:/backup_directory \
-        --name peertube-index-backup-elasticsearch \
-        debian \
-        cp -r /backup_volume/. /backup_directory
+    docker cp "$(docker-compose ps -q elasticsearch)":/backups - > /root/elasticsearch_backups/${SNAPSHOT}.tar
 END_OF_REMOTE_SCRIPT
 
-rsync -az ${MACHINE_SSH_DESTINATION}:/root/elasticsearch_backups/ ${LOCAL_DIRECTORY}
+rsync -z ${MACHINE_SSH_DESTINATION}:/root/elasticsearch_backups/${SNAPSHOT}.tar ${LOCAL_DIRECTORY}
 
 echo "Finished, snapshot name: ${SNAPSHOT}"

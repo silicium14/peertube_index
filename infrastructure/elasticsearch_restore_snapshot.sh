@@ -1,29 +1,23 @@
 #!/usr/bin/env bash
 
-# Restore elasticsearch snapshot to an elasticsearch instance running in a container
+# Restore an elasticsearch snapshot repository tar backup to an elasticsearch instance running in a container
 
 # Example usage:
-# infrastructure/elasticsearch_restore_snapshot.sh snapshots/repository/directory container snapshot-name
+# infrastructure/elasticsearch_restore_snapshot.sh path/to/backup.tar container snapshot-name
 
 # Arguments:
-#  First argument: elasticserach repository directory
+#  First argument: elasticsearch snapshot repository tar backup
 #  Second argument: elasticsearch container name
 #  Third argument: snapshot name
 
 set -e
 set -x
 
-BACKUP_DIRECTORY="$(realpath "$1")"
+BACKUP_FILE="$(realpath "$1")"
 DESTINATION_CONTAINER="$2"
 SNAPSHOT="$3"
 
-docker run \
-    --rm \
-    -v elasticsearch_backups:/backup_volume \
-    -v ${BACKUP_DIRECTORY}:/backup_directory \
-    --name peertube-index-restore-elasticsearch \
-    debian \
-    cp -r /backup_directory/. /backup_volume/
+docker cp - "${DESTINATION_CONTAINER}":/ < "${BACKUP_FILE}"
 
 docker exec \
     ${DESTINATION_CONTAINER} \

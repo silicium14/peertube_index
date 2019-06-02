@@ -27,13 +27,13 @@ defaultEntryPoints = []
 [backends]
   [backends.peertube-index]
     [backends.peertube-index.servers.server1]
-    url = "http://peertube-index:80"
+    url = "http://webapp:80"
   [backends.errors]
     [backends.errors.servers.error]
-    url = "http://peertube-index-error-pages:80"
+    url = "http://error-pages:80"
   [backends.monitoring]
     [backends.monitoring.servers.server1]
-    url = "http://peertube-index-grafana:3000"
+    url = "http://grafana:3000"
 
 [frontends]
   # App

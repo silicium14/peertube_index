@@ -1,0 +1,143 @@
+version: "3.7"
+volumes:
+  elasticsearch_data:
+    external: true
+  elasticsearch_backups:
+    external: true
+  status_storage:
+    external: true
+  prometheus_data:
+    external: true
+  grafana_data:
+    external: true
+  status_monitoring_data:
+    external: true
+  traefik_acme_certs:
+    external: true
+
+services:
+  traefik:
+    image: "traefik:1.7-alpine"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - type: bind
+        source: ./traefik.toml
+        target: /etc/traefik/traefik.toml
+        read_only: true
+      - type: bind
+        source: ./monitoring_users_credentials.htdigest
+        target: /srv/monitoring_users_credentials.htdigest
+        read_only: true
+      - type: volume
+        source: traefik_acme_certs
+        target: /acme_certs
+
+  elasticsearch:
+    image: "docker.elastic.co/elasticsearch/elasticsearch:6.6.0"
+    environment:
+      discovery.type: "single-node"
+      cluster.name: "peertube-index-cluster"
+      path.repo: "/backups"
+      ES_JAVA_OPTS: "-Xms256m -Xmx256m"
+    volumes:
+      - type: volume
+        source: elasticsearch_data
+        target: /usr/share/elasticsearch/data
+      - type: volume
+        source: elasticsearch_backups
+        target: /backups
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+
+  webapp:
+    image: "peertube-index/app:prod"
+    depends_on:
+      - elasticsearch
+    environment:
+      ELASTICSEARCH_URL: 'http://elasticsearch:9200'
+      STATUS_STORAGE_DIRECTORY: '/status_storage'
+      HTTP_API_PORT: 80
+    volumes:
+      - type: volume
+        source: status_storage
+        target: /status_storage
+
+  error-pages:
+    image: "peertube-index/error-pages:prod"
+
+  scan-loop:
+    image: "peertube-index/app:prod"
+    depends_on:
+      - elasticsearch
+    environment:
+      ELASTICSEARCH_URL: 'http://elasticsearch:9200'
+      STATUS_STORAGE_DIRECTORY: '/status_storage'
+      HTTP_API_PORT: 80
+    volumes:
+      - type: volume
+        source: status_storage
+        target: /status_storage
+    entrypoint:
+      - sh
+      - scan_loop.sh
+
+  seed-loop:
+    image: "peertube-index/app:prod"
+    environment:
+      ELASTICSEARCH_URL: 'http://elasticsearch:9200'
+      STATUS_STORAGE_DIRECTORY: '/status_storage'
+      HTTP_API_PORT: 80
+    volumes:
+      - type: volume
+        source: status_storage
+        target: /status_storage
+    entrypoint:
+      - sh
+      - seed_loop.sh
+
+  status-monitoring-updater:
+    image: "peertube-index/status-monitoring-updater:prod"
+    depends_on:
+      - status-monitoring-db
+    volumes:
+      - type: volume
+        source: status_storage
+        target: /status_storage
+        read_only: true
+
+  status-monitoring-db:
+    image: "postgres:10"
+    volumes:
+      - type: volume
+        source: status_monitoring_data
+        target: /var/lib/postgresql/data
+
+  prometheus:
+    image: "prom/prometheus:v2.8.0"
+    volumes:
+      - type: volume
+        source: prometheus_data
+        target: /prometheus
+      - type: bind
+        source: ./prometheus.yml
+        target: /etc/prometheus/prometheus.yml
+        read_only: true
+
+  grafana:
+    image: "grafana/grafana:6.0.1"
+    volumes:
+      - type: volume
+        source: grafana_data
+        target: /var/lib/grafana
+
+  node-exporter-relay:
+    image: "peertube-index/node-exporter-relay:prod"
+    volumes:
+      - type: bind
+        source: /tmp/node_exporter
+        target: /node_exporter
