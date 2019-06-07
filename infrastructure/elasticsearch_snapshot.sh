@@ -21,13 +21,22 @@ ssh ${MACHINE_SSH_DESTINATION} << END_OF_REMOTE_SCRIPT
     set -e
     set -x
 
-    docker-compose exec \
-        elasticsearch \
-        curl -v --fail -X PUT "localhost:9200/_snapshot/videos/${SNAPSHOT}?wait_for_completion=true"l
+    docker exec peertube-index_elasticsearch_1 \
+        curl -v --fail -X PUT "localhost:9200/_snapshot/videos/${SNAPSHOT}?wait_for_completion=true&pretty=true"
 
-    docker cp "$(docker-compose ps -q elasticsearch)":/backups - > /root/elasticsearch_backups/${SNAPSHOT}.tar
+    mkdir -p /root/elasticsearch_backups
+    docker cp -a peertube-index_elasticsearch_1:/backups - > /root/elasticsearch_backups/${SNAPSHOT}.tar
 END_OF_REMOTE_SCRIPT
 
 rsync -z ${MACHINE_SSH_DESTINATION}:/root/elasticsearch_backups/${SNAPSHOT}.tar ${LOCAL_DIRECTORY}
+
+# Remove snapshot from Elasticsearch repository after download
+ssh ${MACHINE_SSH_DESTINATION} << END_OF_REMOTE_SCRIPT
+    set -e
+    set -x
+
+    docker exec peertube-index_elasticsearch_1 \
+        curl -v --fail -X DELETE "localhost:9200/_snapshot/videos/${SNAPSHOT}?pretty=true"
+END_OF_REMOTE_SCRIPT
 
 echo "Finished, snapshot name: ${SNAPSHOT}"
