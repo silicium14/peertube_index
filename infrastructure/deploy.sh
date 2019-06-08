@@ -38,6 +38,7 @@ function deploy {
     cp "${MONITORING_USERS_CREDENTIALS_FILE}" "${ARTIFACTS_DIRECTORY}/monitoring_users_credentials.htdigest"
     cp infrastructure/prometheus.yml "${ARTIFACTS_DIRECTORY}/prometheus.yml"
     cp docker-compose.yml "${ARTIFACTS_DIRECTORY}/docker-compose.yml"
+    echo "COMPOSE_PROJECT_NAME=peertube-index" > "${ARTIFACTS_DIRECTORY}/.env"
 
     # local artifacts directory must not have a trailing slash to send the directory and not just the files inside
     rsync -rtvz "infrastructure/builds/${VERSION}" ${MACHINE_SSH_DESTINATION}:"/root/"
@@ -70,9 +71,9 @@ function deploy {
         cd "\${ARTIFACTS_DIRECTORY}"
 
         # Remove prometheus container to avoid this error: Cannot create container for service prometheus: Duplicate mount point: /prometheus
-        docker-compose -p peertube-index rm -sf prometheus
+        docker-compose rm -sf prometheus
 
-        docker-compose -p peertube-index up -d --no-build
+        docker-compose up -d --no-build
 END_OF_REMOTE_SCRIPT
 
 echo "# Finished, deploy successful for version ${VERSION}"
