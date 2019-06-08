@@ -1,19 +1,39 @@
 version: "3.7"
 volumes:
+  elasticsearch_data_external:
+    external:
+      name: elasticsearch_data
   elasticsearch_data:
-    external: true
+
+  elasticsearch_backups_external:
+    external:
+      name: elasticsearch_backups
   elasticsearch_backups:
-    external: true
+
+  status_storage_external:
+    external:
+      name: status_storage
   status_storage:
-    external: true
+
+  prometheus_data_external:
+    external:
+      name: prometheus_data
   prometheus_data:
-    external: true
+
+  grafana_data_external:
+    external:
+      name: grafana_data
   grafana_data:
-    external: true
+
+  status_monitoring_data_external:
+    external:
+      name: status_monitoring_data
   status_monitoring_data:
-    external: true
+
+  traefik_acme_certs_external:
+    external:
+      name: traefik_acme_certs
   traefik_acme_certs:
-    external: true
 
 services:
   traefik:
@@ -32,7 +52,7 @@ services:
         target: /srv/monitoring_users_credentials.htdigest
         read_only: true
       - type: volume
-        source: traefik_acme_certs
+        source: traefik_acme_certs_external
         target: /acme_certs
 
   elasticsearch:
@@ -44,10 +64,10 @@ services:
       ES_JAVA_OPTS: "-Xms256m -Xmx256m"
     volumes:
       - type: volume
-        source: elasticsearch_data
+        source: elasticsearch_data_external
         target: /usr/share/elasticsearch/data
       - type: volume
-        source: elasticsearch_backups
+        source: elasticsearch_backups_external
         target: /backups
     ulimits:
       memlock:
@@ -64,7 +84,7 @@ services:
       HTTP_API_PORT: 80
     volumes:
       - type: volume
-        source: status_storage
+        source: status_storage_external
         target: /status_storage
 
   error-pages:
@@ -80,7 +100,7 @@ services:
       HTTP_API_PORT: 80
     volumes:
       - type: volume
-        source: status_storage
+        source: status_storage_external
         target: /status_storage
     entrypoint:
       - sh
@@ -94,7 +114,7 @@ services:
       HTTP_API_PORT: 80
     volumes:
       - type: volume
-        source: status_storage
+        source: status_storage_external
         target: /status_storage
     entrypoint:
       - sh
@@ -106,7 +126,7 @@ services:
       - status-monitoring-db
     volumes:
       - type: volume
-        source: status_storage
+        source: status_storage_external
         target: /status_storage
         read_only: true
 
@@ -114,14 +134,14 @@ services:
     image: "postgres:10"
     volumes:
       - type: volume
-        source: status_monitoring_data
+        source: status_monitoring_data_external
         target: /var/lib/postgresql/data
 
   prometheus:
     image: "prom/prometheus:v2.8.0"
     volumes:
       - type: volume
-        source: prometheus_data
+        source: prometheus_data_external
         target: /prometheus
       - type: bind
         source: ./prometheus.yml
@@ -132,7 +152,7 @@ services:
     image: "grafana/grafana:6.0.1"
     volumes:
       - type: volume
-        source: grafana_data
+        source: grafana_data_external
         target: /var/lib/grafana
 
   node-exporter-relay:
@@ -141,3 +161,52 @@ services:
       - type: bind
         source: /tmp/node_exporter
         target: /node_exporter
+
+  volume-migrate:
+    image: "debian"
+    entrypoint:
+      - sleep
+      - "604800" # 7 days
+    volumes:
+      - type: volume
+        source: elasticsearch_data_external
+        target: /volumes/elasticsearch_data_src
+      - type: volume
+        source: elasticsearch_data
+        target: /volumes/elasticsearch_data_dst
+      - type: volume
+        source: elasticsearch_backups_external
+        target: /volumes/elasticsearch_backups_src
+      - type: volume
+        source: elasticsearch_backups
+        target: /volumes/elasticsearch_backups_dst
+      - type: volume
+        source: status_storage_external
+        target: /volumes/status_storage_src
+      - type: volume
+        source: status_storage
+        target: /volumes/status_storage_dst
+      - type: volume
+        source: prometheus_data_external
+        target: /volumes/prometheus_data_src
+      - type: volume
+        source: prometheus_data
+        target: /volumes/prometheus_data_dst
+      - type: volume
+        source: grafana_data_external
+        target: /volumes/grafana_data_src
+      - type: volume
+        source: grafana_data
+        target: /volumes/grafana_data_dst
+      - type: volume
+        source: status_monitoring_data_external
+        target: /volumes/status_monitoring_data_src
+      - type: volume
+        source: status_monitoring_data
+        target: /volumes/status_monitoring_data_dst
+      - type: volume
+        source: traefik_acme_certs_external
+        target: /volumes/traefik_acme_certs_src
+      - type: volume
+        source: traefik_acme_certs
+        target: /volumes/traefik_acme_certs_dst
