@@ -32,13 +32,13 @@ htdigest monitoring_users_credentials.htdigest traefik username
 Edit the htdigest file and remove the line corresponding to the user
 
 ### Start host metrics exporter (on the server)
-See `infrastructure/node_exporter/setup_node_exporter.md`
+See `node_exporter_relay/setup_node_exporter.md`
 
 ### Run a first deploy (locally)
 ```bash
 MACHINE_SSH_DESTINATION="user@hostname.domain" \
 MONITORING_USERS_CREDENTIALS_FILE="monitoring_users_credentials_file.htdigest" \
-./infrastructre/
+./scripts/deploy.sh
 ```
 Some containers will be giving failure messages because Elasticsearch index and status storage are not created yet.
 Use the same command for next deploys.
@@ -46,7 +46,7 @@ Use the same command for next deploys.
 ### Create Elasticsearch index (on the server)
 Start an iex session inside the webapp container, without starting the app
 ```bash
-docker-compose exec webapp iex -S mix run --no-start
+docker exec -it peertube-index_webapp_1 iex -S mix run --no-start
 ```
 Then, in the iex session
 ```elixir
@@ -58,7 +58,7 @@ PeertubeIndex.VideoStorage.Elasticsearch.empty()
 This is necessary for making backups of Elasticsearch.
 Open an shell in the Elasticsearch container
 ```bash
-docker-compose exec elasticsearch /bin/bash
+docker exec -it peertube-index_elasticsearch_1 /bin/bash
 ```
 Then, in the Elasticsearch container
 ```bash

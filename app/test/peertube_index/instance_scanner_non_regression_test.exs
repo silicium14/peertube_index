@@ -12,10 +12,10 @@ defmodule InstanceScannerNonRegressionTest do
 
   @moduletag :integration
 
-  @reference_videos_file "test/peertube_index/instance_api_non_regression_test_data/reference_videos.json"
-  @reference_instances_file "test/peertube_index/instance_api_non_regression_test_data/reference_instances.json"
-  @result_videos_file "test/peertube_index/instance_api_non_regression_test_data/videos.json"
-  @result_instances_file "test/peertube_index/instance_api_non_regression_test_data/instances.json"
+  @reference_videos_file "test/peertube_index/instance_scanner_non_regression_test_data/reference_videos.json"
+  @reference_instances_file "test/peertube_index/instance_scanner_non_regression_test_data/reference_instances.json"
+  @result_videos_file "test/peertube_index/instance_scanner_non_regression_test_data/videos.json"
+  @result_instances_file "test/peertube_index/instance_scanner_non_regression_test_data/instances.json"
 
   setup_all do
     {:ok, {videos, instances}} = PeertubeIndex.InstanceScanner.Http.scan("peertube.cpy.re", 5)

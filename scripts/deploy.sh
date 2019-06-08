@@ -15,33 +15,33 @@ function die {
 
 function deploy {
     export VERSION=$(git rev-parse --short --verify HEAD)
-    export ARTIFACTS_DIRECTORY="infrastructure/builds/${VERSION}/"
+    export ARTIFACTS_DIRECTORY="builds/${VERSION}/"
     echo "# Starting deploy for version ${VERSION}"
 
     [[ -n "$(git status --porcelain)" ]] && die "working directory not clean"
 
-    mkdir "${ARTIFACTS_DIRECTORY}"
+    mkdir -p "${ARTIFACTS_DIRECTORY}"
 
-    docker build -t peertube-index/app:${VERSION} .
+    docker build -t peertube-index/app:${VERSION} app
     docker image save -o "${ARTIFACTS_DIRECTORY}/app-image-${VERSION}.tar" peertube-index/app:${VERSION}
 
-    docker build -t peertube-index/error-pages:${VERSION} infrastructure/error_pages
+    docker build -t peertube-index/error-pages:${VERSION} error_pages
     docker image save -o "${ARTIFACTS_DIRECTORY}/error-pages-image-${VERSION}.tar" peertube-index/error-pages:${VERSION}
 
-    docker build -t peertube-index/status-monitoring-updater:${VERSION} status_monitoring
+    docker build -t peertube-index/status-monitoring-updater:${VERSION} status_monitoring_updater
     docker image save -o "${ARTIFACTS_DIRECTORY}/status-monitoring-updater-image-${VERSION}.tar" peertube-index/status-monitoring-updater:${VERSION}
 
-    docker build -t peertube-index/node-exporter-relay:${VERSION} infrastructure/node_exporter
+    docker build -t peertube-index/node-exporter-relay:${VERSION} node_exporter_relay
     docker image save -o "${ARTIFACTS_DIRECTORY}/node-exporter-relay-image-${VERSION}.tar" peertube-index/node-exporter-relay:${VERSION}
 
-    cp infrastructure/traefik.toml "${ARTIFACTS_DIRECTORY}/traefik.toml"
+    cp traefik/traefik.toml "${ARTIFACTS_DIRECTORY}/traefik.toml"
     cp "${MONITORING_USERS_CREDENTIALS_FILE}" "${ARTIFACTS_DIRECTORY}/monitoring_users_credentials.htdigest"
-    cp infrastructure/prometheus.yml "${ARTIFACTS_DIRECTORY}/prometheus.yml"
+    cp prometheus/prometheus.yml "${ARTIFACTS_DIRECTORY}/prometheus.yml"
     cp docker-compose.yml "${ARTIFACTS_DIRECTORY}/docker-compose.yml"
     echo "COMPOSE_PROJECT_NAME=peertube-index" > "${ARTIFACTS_DIRECTORY}/.env"
 
     # local artifacts directory must not have a trailing slash to send the directory and not just the files inside
-    rsync -rtvz "infrastructure/builds/${VERSION}" ${MACHINE_SSH_DESTINATION}:"/root/"
+    rsync -rtvz "builds/${VERSION}" ${MACHINE_SSH_DESTINATION}:"/root/"
     export SERVER_ARTIFACTS_DIRECTORY="/root/${VERSION}/"
 
     ssh ${MACHINE_SSH_DESTINATION} << END_OF_REMOTE_SCRIPT
@@ -79,4 +79,4 @@ END_OF_REMOTE_SCRIPT
 echo "# Finished, deploy successful for version ${VERSION}"
 }
 
-deploy 2>&1 | tee -a infrastructure/deploy.log
+deploy 2>&1 | tee -a deploy.log

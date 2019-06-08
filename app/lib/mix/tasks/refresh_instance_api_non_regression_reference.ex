@@ -15,12 +15,12 @@ defmodule Mix.Tasks.RefreshInstanceScannerNonRegressionReference do
     videos = Enum.to_list(videos)
 
     File.write!(
-      "test/peertube_index/instance_api_non_regression_test_data/reference_videos.json",
+      "test/peertube_index/instance_scanner_non_regression_test_data/reference_videos.json",
       Poison.encode!(videos, pretty: true),
       [:binary, :write]
     )
     File.write!(
-      "test/peertube_index/instance_api_non_regression_test_data/reference_instances.json",
+      "test/peertube_index/instance_scanner_non_regression_test_data/reference_instances.json",
       Poison.encode!(MapSet.to_list(instances), pretty: true),
       [:binary, :write]
     )

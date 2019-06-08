@@ -55,7 +55,6 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 ### Enhancements
 - Make Elasticsearch backups not incremental by deleting existing snapshots in the repository before making a new one
 - Script to start node_expoter and socat inside a tmux
-- Enhance directory structure, elixir project should be in its own directory?
 - Move use cases from lib/peertube_index.ex to lib/peertube_index/use_cases.ex for clarity?
 - Upgrade Elasticsearch
 - Build script and upload script
@@ -63,7 +62,6 @@ HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRE
 - Keep track of all updatable components (containers and dependencies): use dependabot for packages
 - Grafana on monitoring.peertube-index.net with HTTPS
 - Elasticsearch metrics
-- Separate infrastructure before making code public open source?
 - Install script should `cd` into the appropriate directory to work
 - Measure test coverage
 - Better function names for StatusStorage functions to change the status?

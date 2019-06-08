@@ -1,6 +1,0 @@
-/.git/
-/.idea/
-
-/infrastructure/builds/
-/infrastructure/deploy.log
-/local_only/
