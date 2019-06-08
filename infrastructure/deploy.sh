@@ -72,9 +72,6 @@ function deploy {
         # Remove prometheus container to avoid this error: Cannot create container for service prometheus: Duplicate mount point: /prometheus
         docker-compose -p peertube-index rm -sf prometheus
 
-        # Force traefik to restart with new configuration file
-        docker-compose -p peertube-index stop traefik
-
         docker-compose -p peertube-index up -d --no-build
 END_OF_REMOTE_SCRIPT
 
