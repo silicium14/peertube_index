@@ -1,80 +1,27 @@
-# PeertubeIndex
+# PeerTube Index
 
-## Decisions
-- We should not put too much pressure on instances by querying them heavily so we scan one instance sequentially.
-- Our validation of video documents expects fields that are not in PeerTube OpenAPI spec but that we found were provided by most instances.
-We should check monitor video document validation errors per PeerTube instance version to make sure our validation works correctly for newer versions.
+PeerTube Index is a centralized search engine for PeerTube videos.
+It crawls PeerTube instances, index their videos, and discovers new instances.
+It is hosted at [peertube-index.net](https://peertube-index.net).
 
+This project is not affiliated to Framasoft, the maintainer of the [PeerTube](https://github.com/Chocobozzz/PeerTube) software.
 
-## How to run the project
-### Development
-- To run Elasticsearch in docker
-```bash
-docker run -d --name peertube-index-elasticsearch-dev -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:6.6.0
-# For tests
-docker run -d --name peertube-index-elasticsearch-test -p 5555:9200 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:6.6.0
-```
+## How it works / what it does
 
-- To start iex
-This project relies on environment variables for configuration, see the `config.exs` file for the environment variables you need to set
-```bash
-HTTP_API_PORT=4000 ELASTICSEARCH_URL="http://localhost:9200" STATUS_STORAGE_DIRECTORY="status_storage_dev" iex -S mix
-```
+- Scans instances if they have not been scanned for more than 24 hours
+- Respects robots.txt directives
+- Discovers new instances by adding the followed and following instances of a known instance being scanned
+- Periodically updates its list of known instances from thefederation.info and instances.joinpeertube.org
+- No scanning retry: at the first scanning error (network error, HTTP error, parsing error...) the instance is marked as failed for the next 24h
 
-- To run tests
-```bash
-HTTP_API_PORT=4001 ELASTICSEARCH_URL="http://localhost:5555" STATUS_STORAGE_DIRECTORY="status_storage_test" mix test
-```
+## State of the project
 
-## TODO
-### Features
-- Add created by info on about page
-- Advertise it on disussion threads about Peertube global search
-- Make the code public
-- Update report form explanation to include spam?
-- Scan loop optimization + scheme detection: check node compatibility with Nodeinfo
-- Logo and home page link on search page
-- SEO metadata
-- Bigger title
-- Monitoring: measure scanning duration
-- Error reporting
-- Home page link on every page
-- Search bar icon also a button?
-- Video title truncated if too long
-- Thumbnails placeholder during loading OR pagination
-- Handle instance timezone if such a thing exists?
-- Monitor invalid document errors by instance version to ensure that our validation still works correctly for new versions
-- Rate limiting
-- Better looking error and not found pages
-- Status frontend
-- Provide search for unsafe content
-- Zero downtime deploy
-- Staging configuration and provisioning for a prod backup
-- Healthchecks in monitoring
+This is a toy project built with the objectives of
+learning the Elixir language and experimenting some coding practices
+while building something that may be useful enough to keep me motivated.
 
-### Enhancements
-- Make Elasticsearch backups not incremental by deleting existing snapshots in the repository before making a new one
-- Script to start node_expoter and socat inside a tmux
-- Move use cases from lib/peertube_index.ex to lib/peertube_index/use_cases.ex for clarity?
-- Upgrade Elasticsearch
-- Build script and upload script
-- Better code organization: web server in its own app using core peertube-index with a path dependency?
-- Keep track of all updatable components (containers and dependencies): use dependabot for packages
-- Grafana on monitoring.peertube-index.net with HTTPS
-- Elasticsearch metrics
-- Install script should `cd` into the appropriate directory to work
-- Measure test coverage
-- Better function names for StatusStorage functions to change the status?
-- Functions in StatusStorage have no exclamation mark but functions in VideoStorage have one
-- Replace `EEx.eval_file` with `EEx.function_from_file` at compile time?
-- Update setup procecure
-- Make deploy not failing on container deletion if a container does not exists
-- Use Hackney instead of httpc (waiting for https://github.com/PSPDFKit-labs/bypass/issues/75)
-- Figure why httpc truncates response in some cases or change http client
-- Instance scanner non regression tests with a cassette that replays a real payload in tests
-- Add an end to end test
-- See if we can reduce duplication of `@media (min-width: 900px)` in CSS code
-- Scan multiple instances concurrently
-- Use document type from Elasticsearch library?
-- Remember that in the domain we directly use the objects returned by the storage without any conversion, we are coupled to the storage format for now
-- Analysis tool check matching of collaboration and contract tests
+I may improve it if it has enough users.
+
+## Contributing
+
+As this a toy project for practice and learning purposes, I do **not** want code contributions for now.

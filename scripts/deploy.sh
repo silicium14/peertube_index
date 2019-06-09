@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Deploy the API and the scan loop
+# Deploy the entire stack
 # Expected environment variables:
 #   MACHINE_SSH_DESTINATION: user@hostname.domain
 #   MONITORING_USERS_CREDENTIALS_FILE: path of monitoring user credentials in htdigest format
