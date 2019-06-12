@@ -3,6 +3,11 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
+
+html {
+    -webkit-text-size-adjust: 100%; /* Prevent font scaling in landscape while allowing user zoom */
+}
+
 body {
     margin: 0;
     font-family: Verdana, sans-serif
@@ -13,25 +18,71 @@ body {
     justify-content: center;
     width: 100%;
     min-width: 320px;
-    margin-top: 20px;
     position: fixed;
+    top: 20px;
     z-index: 1000;
 }
 
-.topSpacer {
-    height: 80px;
+.homeButton {
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    z-index: 1000;
+    visibility: hidden;
+}
+.homeButton span {
+    position: relative;
+}
+.homeButton a {
+    color: white;
+    text-decoration: none;
+    background-color: #333333;
+    padding: 0.8rem 0.4rem;
+    border-radius: 8px;
+    box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+    position: absolute;
+}
+@media (min-width: 900px) {
+    .homeButton--top {
+        visibility: visible;
+    }
+}
+.homeButton--top {
+    top: 20px;
+}
+.homeButton--top span {
+    width: 572px;
+}
+.homeButton--top a {
+    right: 592px; # width of search bar plus 20px
+}
+@media (max-width: 899px) {
+    .homeButton--bottom {
+        visibility: visible;
+    }
+}
+.homeButton--bottom {
+    bottom: 0px;
+}
+.homeButton--bottom span {
+    width: 288px;
+}
+.homeButton--bottom a {
+    bottom: 70px;
 }
 
 .main {
     width: 267px;
-    /* The bottom margin leaves room for the fixed warning footer */
-    margin: 0 auto 20px auto;
+    /* The bottom margin leaves room for the fixed warning footer plus home button */
+    margin: 80px auto 140px auto;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 @media (min-width: 900px) {
     .main {
+        margin-bottom: 100px;
         width: auto;
         max-width: 768px;
         align-items: stretch;
@@ -51,6 +102,11 @@ body {
     flex-direction: column;
     margin-bottom: 50px;
 }
+
+.video:last-of-type {
+    margin-bottom: auto;
+}
+
 @media (min-width: 900px) {
     .video {
         flex-direction: row;
@@ -118,7 +174,7 @@ body {
     <form class="searchForm">
         <%= EEx.eval_file("frontend/search_bar.html.eex", fixed: true, query: query) %>
     </form>
-    <div class="topSpacer"></div>
+    <div class="homeButton homeButton--top"><span><a href="/">home</a></span></div>
     <div class="main">
 
         <div class="resultsMessage<%= if length(videos) == 0, do: " resultsMessage--noresult"%>">
@@ -193,7 +249,9 @@ body {
                 %>
             </div>
         </article>
-    <%end%></div>
+    <%end%>
+    </div>
+    <div class="homeButton homeButton--bottom"><span><a href="/">home</a></span></div>
     <%= EEx.eval_file("frontend/warning_footer.html.eex") %>
 </body>
 
