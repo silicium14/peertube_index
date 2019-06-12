@@ -9,8 +9,12 @@ html {
 }
 
 body {
+    font-family: Verdana, sans-serif;
     margin: 0;
-    font-family: Verdana, sans-serif
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .searchForm {
@@ -20,7 +24,7 @@ body {
     min-width: 320px;
     position: fixed;
     top: 20px;
-    z-index: 1000;
+    z-index: 100;
 }
 
 .homeButton {
@@ -28,7 +32,7 @@ body {
     display: flex;
     justify-content: center;
     width: 100%;
-    z-index: 1000;
+    z-index: 100;
     visibility: hidden;
 }
 .homeButton span {
@@ -74,17 +78,16 @@ body {
 
 .main {
     width: 267px;
-    /* The bottom margin leaves room for the fixed warning footer plus home button */
-    margin: 80px auto 140px auto;
+    /* The bottom margin leaves room for the home button */
+    margin: 80px auto 90px auto;
     display: flex;
     flex-direction: column;
     align-items: center;
 }
 @media (min-width: 900px) {
     .main {
-        margin-bottom: 100px;
-        width: auto;
-        max-width: 768px;
+        margin-bottom: 70px;
+        width: 768px;
         align-items: stretch;
     }
 }

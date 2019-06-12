@@ -9,7 +9,7 @@
 }
 .searchBar--fixed {
     box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
-    z-index: 1000;
+    z-index: 100;
 }
 @media (min-width: 900px) {
     .searchBar {
