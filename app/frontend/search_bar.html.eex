@@ -5,14 +5,15 @@ else
     "searchBar"
 end
 %>
+<div class="<%= classes %>">
 <%=
 Phoenix.HTML.Tag.tag(
     "input",
     type: "text",
     name: "text",
-    class: classes,
     value: query,
     placeholder: "Search videos by name",
     required: true
 ) |> Phoenix.HTML.safe_to_string()
-%>
+%><button type="submit"><img src="/static/search_icon.svg"></button>
+</div>

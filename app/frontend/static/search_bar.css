@@ -1,11 +1,9 @@
 .searchBar {
+    display: flex;
     box-sizing: border-box;
-    font-size: medium;
     width: 288px;
-    padding: 0.8rem;
     border: none;
     border-radius: 8px;
-    background: url("/static/search_icon.svg") 98.1% 50% no-repeat white;
 }
 .searchBar--fixed {
     box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
@@ -14,6 +12,30 @@
 @media (min-width: 900px) {
     .searchBar {
         width: 572px;
-        align-items: stretch;
     }
+}
+.searchBar input {
+    flex-grow: 1;
+    box-sizing: border-box;
+    font-size: medium;
+    margin: 0px;
+    padding: 0.8rem;
+    border: none;
+    border-radius: 8px 0 0 8px;
+}
+.searchBar button {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    width: 60px;
+    border: none;
+    border-radius: 0 8px 8px 0;
+    background-color: #333333;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.searchBar button img {
+    /* https://stackoverflow.com/a/11126701 */
+    display: block;
+    margin: auto;
 }
