@@ -16,12 +16,12 @@ defmodule PeertubeIndex.WebServer do
 
   get "/" do
     conn = put_resp_content_type(conn, "text/html")
-    send_resp(conn, 200, EEx.eval_file("frontend/home.html.eex", []))
+    send_resp(conn, 200, PeertubeIndex.Templates.home())
   end
 
   get "/search" do
     search = conn.assigns[:search_usecase_function] || &PeertubeIndex.search/1
-    render = conn.assigns[:render_page_function] || &render_search_page/2
+    render = conn.assigns[:render_page_function] || &PeertubeIndex.Templates.search/2
 
     conn = fetch_query_params(conn)
     query = conn.query_params["text"]
@@ -41,10 +41,6 @@ defmodule PeertubeIndex.WebServer do
     end
   end
 
-  defp render_search_page(videos, query) do
-    EEx.eval_file("frontend/search.html.eex", [videos: videos, query: query])
-  end
-
   get "/api/search" do
     search = conn.assigns[:search_usecase_function] || &PeertubeIndex.search/1
 
@@ -56,7 +52,7 @@ defmodule PeertubeIndex.WebServer do
 
   get "/about" do
     conn = put_resp_content_type(conn, "text/html")
-    send_resp(conn, 200, EEx.eval_file("frontend/about.html.eex", []))
+    send_resp(conn, 200, PeertubeIndex.Templates.about())
   end
 
   match _ do

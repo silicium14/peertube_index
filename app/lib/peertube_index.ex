@@ -76,6 +76,7 @@ defmodule PeertubeIndex do
         @status_storage.discovered_instance(hostname, current_time)
       end
     end
+    :ok
   end
 
   @spec get_current_time_naivedatetime :: NaiveDateTime.t

@@ -75,12 +75,12 @@ body {
 <div id="background"></div>
 <form class="searchForm" action="search">
     <h1 class="searchForm-title">PeerTube Index</h1>
-    <%= EEx.eval_file("frontend/search_bar.html.eex", fixed: false, query: "") %>
+    <%= PeertubeIndex.Templates.search_bar(false, "") %>
     <button class="searchForm-button" type="submit">Search</button>
 </form>
 <div class="aboutLinks">
 <a href="/about#this-site">about this site</a> - <a href="/about#photo">photo credits</a>
 </div>
-<%= EEx.eval_file("frontend/warning_footer.html.eex") %>
+<%= PeertubeIndex.Templates.warning_footer() %>
 </body>
 </html>

@@ -175,7 +175,7 @@ body {
 
 <body>
     <form class="searchForm">
-        <%= EEx.eval_file("frontend/search_bar.html.eex", fixed: true, query: query) %>
+        <%= PeertubeIndex.Templates.search_bar(true, query) %>
     </form>
     <div class="homeButton homeButton--top"><span><a href="/">home</a></span></div>
     <div class="main">
@@ -255,7 +255,7 @@ body {
     <%end%>
     </div>
     <div class="homeButton homeButton--bottom"><span><a href="/">home</a></span></div>
-    <%= EEx.eval_file("frontend/warning_footer.html.eex") %>
+    <%= PeertubeIndex.Templates.warning_footer() %>
 </body>
 
 </html>
