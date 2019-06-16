@@ -171,6 +171,8 @@ body {
 </style>
 <link rel="stylesheet" href="/static/search_bar.css">
 <link rel="stylesheet" href="/static/warning_footer.css">
+
+<title>PeerTube Index</title>
 </head>
 
 <body>
