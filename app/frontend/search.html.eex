@@ -44,7 +44,7 @@ body {
     background-color: #333333;
     padding: 0.8rem 0.4rem;
     border-radius: 8px;
-    box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+    box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
     position: absolute;
 }
 @media (min-width: 900px) {
@@ -59,7 +59,7 @@ body {
     width: 572px;
 }
 .homeButton--top a {
-    right: 592px; # width of search bar plus 20px
+    right: 592px; /* width of search bar plus 20px */
 }
 @media (max-width: 899px) {
     .homeButton--bottom {
@@ -175,7 +175,7 @@ body {
 
 <body>
     <form class="searchForm">
-        <%= PeertubeIndex.Templates.search_bar(true, query) %>
+        <%= PeertubeIndex.Templates.search_bar(query) %>
     </form>
     <div class="homeButton homeButton--top"><span><a href="/">home</a></span></div>
     <div class="main">

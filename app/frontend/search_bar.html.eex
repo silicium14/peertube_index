@@ -1,11 +1,4 @@
-<%
-classes = if fixed do
-    "searchBar searchBar--fixed"
-else
-    "searchBar"
-end
-%>
-<div class="<%= classes %>">
+<div class="searchBar">
 <%=
 Phoenix.HTML.Tag.tag(
     "input",

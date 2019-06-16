@@ -4,9 +4,7 @@
     width: 288px;
     border: none;
     border-radius: 8px;
-}
-.searchBar--fixed {
-    box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.7);
+    box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.3);
     z-index: 100;
 }
 @media (min-width: 900px) {
@@ -15,9 +13,10 @@
     }
 }
 .searchBar input {
+    font-size: medium;
+    font-family: Verdana, sans-serif;
     flex-grow: 1;
     box-sizing: border-box;
-    font-size: medium;
     margin: 0px;
     padding: 0.8rem;
     border: none;

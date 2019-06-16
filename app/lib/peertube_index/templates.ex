@@ -6,7 +6,7 @@ defmodule PeertubeIndex.Templates do
     {:about, []},
     {:home, []},
     {:search, [:videos, :query]},
-    {:search_bar, [:fixed, :query]},
+    {:search_bar, [:query]},
     {:warning_footer, []},
   ] do
     EEx.function_from_file(:def, template_name, "frontend/#{template_name}.html.eex", arguments)

@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PeerTube Index</title>
 <style>
+html {
+    -webkit-text-size-adjust: 100%; /* Prevent font scaling in landscape while allowing user zoom */
+}
 body {
     min-width: 320px;
     display: flex;
@@ -98,10 +101,10 @@ body {
 <article id="this-site" class="aboutSection">
     <h2>About this site</h2>
     <p>
-        This site crawls the PeerTube federation to discover PeerTube instances,
-        scans every PeerTube instance found for their videos,
-        and make all found videos searchable by their name,
-        excluding videos marked as Not Safe For Work (NSFW) for now.
+        PeerTube Index is a centralized search engine for PeerTube videos.
+        We run a crawler that visits PeerTube instances to find videos and new instances.
+        All found videos are made searchable by their name.
+        We exclude videos marked as Not Safe For Work (NSFW) for now.
     </p>
     <p>
 
@@ -114,17 +117,17 @@ body {
 <article id="unsafe-content" class="aboutSection">
     <h2>⚠️ Unsafe content warning</h2>
     <p>
-        Unsafe content (such as pornography, violence...) may be displayed on search results, even with normal or "safe" search terms.
+        Unsafe content, also known as Not Safe For Work or NSFW (such as pornography, violence...) may be displayed on search results, even with normal or "safe" search terms.
     </p>
     <p>
         PeerTube allows video publishers to tag their videos either as safe or unsafe.
-        When we discover and scan PeerTube instances for their videos, we get this information for each video, we are therefore able to exclude the videos marked as unsafe.
+        We get this information when we scan PeerTube instances, we are then able to exclude the videos marked as unsafe.
         This tagging is the only information we have to exclude unsafe videos. However, this tagging is out of our control.
         Because anybody can host a PeerTube instance (which is the very purpose of PeerTube), anybody can choose to ignore the tagging on their own instance and publish unsafe videos not tagged as such.
     </p>
     <p>
         As PeerTube Index discovers PeerTube instances and scans them in an automatic fashion in order to find as many instances and videos as possible,
-        PeerTube Index cannot be responsible for the not properly tagged unsafe content that it discovers and displays on search results.
+        PeerTube Index cannot be responsible for the not properly tagged content that it discovers and displays on search results.
     </p>
     <p>
         If you find a video on PeerTube Index that is unsafe and should not be displayed,
@@ -136,7 +139,7 @@ body {
 <article id="report-form" class="aboutSection">
     <h2>Report a video</h2>
     <p>
-        You can use the form below to report a video referenced on PeerTube Index that is illegal according to European Union law or that is unsafe.
+        You can use the form below to report a video referenced on PeerTube Index that is illegal according to European Union law or that is legal but unsafe (Not Safe For Work).
         There is no guarantee that we will remove a video from our search results by submitting this form, this is at our discretion.
     </p>
     <p>
