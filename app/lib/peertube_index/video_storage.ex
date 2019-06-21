@@ -155,7 +155,7 @@ defmodule PeertubeIndex.VideoStorage.Elasticsearch do
     case result do
       {:ok, _} ->
         :ok
-      {:error, %Elasticsearch.Exception{message: "no such index"}} ->
+      {:error, %Elasticsearch.Exception{type: "index_not_found_exception"}} ->
         :ok
       {:error, unexpected_error} ->
         raise unexpected_error

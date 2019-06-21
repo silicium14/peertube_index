@@ -15,6 +15,7 @@ Add this to root crontab to apply sysctl settings on boot
 ## Infrastructure setup
 - Create a monitoring users digest authentication file (locally)
 - Start host metrics exporter (on the server)
+- Change Elasticsearch container configuration for a first deploy (locally)
 - Run a first deploy (locally)
 - Create Elasticsearch index (on the server)
 - Create Elasticsearch snapshot repository (on the server)
@@ -33,6 +34,14 @@ Edit the htdigest file and remove the line corresponding to the user
 
 ### Start host metrics exporter (on the server)
 See `node_exporter_relay/setup_node_exporter.md`
+
+### Change Elasticsearch container configuration for a first deploy (locally)
+In the `docker-compose.yml` file, add the following environment variable to the elasticsearch container:
+```
+cluster.initial_master_nodes: "elasticsearch"
+```
+This is required by Elasticsearch to start safely start new cluster.
+You can remove this environment variable after the first deploy.
 
 ### Run a first deploy (locally)
 ```bash
