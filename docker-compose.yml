@@ -2,10 +2,11 @@ version: "3.7"
 volumes:
   elasticsearch_data:
   elasticsearch_backups:
+  status_db_data:
   status_storage:
+  status_monitoring_data:
   prometheus_data:
   grafana_data:
-  status_monitoring_data:
   traefik_acme_certs:
 
 services:
@@ -48,6 +49,13 @@ services:
         soft: -1
         hard: -1
 
+  status-db:
+    image: "postgres:11"
+    volumes:
+      - type: volume
+        source: status_db_data
+        target: /var/lib/postgresql/data
+
   webapp:
     image: "peertube-index/app:prod"
     depends_on:
@@ -55,6 +63,7 @@ services:
     environment:
       ELASTICSEARCH_URL: 'http://elasticsearch:9200'
       STATUS_STORAGE_DIRECTORY: '/status_storage'
+      STATUS_STORAGE_DATABASE_URL: 'ecto://postgres:@status-db/peertube_index'
       HTTP_API_PORT: 80
     volumes:
       - type: volume
@@ -68,9 +77,11 @@ services:
     image: "peertube-index/app:prod"
     depends_on:
       - elasticsearch
+      - status-db
     environment:
       ELASTICSEARCH_URL: 'http://elasticsearch:9200'
       STATUS_STORAGE_DIRECTORY: '/status_storage'
+      STATUS_STORAGE_DATABASE_URL: 'ecto://postgres:@status-db/peertube_index'
       HTTP_API_PORT: 80
     volumes:
       - type: volume
@@ -82,9 +93,12 @@ services:
 
   seed-loop:
     image: "peertube-index/app:prod"
+    depends_on:
+      - status-db
     environment:
       ELASTICSEARCH_URL: 'http://elasticsearch:9200'
       STATUS_STORAGE_DIRECTORY: '/status_storage'
+      STATUS_STORAGE_DATABASE_URL: 'ecto://postgres:@status-db/peertube_index'
       HTTP_API_PORT: 80
     volumes:
       - type: volume
@@ -97,7 +111,10 @@ services:
   status-monitoring-updater:
     image: "peertube-index/status-monitoring-updater:prod"
     depends_on:
+      - status-db
       - status-monitoring-db
+    environment:
+      SOURCE_DATABASE: 'host=status-db user=postgres dbname=peertube_index'
     volumes:
       - type: volume
         source: status_storage
