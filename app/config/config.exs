@@ -6,6 +6,8 @@ config :peertube_index,
     api: Elasticsearch.API.HTTP
   },
   status_storage_directory: {:system, "STATUS_STORAGE_DIRECTORY"}, # The path of a directory where instances statuses are persisted, for example: status_storage_dev
-  http_api_port: {:system, :integer, "HTTP_API_PORT"} # The TCP port used to listen to incoming HTTP requests for the API, for example: 80
+  status_storage_database_url: {:system, "STATUS_STORAGE_DATABASE_URL"},
+  http_api_port: {:system, :integer, "HTTP_API_PORT"}, # The TCP port used to listen to incoming HTTP requests for the API, for example: 80
+  ecto_repos: [PeertubeIndex.StatusStorage.Repo]
 
 import_config "#{Mix.env}.exs"

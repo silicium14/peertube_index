@@ -26,6 +26,8 @@ defmodule PeertubeIndex.MixProject do
   defp deps do
     [
       {:confex, "~> 3.4"},
+      {:ecto_sql, "~> 3.1"},
+      {:postgrex, ">= 0.0.0"},
       {:elasticsearch, "~> 1.0"},
       {:gollum, github: "silicium14/gollum", ref: "ff84c9c00433ce0d5ff75697ec2f32d34750d6d8"},
       {:phoenix_html, "~> 2.13"},

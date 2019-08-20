@@ -33,6 +33,11 @@ services:
         soft: -1
         hard: -1
 
+  status-db-test:
+    image: postgres:11
+    ports:
+      - "8888:5432"
+
   webapp:
     build:
       context: ./app/
