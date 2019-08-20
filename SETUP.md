@@ -21,6 +21,7 @@ Add this to root crontab to apply sysctl settings on boot
 - Create status monitoring database (on the server)
 - Create Elasticsearch index (on the server)
 - Create Elasticsearch snapshot repository (on the server)
+- Create status monitoring database (on the server)
 
 ### Manage monitoring users digest authentication (locally)
 - Create empty htdigest file
@@ -101,4 +102,9 @@ curl -X PUT "0.0.0.0:9200/_snapshot/videos" -H 'Content-Type: application/json' 
   }
 }
 '
+```
+
+### Create status monitoring database (on the server)
+```bash
+docker exec -it peertube-index_status_monitoring_updater_1 /bin/bash create_database.sh
 ```

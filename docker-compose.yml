@@ -111,7 +111,9 @@ services:
       - status-db
       - status-monitoring-db
     environment:
-      SOURCE_DATABASE: 'host=status-db user=postgres dbname=peertube_index'
+      SOURCE_HOST: 'status-db'
+      SOURCE_USER: 'postgres'
+      SOURCE_DATABASE: 'peertube_index'
     volumes:
       - type: volume
         source: status_storage
