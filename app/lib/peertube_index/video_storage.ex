@@ -38,7 +38,6 @@ defmodule PeertubeIndex.VideoStorage.Elasticsearch do
   @behaviour PeertubeIndex.VideoStorage
 
   @index "videos"
-  @document_type "_doc"
   def elasticsearch_config, do: Confex.fetch_env!(:peertube_index, :elasticsearch_config)
 
   @impl true
@@ -55,7 +54,7 @@ defmodule PeertubeIndex.VideoStorage.Elasticsearch do
   @impl true
   def insert_videos!(videos) do
     for video <- videos do
-      Elasticsearch.post!(elasticsearch_config(), "/#{@index}/#{@document_type}", video)
+      Elasticsearch.post!(elasticsearch_config(), "/#{@index}/_doc", video)
     end
 
     :ok
@@ -95,40 +94,38 @@ defmodule PeertubeIndex.VideoStorage.Elasticsearch do
     |> Enum.to_list()
   end
 
-  defp create_index do
-    Elasticsearch.Index.create(
+  defp create_index! do
+    :ok = Elasticsearch.Index.create(
       elasticsearch_config(),
       @index,
       %{
         "mappings"=> %{
-          @document_type=> %{
-            "properties"=> %{
-              "uuid"=> %{"type"=> "keyword"},
-              "name"=> %{"type"=> "text"},
-              "nsfw"=> %{"type"=> "boolean"},
-              "description"=> %{"type"=> "text"},
-              "duration"=> %{"type"=> "long"},
-              "views"=> %{"type"=> "long"},
-              "likes"=> %{"type"=> "long"},
-              "dislikes"=> %{"type"=> "long"},
-              "createdAt"=> %{"type"=> "date"},
-              "updatedAt"=> %{"type"=> "date"},
-              "publishedAt"=> %{"type"=> "date"},
-              "account"=> %{
-                "properties"=> %{
-                  "uuid"=> %{"type"=> "keyword"},
-                  "name"=> %{"type"=> "text"},
-                  "displayName"=> %{"type"=> "text"},
-                  "host"=> %{"type"=> "keyword"}
-                }
-              },
-              "channel"=> %{
-                "properties"=> %{
-                  "uuid"=> %{"type"=> "keyword"},
-                  "name"=> %{"type"=> "text"},
-                  "displayName"=> %{"type"=> "text"},
-                  "host"=> %{"type"=> "keyword"}
-                }
+          "properties"=> %{
+            "uuid"=> %{"type"=> "keyword"},
+            "name"=> %{"type"=> "text"},
+            "nsfw"=> %{"type"=> "boolean"},
+            "description"=> %{"type"=> "text"},
+            "duration"=> %{"type"=> "long"},
+            "views"=> %{"type"=> "long"},
+            "likes"=> %{"type"=> "long"},
+            "dislikes"=> %{"type"=> "long"},
+            "createdAt"=> %{"type"=> "date"},
+            "updatedAt"=> %{"type"=> "date"},
+            "publishedAt"=> %{"type"=> "date"},
+            "account"=> %{
+              "properties"=> %{
+                "uuid"=> %{"type"=> "keyword"},
+                "name"=> %{"type"=> "text"},
+                "displayName"=> %{"type"=> "text"},
+                "host"=> %{"type"=> "keyword"}
+              }
+            },
+            "channel"=> %{
+              "properties"=> %{
+                "uuid"=> %{"type"=> "keyword"},
+                "name"=> %{"type"=> "text"},
+                "displayName"=> %{"type"=> "text"},
+                "host"=> %{"type"=> "keyword"}
               }
             }
           }
@@ -138,19 +135,19 @@ defmodule PeertubeIndex.VideoStorage.Elasticsearch do
   end
 
   @impl true
-  def with_videos(videos) do
-    empty()
+  def with_videos!(videos) do
+    empty!()
     videos
-    |> Enum.each(fn video -> Elasticsearch.post!(elasticsearch_config(), "/#{@index}/#{@document_type}", video) end)
+    |> Enum.each(fn video -> Elasticsearch.post!(elasticsearch_config(), "/#{@index}/_doc", video) end)
   end
 
   @impl true
-  def empty do
-    _delete_index_ignore_not_exising!()
-    create_index()
+  def empty! do
+    delete_index_ignore_not_exising!()
+    create_index!()
   end
 
-  defp _delete_index_ignore_not_exising! do
+  defp delete_index_ignore_not_exising! do
     result = Elasticsearch.delete(elasticsearch_config(), "/#{@index}")
     case result do
       {:ok, _} ->
