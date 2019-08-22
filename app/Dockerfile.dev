@@ -1,0 +1,8 @@
+FROM elixir:1.8.2-alpine
+RUN apk update && apk add git
+
+WORKDIR /srv
+RUN mix local.rebar --force
+RUN mix local.hex --force
+
+CMD mix run --no-halt

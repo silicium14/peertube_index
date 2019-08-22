@@ -24,6 +24,9 @@ We use Elasticsearch as the search database because :
 - we need fast text search 
 - we found it was easier to setup and faster to get started with than other databases
 
+**Status monitoring database**
+We use PostgreSQL version 10 because it is the highest available version in Grafana PostgreSQL data source setup page.
+
 **Deployment**
 
 We use Docker containers with Docker Compose to deploy the full stack on a single machine, it is enough for the beginning.

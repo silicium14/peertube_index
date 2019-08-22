@@ -60,7 +60,7 @@ docker exec -it peertube-index_webapp_1 iex -S mix run --no-start
 Then, in the iex session
 ```elixir
 Application.ensure_all_started :elasticsearch
-PeertubeIndex.VideoStorage.Elasticsearch.empty()
+PeertubeIndex.VideoStorage.Elasticsearch.empty!()
 ```
 
 ### Create Elasticsearch snapshot repository (on the server)
