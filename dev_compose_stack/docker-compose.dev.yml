@@ -1,8 +1,4 @@
 version: "3.7"
-volumes:
-  webapp_build:
-  scan_loop_build:
-  seed_loop_build:
 
 services:
   traefik:
@@ -50,7 +46,6 @@ services:
         source: ./app
         target: /srv
       - type: volume
-        source: webapp_build
         target: /srv/_build
 
   error-pages:
@@ -68,7 +63,6 @@ services:
         source: ./app
         target: /srv
       - type: volume
-        source: scan_loop_build
         target: /srv/_build
     entrypoint:
       - sh
@@ -87,7 +81,6 @@ services:
         source: ./app
         target: /srv
       - type: volume
-        source: seed_loop_build
         target: /srv/_build
     entrypoint:
       - sh
