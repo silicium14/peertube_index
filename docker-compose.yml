@@ -62,7 +62,6 @@ services:
       - elasticsearch
     environment:
       ELASTICSEARCH_URL: 'http://elasticsearch:9200'
-      STATUS_STORAGE_DIRECTORY: '/status_storage'
       STATUS_STORAGE_DATABASE_URL: 'ecto://postgres:@status-db/peertube_index'
       HTTP_API_PORT: 80
     volumes:
@@ -80,7 +79,6 @@ services:
       - status-db
     environment:
       ELASTICSEARCH_URL: 'http://elasticsearch:9200'
-      STATUS_STORAGE_DIRECTORY: '/status_storage'
       STATUS_STORAGE_DATABASE_URL: 'ecto://postgres:@status-db/peertube_index'
       HTTP_API_PORT: 80
     volumes:
@@ -97,7 +95,6 @@ services:
       - status-db
     environment:
       ELASTICSEARCH_URL: 'http://elasticsearch:9200'
-      STATUS_STORAGE_DIRECTORY: '/status_storage'
       STATUS_STORAGE_DATABASE_URL: 'ecto://postgres:@status-db/peertube_index'
       HTTP_API_PORT: 80
     volumes:

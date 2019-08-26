@@ -9,7 +9,10 @@ defmodule Mix.Tasks.SeedFromInstancesJoinpeertubeOrg do
   Fetches instances from instances.joinpeertube.org and adds the not yet known instances to the instance storage
   """
   def run(_) do
-    Application.ensure_all_started :elasticsearch
+    Application.ensure_all_started :httpoison
+    Application.ensure_all_started :ecto_sql
+    Application.ensure_all_started :postgrex
+    PeertubeIndex.StatusStorage.Repo.start_link()
 
     {:ok, response} = HTTPoison.get "https://instances.joinpeertube.org/api/v1/instances?count=1000000000000000000"
     response.body

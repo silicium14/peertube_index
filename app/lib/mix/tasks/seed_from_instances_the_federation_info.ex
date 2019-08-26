@@ -9,7 +9,10 @@ defmodule Mix.Tasks.SeedFromTheFederationInfo do
   Fetches instances from the-federation.info and adds the not yet known instances to the instance storage
   """
   def run(_) do
-    Application.ensure_all_started :elasticsearch
+    Application.ensure_all_started :httpoison
+    Application.ensure_all_started :ecto_sql
+    Application.ensure_all_started :postgrex
+    PeertubeIndex.StatusStorage.Repo.start_link()
 
     query = "{nodes(platform: \"peertube\") {host}}"
     url = URI.encode("https://the-federation.info/graphql?query=" <> query)
