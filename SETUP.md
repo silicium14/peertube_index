@@ -1,5 +1,5 @@
-# Production Digitalocean droplet with docker installed
-## System setup
+# Docker compose deployment
+## System setup for DigitalOcean droplet
 Add this to `/etc/sysctl.conf`
 ```
 # Added by hand, trying to prevent reaching conntrack tracking limit that cause denial of service
@@ -17,16 +17,19 @@ Add this to root crontab to apply sysctl settings on boot
 - Start host metrics exporter (on the server)
 - Change Elasticsearch container configuration for a first deploy (locally)
 - Run a first deploy (locally)
+- Create status database (on the server)
+- Create status monitoring database (on the server)
 - Create Elasticsearch index (on the server)
 - Create Elasticsearch snapshot repository (on the server)
+- Create status monitoring database (on the server)
 
 ### Manage monitoring users digest authentication (locally)
 - Create empty htdigest file
-```bash
+```shell
 touch monitoring_users_credentials.htdigest
 ``` 
 - Add a user, the second parameter to `htdigest` must be `traefik`
-```bash
+```shell
 htdigest monitoring_users_credentials.htdigest traefik username
 ``` 
 - Remove a user
@@ -44,7 +47,7 @@ This is required by Elasticsearch to start safely start new cluster.
 You can remove this environment variable after the first deploy.
 
 ### Run a first deploy (locally)
-```bash
+```shell
 MACHINE_SSH_DESTINATION="user@hostname.domain" \
 MONITORING_USERS_CREDENTIALS_FILE="monitoring_users_credentials_file.htdigest" \
 ./scripts/deploy.sh
@@ -52,25 +55,42 @@ MONITORING_USERS_CREDENTIALS_FILE="monitoring_users_credentials_file.htdigest" \
 Some containers will be giving failure messages because Elasticsearch index and status storage are not created yet.
 Use the same command for next deploys.
 
+### Create status database (on the server)
+Start a shell in the webapp container
+```shell
+docker exec -it peertube-index_webapp_1 /bin/sh
+```
+Then
+```shell
+mix ecto.create
+mix ecto.migrate
+```
+
+### Create status monitoring database (on the server)
+```shell
+docker exec -it peertube-index_status-monitoring-updater_1 /bin/sh create_database.sh
+```
+
 ### Create Elasticsearch index (on the server)
 Start an iex session inside the webapp container, without starting the app
-```bash
+```shell
 docker exec -it peertube-index_webapp_1 iex -S mix run --no-start
 ```
 Then, in the iex session
 ```elixir
 Application.ensure_all_started :elasticsearch
 PeertubeIndex.VideoStorage.Elasticsearch.empty!()
+System.stop
 ```
 
 ### Create Elasticsearch snapshot repository (on the server)
 This is necessary for making backups of Elasticsearch.
 Open an shell in the Elasticsearch container
-```bash
+```shell
 docker exec -it peertube-index_elasticsearch_1 /bin/bash
 ```
 Then, in the Elasticsearch container
-```bash
+```shell
 chown -R elasticsearch:elasticsearch /backups
 # Once Elasticsearch is ready
 curl -X PUT "0.0.0.0:9200/_snapshot/videos" -H 'Content-Type: application/json' -d'
@@ -82,4 +102,9 @@ curl -X PUT "0.0.0.0:9200/_snapshot/videos" -H 'Content-Type: application/json' 
   }
 }
 '
+```
+
+### Create status monitoring database (on the server)
+```bash
+docker exec -it peertube-index_status_monitoring_updater_1 /bin/bash create_database.sh
 ```

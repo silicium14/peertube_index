@@ -6,8 +6,10 @@ docker-compose up -d
 ```
 
 - Follow these steps from [SETUP.md](../SETUP.md):
-    - Create Elasticsearch index (on the server);
-    - Create Elasticsearch snapshot repository (on the server).
+    - Create status database (on the server)
+    - Create status monitoring database (on the server)
+    - Create Elasticsearch index (on the server)
+    - Create Elasticsearch snapshot repository (on the server)
 
 - Configure Grafana data sources and import dashboards
 

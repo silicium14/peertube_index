@@ -1,12 +1,12 @@
 #!/usr/bin/env sh
 
 function load {
-    elixir join_statuses.exs
     psql \
         -h status-monitoring-db \
         -U postgres \
-        -f load.sql \
-        -v import_time="'$(TZ=UTC date '+%Y-%m-%d %H:%M:%S')'"
+        -d peertube_index \
+        -v import_time="'$(TZ=UTC date '+%Y-%m-%d %H:%M:%S')'" \
+        -f etl.sql
 }
 
 while [ 1 ]; do
