@@ -345,10 +345,10 @@ defmodule PeertubeIndex.InstanceScanner.VideoParams do
       label!: :string
     },
     language!: %{
-      id: :integer,
+#      id: :integer before 1.4.0 and :string 1.4.0 onwards
       label!: :string
     },
-    privacy!: %{
+    privacy: %{ # we used to require this field but found it may be absent
       id!: :integer,
       label!: :string
     },
@@ -366,8 +366,8 @@ defmodule PeertubeIndex.InstanceScanner.VideoParams do
     updatedAt!: :string, # Validate date format?
     publishedAt: :string, # Validate date format?
     account!: %{
-      id!: :integer,
-      uuid!: :string,
+      id: :integer, # we used to require this field but found it may be absent
+      uuid: :string, # we used to require this field but found it may be absent
       name!: :string,
       displayName!: :string,
       url!: :string,
@@ -378,7 +378,7 @@ defmodule PeertubeIndex.InstanceScanner.VideoParams do
         updatedAt: :string, # Validate date format?
       }
     },
-    channel!: %{
+    channel: %{ # we used to require this field but found it may be absent
       id: :integer,
       uuid: :string,
       name: :string,
