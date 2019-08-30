@@ -182,7 +182,7 @@
       "scroll": true,
       "showHeader": true,
       "sort": {
-        "col": 1,
+        "col": 0,
         "desc": true
       },
       "styles": [],
@@ -226,7 +226,7 @@
       "dashLength": 10,
       "dashes": false,
       "datasource": "Instances",
-      "fill": 1,
+      "fill": 0,
       "gridPos": {
         "h": 10,
         "w": 24,
@@ -252,10 +252,28 @@
       "nullPointMode": "null",
       "paceLength": 10,
       "percentage": false,
-      "pointradius": 2,
+      "pointradius": 1,
       "points": true,
       "renderer": "flot",
-      "seriesOverrides": [],
+      "seriesOverrides": [
+        {
+          "alias": "error",
+          "color": "#AD0317"
+        },
+        {
+          "alias": "ok",
+          "color": "#19730E"
+        },
+        {
+          "alias": "discovered",
+          "color": "#3274D9",
+          "pointradius": 3
+        },
+        {
+          "alias": "banned",
+          "color": "#CA95E5"
+        }
+      ],
       "stack": false,
       "steppedLine": false,
       "targets": [
@@ -472,5 +490,5 @@
   "timezone": "",
   "title": "Instances",
   "uid": "owa5wX6ik",
-  "version": 7
+  "version": 9
 }
