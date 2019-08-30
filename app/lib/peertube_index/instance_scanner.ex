@@ -10,6 +10,7 @@ defmodule PeertubeIndex.InstanceScanner.Http do
   @moduledoc false
   @behaviour PeertubeIndex.InstanceScanner
   require Logger
+  use Params
 
   @user_agent "PeertubeIndex"
 
@@ -63,11 +64,9 @@ defmodule PeertubeIndex.InstanceScanner.Http do
     |> reduce_enum_while_no_error(MapSet.new(), fn follower, set_of_instances -> MapSet.put(set_of_instances, follower["follower"]["host"]) end)
   end
 
-  @doc """
-  Fetches videos with streaming, saves the result on a file on disk
-  and returns a stream to read the videos from disk.
-  Also returns a set instances found in the videos.
-  """
+  #  Fetches videos with streaming, saves the result on a file on disk
+  #  and returns a stream to read the videos from disk.
+  #  Also returns a set instances found in the videos.
   @spec get_videos(String.t, integer, integer) :: {:ok, Enumerable.t, MapSet.t}
   defp get_videos(videos_url, page_size, request_timeout) do
     buffer_file_path = "video_buffer"
@@ -101,21 +100,20 @@ defmodule PeertubeIndex.InstanceScanner.Http do
     end
   end
 
-  @doc """
-  Iterate over the stream of videos and
-  - compute the set of instances found from the videos
-  - save videos to disk, excluding non local videos
-
-  The following format is used for serializing the collection of videos
-  start_of_file
-  [size_as_text,newline
-  term_as_binary,newline] repeated as many times as needed
-  end_of_file
-
-  size_as_text: the string representation of the binary size of term_as_binary, if term_as_binary is 152 bytes long, then size_as_text is the string 152
-  newline: a line jump character, \n
-  term_as_binary: the bytes given by :erlang.term_to_binary
-  """
+  #  Iterate over the stream of videos and
+  #  - compute the set of instances found from the videos
+  #  - save videos to disk, excluding non local videos
+  #
+  #  The following format is used for serializing the collection of videos
+  #  start_of_file
+  #  [size_as_text,newline
+  #  term_as_binary,newline] repeated as many times as needed
+  #  end_of_file
+  #
+  #  size_as_text: the string representation of the binary size of term_as_binary,
+  #                if term_as_binary is 152 bytes long, then size_as_text is the string 152
+  #  newline: a line jump character, \n
+  #  term_as_binary: the bytes given by :erlang.term_to_binary
   defp save_videos_and_reduce_instances(video = %{"isLocal" => true}, {buffer_file, instances}) do
     # Save video to disk
     term_binary = :erlang.term_to_binary(video)
@@ -182,82 +180,6 @@ defmodule PeertubeIndex.InstanceScanner.Http do
     end
   end
 
-  # credo:disable-for-next-line Credo.Check.Refactor.CyclomaticComplexity
-  defp valid_video?(video) do
-    video |> Map.get("id") |> is_integer
-    && video |> Map.get("uuid") |> is_binary
-    && video |> Map.get("name") |> is_binary
-    && video |> Map.get("category") |> is_map
-    && (
-      video |> get_in(["category", "id"]) |> is_nil
-      || video |> get_in(["category", "id"]) |> is_integer
-    )
-    && video |> get_in(["category", "label"]) |> is_binary
-    && video |> Map.get("licence") |> is_map
-    && (
-      video |> get_in(["licence", "id"]) |> is_nil
-      || video |> get_in(["licence", "id"]) |> is_integer
-    )
-    && video |> get_in(["licence", "label"]) |> is_binary
-    && video |> Map.get("language") |> is_map
-    && (
-      video |> get_in(["language", "id"]) |> is_nil
-      || video |> get_in(["language", "id"]) |> is_binary
-    )
-    && video |> get_in(["language", "label"]) |> is_binary
-    && video |> Map.get("privacy") |> is_map
-    && video |> get_in(["privacy", "id"]) |> is_integer
-    && video |> get_in(["privacy", "label"]) |> is_binary
-    && video |> Map.get("nsfw") |> is_boolean
-    && (
-      video |> Map.get("description") |> is_nil
-      || video |> Map.get("description") |> is_binary
-    )
-    && video |> Map.get("isLocal") |> is_boolean
-    && video |> Map.get("duration") |> is_integer
-    && video |> Map.get("views") |> is_integer
-    && video |> Map.get("likes") |> is_integer
-    && video |> Map.get("dislikes") |> is_integer
-    && video |> Map.get("thumbnailPath") |> is_binary
-    && video |> Map.get("previewPath") |> is_binary
-    && video |> Map.get("embedPath") |> is_binary
-    && video |> Map.get("createdAt") |> is_binary # Validate date format?
-    && video |> Map.get("updatedAt") |> is_binary # Validate date format?
-    && video |> Map.get("publishedAt") |> is_binary # Validate date format?
-    && video |> Map.get("account") |> is_map
-    && video |> get_in(["account", "id"]) |> is_integer
-    && video |> get_in(["account", "uuid"]) |> is_binary
-    && video |> get_in(["account", "name"]) |> is_binary
-    && video |> get_in(["account", "displayName"]) |> is_binary
-    && video |> get_in(["account", "url"]) |> is_binary
-    && video |> get_in(["account", "host"]) |> is_binary
-    && (
-      video |> get_in(["account", "avatar"]) |> is_nil
-      || (
-        video |> get_in(["account", "avatar"]) |> is_map
-        && video |> get_in(["account", "avatar", "path"]) |> is_binary
-        && video |> get_in(["account", "avatar", "createdAt"]) |> is_binary # Validate date format?
-        && video |> get_in(["account", "avatar", "updatedAt"]) |> is_binary # Validate date format?
-      )
-    )
-    && video |> Map.get("channel") |> is_map
-    && video |> get_in(["channel", "id"]) |> is_integer
-    && video |> get_in(["channel", "uuid"]) |> is_binary
-    && video |> get_in(["channel", "name"]) |> is_binary
-    && video |> get_in(["channel", "displayName"]) |> is_binary
-    && video |> get_in(["channel", "url"]) |> is_binary
-    && video |> get_in(["channel", "host"]) |> is_binary
-    && (
-      video |> get_in(["channel", "avatar"]) |> is_nil
-      || (
-        video |> get_in(["channel", "avatar"]) |> is_map
-        && video |> get_in(["channel", "avatar", "path"]) |> is_binary
-        && video |> get_in(["channel", "avatar", "createdAt"]) |> is_binary # Validate date format?
-        && video |> get_in(["channel", "avatar", "updatedAt"]) |> is_binary # Validate date format?
-      )
-    )
-  end
-
   defp get_page(url, request_timeout) do
     Logger.debug fn -> "Getting #{url}" end
     with {:ok, httpc_result} <- request_with_timeout(url, request_timeout),
@@ -288,10 +210,16 @@ defmodule PeertubeIndex.InstanceScanner.Http do
   end
 
   defp validate_one_video_and_keep_errors({:ok, video}) do
-    if valid_video?(video) do
+    changeset = PeertubeIndex.InstanceScanner.VideoParams.from(video)
+    if changeset.valid? do
       {:ok, video}
     else
-      {:error, :invalid_video_document}
+    {
+      :error, {
+        :invalid_video_document,
+        Ecto.Changeset.traverse_errors(changeset, fn error -> error end)
+      }
+    }
     end
   end
 
@@ -299,12 +227,11 @@ defmodule PeertubeIndex.InstanceScanner.Http do
     {:error, reason}
   end
 
-  @doc """
-  Returns an stream of ok/error tuples for each item of the collection: {:ok, item} or {:error, reason}.
-  The errors that my be present are about the page fetching steps.
-  For example, with a page size of 2 items and 3 pages, if there was an http error on the second page, the output would be :
-  `[{:ok, item}, {:ok, item}, {:error, :http_error}, {:ok, item}, {:ok, item}]`
-  """
+  #  Returns an stream of ok/error tuples for each item of the collection: {:ok, item} or {:error, reason}.
+  #  The errors that my be present are about the page fetching steps.
+  #  For example, with a page size of 2 items and 3 pages,
+  #  if there was an http error on the second page, the output would be :
+  #  `[{:ok, item}, {:ok, item}, {:error, :http_error}, {:ok, item}, {:ok, item}]`
   @spec get_collection(String.t, integer(), integer()) :: Enumerable.t
   defp get_collection(paginated_collection_url, page_size, request_timeout) do
     paginated_collection_url
@@ -312,19 +239,18 @@ defmodule PeertubeIndex.InstanceScanner.Http do
     |> Stream.flat_map(&extract_page_items_and_keep_errors/1) # {:ok, video} or {:error, reason}
   end
 
-  @doc """
-  Returns an enumerable of ok/error tuples for each page: {:ok, page_data} or {:error, reason}
-  If there is a single page the result is a list.
-  If there is more than one page the result is a stream.
-  """
+  #  Returns an enumerable of ok/error tuples for each page: {:ok, page_data} or {:error, reason}
+  #  If there is a single page the result is a list.
+  #  If there is more than one page the result is a stream.
   @spec get_pages(String.t, integer(), integer()) :: Enumerable.t
   defp get_pages(paginated_collection_url, page_size, request_timeout) do
     common_params = %{
       "count" => page_size,
       "sort" => "createdAt"
     }
-    with {:ok, first_page} <- get_page(url_with_params(paginated_collection_url, common_params), request_timeout) do
-      # credo:disable-for-next-line Credo.Check.Refactor.PipeChainStart
+    case get_page(url_with_params(paginated_collection_url, common_params), request_timeout) do
+      {:ok, first_page} ->
+        # credo:disable-for-next-line Credo.Check.Refactor.PipeChainStart
       number_of_pages = (first_page["total"] / page_size) |> Float.ceil() |> trunc()
       Logger.debug fn -> "#{paginated_collection_url} has #{first_page["total"]} items, using #{number_of_pages} pages" end
       if number_of_pages > 1 do
@@ -336,9 +262,8 @@ defmodule PeertubeIndex.InstanceScanner.Http do
       else
         [{:ok, first_page}]
       end
-    else
-      {:error, reason} ->
-        [{:error, reason}]
+    {:error, reason} ->
+      [{:error, reason}]
     end
   end
 
@@ -375,17 +300,80 @@ defmodule PeertubeIndex.InstanceScanner.Http do
     fn element, accumulator -> reduce_while_no_error(element, accumulator, reducer) end
   end
 
-  @doc """
-  Reduces an enumerable whose elements are either {:ok, element} or {:error, reason}
-  and stops if at the first {:error, reason} found.
-
-  The reducer function receives the second element of each tuple.
-
-  If an error is found, is is returned as is.
-  If no error is found, the returned value is {:ok, accumulator}.
-  """
+  #  Reduces an enumerable whose elements are either {:ok, element} or {:error, reason}
+  #  and stops if at the first {:error, reason} found.
+  #
+  #  The reducer function receives the second element of each tuple.
+  #
+  #  If an error is found, is is returned as is.
+  #  If no error is found, the returned value is {:ok, accumulator}.
   @spec reduce_enum_while_no_error(Enumerable.t, any(), (any(), any() -> any())) :: {:ok, any()} | {:error, any()}
   defp reduce_enum_while_no_error(enum, acc, fun) do
     Enum.reduce_while(enum, {:ok, acc}, reducer_while_no_error(fun))
   end
+end
+
+defmodule PeertubeIndex.InstanceScanner.VideoParams do
+  @moduledoc false
+
+  use Params.Schema, %{
+    id!: :integer,
+    uuid!: :binary,
+    name!: :binary,
+    category!: %{
+      id: :integer,
+      label!: :binary
+    },
+    licence!: %{
+      id: :integer,
+      label!: :binary
+    },
+    language!: %{
+      id: :integer,
+      label!: :binary
+    },
+    privacy!: %{
+      id!: :integer,
+      label!: :binary
+    },
+    nsfw!: :boolean,
+    description: :binary,
+    isLocal!: :boolean,
+    duration!: :integer,
+    views!: :integer,
+    likes!: :integer,
+    dislikes!: :integer,
+    thumbnailPath!: :binary,
+    previewPath!: :binary,
+    embedPath!: :binary,
+    createdAt!: :binary, # Validate date format?
+    updatedAt!: :binary, # Validate date format?
+    publishedAt: :binary, # Validate date format?
+    account!: %{
+      id!: :integer,
+      uuid!: :binary,
+      name!: :binary,
+      displayName!: :binary,
+      url!: :binary,
+      host!: :binary,
+      avatar: %{
+        path: :binary,
+        createdAt: :binary, # Validate date format?
+        updatedAt: :binary, # Validate date format?
+      }
+    },
+    channel!: %{
+      id: :integer,
+      uuid: :binary,
+      name: :binary,
+      displayName: :binary,
+      url: :binary,
+      host: :binary,
+      avatar: %{
+        path: :binary,
+        createdAt: :binary, # Validate date format?
+        updatedAt: :binary, # Validate date format?
+      }
+    }
+  }
 end
