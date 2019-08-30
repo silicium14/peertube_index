@@ -3,7 +3,6 @@ volumes:
   elasticsearch_data:
   elasticsearch_backups:
   status_db_data:
-  status_storage:
   status_monitoring_data:
   prometheus_data:
   grafana_data:
@@ -64,10 +63,6 @@ services:
       ELASTICSEARCH_URL: 'http://elasticsearch:9200'
       STATUS_STORAGE_DATABASE_URL: 'ecto://postgres:@status-db/peertube_index'
       HTTP_API_PORT: 80
-    volumes:
-      - type: volume
-        source: status_storage
-        target: /status_storage
 
   error-pages:
     image: "peertube-index/error-pages:prod"
@@ -81,10 +76,6 @@ services:
       ELASTICSEARCH_URL: 'http://elasticsearch:9200'
       STATUS_STORAGE_DATABASE_URL: 'ecto://postgres:@status-db/peertube_index'
       HTTP_API_PORT: 80
-    volumes:
-      - type: volume
-        source: status_storage
-        target: /status_storage
     entrypoint:
       - sh
       - scan_loop.sh
@@ -97,10 +88,6 @@ services:
       ELASTICSEARCH_URL: 'http://elasticsearch:9200'
       STATUS_STORAGE_DATABASE_URL: 'ecto://postgres:@status-db/peertube_index'
       HTTP_API_PORT: 80
-    volumes:
-      - type: volume
-        source: status_storage
-        target: /status_storage
     entrypoint:
       - sh
       - seed_loop.sh
@@ -114,11 +101,6 @@ services:
       SOURCE_HOST: 'status-db'
       SOURCE_USER: 'postgres'
       SOURCE_DATABASE: 'peertube_index'
-    volumes:
-      - type: volume
-        source: status_storage
-        target: /status_storage
-        read_only: true
 
   status-monitoring-db:
     image: "postgres:10"

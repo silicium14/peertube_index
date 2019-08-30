@@ -138,7 +138,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\n  status,\n  max(now() - date) as age_oldest,\n  EXTRACT(EPOCH FROM max(now() - date)) as age_oldest_in_seconds,\n  min(now() - date) as age_newest\nFROM instance\nGROUP BY status",
+          "rawSql": "SELECT\n  status,\n  max(now() - date) as age_oldest,\n  EXTRACT(EPOCH FROM max(now() - date)) as age_oldest_in_seconds,\n  min(now() - date) as age_newest\nFROM instance\nWHERE status != 'banned'\nGROUP BY status",
           "refId": "A",
           "select": [
             [
@@ -472,5 +472,5 @@
   "timezone": "",
   "title": "Instances",
   "uid": "owa5wX6ik",
-  "version": 6
+  "version": 7
 }
