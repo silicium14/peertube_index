@@ -118,9 +118,7 @@ defmodule PeertubeIndex.InstanceScannerTest do
     end
   end
 
-  @doc """
-  Create bypass responses for an empty instance and overwrite one route with the given arguments
-  """
+  # Create bypass responses for an empty instance and overwrite one route with the given arguments
   defp empty_instance_but(bypass, expect_function, method, path, function) do
     empty_instance()
     |> overwrite_expectation(expect_function, method, path, function)
@@ -229,7 +227,7 @@ defmodule PeertubeIndex.InstanceScannerTest do
       )
     end)
     result = PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}", 100, false)
-    assert result == {:error, :invalid_video_document}
+    assert result == {:error, {:invalid_video_document, %{account: [{"can't be blank", [validation: :required]}]}}}
   end
 
   test "can timeout on requests", %{bypass: bypass} do
@@ -362,14 +360,13 @@ defmodule PeertubeIndex.InstanceScannerTest do
   test "presents the correct user agent", %{bypass: bypass} do
     test_pid = self()
     empty_instance_but(bypass, :stub, "GET", "/api/v1/videos", fn conn ->
-      conn.req_headers |> inspect |> IO.puts
       user_agent = conn.req_headers |> List.keyfind("user-agent", 0) |> elem(1)
       send test_pid, {:request_user_agent, user_agent}
 
       Plug.Conn.resp(conn, 200, ~s<{"total": 0, "data": []}>)
     end)
 
-    result = PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}", 100, false)
+    PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}", 100, false)
 
     assert_received {:request_user_agent, "PeertubeIndex"}
   end

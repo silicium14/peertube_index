@@ -31,6 +31,7 @@ defmodule PeertubeIndex.MixProject do
       {:elasticsearch, "~> 1.0"},
       {:gollum, github: "silicium14/gollum", ref: "ff84c9c00433ce0d5ff75697ec2f32d34750d6d8"},
       {:httpoison, "~> 1.5"},
+      {:params, "~> 2.1"},
       {:phoenix_html, "~> 2.13"},
       {:plug, "~> 1.8"},
       {:plug_cowboy, "~> 2.0"},
