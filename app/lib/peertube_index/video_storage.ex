@@ -24,12 +24,12 @@ defmodule PeertubeIndex.VideoStorage do
   @doc """
   Create a video storage with some videos for testing
   """
-  @callback with_videos([map]) :: :ok
+  @callback with_videos!([map]) :: :ok
 
   @doc """
   Create an empty video storage for testing
   """
-  @callback empty() :: :ok
+  @callback empty!() :: :ok
 end
 
 defmodule PeertubeIndex.VideoStorage.Elasticsearch do
