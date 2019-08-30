@@ -33,6 +33,16 @@ defmodule PeertubeIndex.InstanceScanner.Http do
       |> MapSet.delete(host)
 
       {:ok, {videos, instances}}
+    else
+      {:error, {:invalid_video_document, validation_errors}} ->
+        case get_json_page(api_base_url <> "config", request_timeout) do
+          {:ok, %{"serverVersion" => version}} ->
+            {:error, {:invalid_video_document, version, validation_errors}}
+          _ ->
+            {:error, {:invalid_video_document, nil, validation_errors}}
+        end
+      other_error ->
+        other_error
     end
   end
 
@@ -180,11 +190,17 @@ defmodule PeertubeIndex.InstanceScanner.Http do
     end
   end
 
-  defp get_page(url, request_timeout) do
+  defp get_json_page(url, request_timeout) do
     Logger.debug fn -> "Getting #{url}" end
     with {:ok, httpc_result} <- request_with_timeout(url, request_timeout),
          {:ok, body} <- request_successful(httpc_result),
-         {:ok, parsed} <- Poison.decode(body),
+         {:ok, parsed} <- Poison.decode(body) do
+      {:ok, parsed}
+    end
+  end
+
+  defp get_page(url, request_timeout) do
+    with {:ok, parsed} <- get_json_page(url, request_timeout),
          {:ok, parsed} <- validate_page_data(parsed) do
       {:ok, parsed}
     end
@@ -318,61 +334,61 @@ defmodule PeertubeIndex.InstanceScanner.VideoParams do
 
   use Params.Schema, %{
     id!: :integer,
-    uuid!: :binary,
-    name!: :binary,
+    uuid!: :string,
+    name!: :string,
     category!: %{
       id: :integer,
-      label!: :binary
+      label!: :string
     },
     licence!: %{
       id: :integer,
-      label!: :binary
+      label!: :string
     },
     language!: %{
       id: :integer,
-      label!: :binary
+      label!: :string
     },
     privacy!: %{
       id!: :integer,
-      label!: :binary
+      label!: :string
     },
     nsfw!: :boolean,
-    description: :binary,
+    description: :string,
     isLocal!: :boolean,
     duration!: :integer,
     views!: :integer,
     likes!: :integer,
     dislikes!: :integer,
-    thumbnailPath!: :binary,
-    previewPath!: :binary,
-    embedPath!: :binary,
-    createdAt!: :binary, # Validate date format?
-    updatedAt!: :binary, # Validate date format?
-    publishedAt: :binary, # Validate date format?
+    thumbnailPath!: :string,
+    previewPath!: :string,
+    embedPath!: :string,
+    createdAt!: :string, # Validate date format?
+    updatedAt!: :string, # Validate date format?
+    publishedAt: :string, # Validate date format?
     account!: %{
       id!: :integer,
-      uuid!: :binary,
-      name!: :binary,
-      displayName!: :binary,
-      url!: :binary,
-      host!: :binary,
+      uuid!: :string,
+      name!: :string,
+      displayName!: :string,
+      url!: :string,
+      host!: :string,
       avatar: %{
-        path: :binary,
-        createdAt: :binary, # Validate date format?
-        updatedAt: :binary, # Validate date format?
+        path: :string,
+        createdAt: :string, # Validate date format?
+        updatedAt: :string, # Validate date format?
       }
     },
     channel!: %{
       id: :integer,
-      uuid: :binary,
-      name: :binary,
-      displayName: :binary,
-      url: :binary,
-      host: :binary,
+      uuid: :string,
+      name: :string,
+      displayName: :string,
+      url: :string,
+      host: :string,
       avatar: %{
-        path: :binary,
-        createdAt: :binary, # Validate date format?
-        updatedAt: :binary, # Validate date format?
+        path: :string,
+        createdAt: :string, # Validate date format?
+        updatedAt: :string, # Validate date format?
       }
     }
   }

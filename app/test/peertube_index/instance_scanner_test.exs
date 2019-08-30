@@ -209,7 +209,7 @@ defmodule PeertubeIndex.InstanceScannerTest do
     assert result == {:error, :page_invalid}
   end
 
-  test "validates incoming video documents", %{bypass: bypass} do
+  test "validates incoming video documents and returns validation errors with server version", %{bypass: bypass} do
     invalid_video = Map.delete(@valid_video, "account")
     empty_instance_but(bypass, :expect, "GET", "/api/v1/videos", fn conn ->
       Plug.Conn.resp(
@@ -226,8 +226,35 @@ defmodule PeertubeIndex.InstanceScannerTest do
         >
       )
     end)
+    Bypass.expect_once(bypass, "GET", "/api/v1/config", fn conn ->
+      Plug.Conn.resp(conn, 200, ~s<{"serverVersion": "a peertube version string like 1.4.0"}>)
+    end)
     result = PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}", 100, false)
-    assert result == {:error, {:invalid_video_document, %{account: [{"can't be blank", [validation: :required]}]}}}
+    assert result == {:error, {:invalid_video_document, "a peertube version string like 1.4.0", %{account: [{"can't be blank", [validation: :required]}]}}}
+  end
+
+  test "does not fail if unable to fetch server version after a video document validation error", %{bypass: bypass} do
+    invalid_video = Map.delete(@valid_video, "uuid")
+    empty_instance_but(bypass, :expect, "GET", "/api/v1/videos", fn conn ->
+      Plug.Conn.resp(
+        conn,
+        200,
+        ~s<
+        {
+          "total": 2,
+          "data": [
+            #{Poison.encode!(@valid_video)},
+            #{Poison.encode!(invalid_video)}
+          ]
+        }
+        >
+      )
+    end)
+    Bypass.expect_once(bypass, "GET", "/api/v1/config", fn conn ->
+      Plug.Conn.resp(conn, 500, "error page")
+    end)
+    result = PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}", 100, false)
+    assert result == {:error, {:invalid_video_document, nil, %{uuid: [{"can't be blank", [validation: :required]}]}}}
   end
 
   test "can timeout on requests", %{bypass: bypass} do
