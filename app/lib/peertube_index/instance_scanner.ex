@@ -34,13 +34,21 @@ defmodule PeertubeIndex.InstanceScanner.Http do
 
       {:ok, {videos, instances}}
     else
-      {:error, {:invalid_video_document, validation_errors}} ->
+      {:error, {:invalid_video_document, faulty_video_document, validation_errors}} ->
+        version =
         case get_json_page(api_base_url <> "config", request_timeout) do
-          {:ok, %{"serverVersion" => version}} ->
-            {:error, {:invalid_video_document, version, validation_errors}}
+          {:ok, %{"serverVersion" => fetched_version}} ->
+            fetched_version
           _ ->
-            {:error, {:invalid_video_document, nil, validation_errors}}
+            nil
         end
+        {
+          :error, {
+            :invalid_video_document,
+            %{version: version, is_local: Map.get(faulty_video_document, "isLocal")},
+            validation_errors
+          }
+        }
       other_error ->
         other_error
     end
@@ -85,7 +93,7 @@ defmodule PeertubeIndex.InstanceScanner.Http do
     result_of_processing =
     videos_url
     |> get_collection(page_size, request_timeout) # {:ok, video} or {:error, page_error}
-    |> Stream.map(&validate_one_video_and_keep_errors/1) # {:ok, video} or {:error, page_error} or :error, :invalid_video_document}
+    |> Stream.map(&validate_one_video_and_keep_errors/1) # {:ok, video} or {:error, page_error} or {:error, :invalid_video_document}
     |> reduce_enum_while_no_error({buffer_file, MapSet.new()}, &save_videos_and_reduce_instances/2)
 
     File.close(buffer_file)
@@ -230,12 +238,21 @@ defmodule PeertubeIndex.InstanceScanner.Http do
     if changeset.valid? do
       {:ok, video}
     else
-    {
-      :error, {
-        :invalid_video_document,
-        Ecto.Changeset.traverse_errors(changeset, fn error -> error end)
-      }
-    }
+      errors = Ecto.Changeset.traverse_errors(changeset, fn error -> error end)
+      if Map.get(video, "isLocal") == false
+         and Map.keys(errors) == [:account]
+         and is_map(Map.get(errors, :account))
+         and Map.keys(Map.get(errors, :account)) == [:displayName] do
+        {:ok, video}
+      else
+        {
+          :error, {
+            :invalid_video_document,
+            video,
+            errors
+          }
+        }
+      end
     end
   end
 

@@ -182,7 +182,7 @@
       "scroll": true,
       "showHeader": true,
       "sort": {
-        "col": 0,
+        "col": 1,
         "desc": true
       },
       "styles": [],
@@ -490,5 +490,5 @@
   "timezone": "",
   "title": "Instances",
   "uid": "owa5wX6ik",
-  "version": 9
+  "version": 10
 }
