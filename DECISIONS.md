@@ -21,6 +21,10 @@ As long as the number of local videos an instance have fits into memory, we do n
 Reducing the stream to memory by excluding non local videos is sufficient.
 As we discovered this after implementing the streaming to disk, we leave the code as is for the moment.
 We took a shortcut by hard coding the file name we use as temporary storage, which prevents running multiple scans concurrently.
+- We found that for some instances, some non local videos had an one validation error.
+We decided to add and exception that allows this specific validation error for non local videos.
+This means we only silent this error and any other validation error will make the scan fail.
+We do not want to silent unexpected errors.
 
 **Status database**
 

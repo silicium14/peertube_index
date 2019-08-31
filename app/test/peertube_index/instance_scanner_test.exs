@@ -209,8 +209,9 @@ defmodule PeertubeIndex.InstanceScannerTest do
     assert result == {:error, :page_invalid}
   end
 
-  test "validates incoming video documents and returns validation errors with server version", %{bypass: bypass} do
-    invalid_video = Map.delete(@valid_video, "account")
+  test "validates incoming video documents and returns validation errors with server version and value of isLocal field", %{bypass: bypass} do
+    valid_video = @valid_video |> Map.put("isLocal", true)
+    invalid_video = @valid_video |> Map.delete("account") |> Map.put("isLocal", false)
     empty_instance_but(bypass, :expect, "GET", "/api/v1/videos", fn conn ->
       Plug.Conn.resp(
         conn,
@@ -219,7 +220,7 @@ defmodule PeertubeIndex.InstanceScannerTest do
         {
           "total": 2,
           "data": [
-            #{Poison.encode!(@valid_video)},
+            #{Poison.encode!(valid_video)},
             #{Poison.encode!(invalid_video)}
           ]
         }
@@ -227,10 +228,16 @@ defmodule PeertubeIndex.InstanceScannerTest do
       )
     end)
     Bypass.expect_once(bypass, "GET", "/api/v1/config", fn conn ->
-      Plug.Conn.resp(conn, 200, ~s<{"serverVersion": "a peertube version string like 1.4.0"}>)
+      Plug.Conn.resp(conn, 200, ~s<{"serverVersion": "1.4.0"}>)
     end)
     result = PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}", 100, false)
-    assert result == {:error, {:invalid_video_document, "a peertube version string like 1.4.0", %{account: [{"can't be blank", [validation: :required]}]}}}
+    assert result == {
+             :error, {
+               :invalid_video_document,
+               %{version: "1.4.0", is_local: false},
+               %{account: [{"can't be blank", [validation: :required]}]}
+             }
+           }
   end
 
   test "does not fail if unable to fetch server version after a video document validation error", %{bypass: bypass} do
@@ -254,7 +261,71 @@ defmodule PeertubeIndex.InstanceScannerTest do
       Plug.Conn.resp(conn, 500, "error page")
     end)
     result = PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}", 100, false)
-    assert result == {:error, {:invalid_video_document, nil, %{uuid: [{"can't be blank", [validation: :required]}]}}}
+    assert result == {
+             :error, {
+               :invalid_video_document,
+               %{version: nil, is_local: true},
+               %{uuid: [{"can't be blank", [validation: :required]}]}
+             }
+           }
+  end
+
+  test "allows validation errors on account.displayName field for non local videos and discard these videos but report host", %{bypass: bypass} do
+    invalid_video = @valid_video |> put_in(["account", "displayName"], "") |> Map.put("isLocal", false) |> put_in(["account", "host"], "foreign-peertube.example.com")
+    empty_instance_but(bypass, :expect, "GET", "/api/v1/videos", fn conn ->
+      Plug.Conn.resp(
+        conn,
+        200,
+        ~s<
+        {
+          "total": 2,
+          "data": [
+            #{Poison.encode!(@valid_video)},
+            #{Poison.encode!(invalid_video)}
+          ]
+        }
+        >
+      )
+    end)
+
+    {:ok, {videos, instances}} = PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}", 10, false)
+
+    assert Enum.to_list(videos) == [@valid_video]
+    assert instances == MapSet.new([
+             get_in(@valid_video, ["account", "host"]),
+             "foreign-peertube.example.com"
+           ])
+  end
+
+  test "does not allow validation errors on account.displayName field for local videos", %{bypass: bypass} do
+    invalid_video = @valid_video |> put_in(["account", "displayName"], "")
+    empty_instance_but(bypass, :expect, "GET", "/api/v1/videos", fn conn ->
+      Plug.Conn.resp(
+        conn,
+        200,
+        ~s<
+        {
+          "total": 1,
+          "data": [
+            #{Poison.encode!(invalid_video)}
+          ]
+        }
+        >
+      )
+    end)
+    Bypass.expect_once(bypass, "GET", "/api/v1/config", fn conn ->
+      Plug.Conn.resp(conn, 200, ~s<{"serverVersion": "1.4.0"}>)
+    end)
+
+    result = PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}", 10, false)
+
+    assert result == {
+             :error, {
+               :invalid_video_document,
+               %{version: "1.4.0", is_local: true},
+               %{account: %{displayName: [{"can't be blank", [validation: :required]}]}}
+             }
+           }
   end
 
   test "can timeout on requests", %{bypass: bypass} do
