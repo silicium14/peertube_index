@@ -10,7 +10,7 @@ defmodule InstanceScannerNonRegressionTest do
   - run this test
   """
 
-  @moduletag :integration
+  @moduletag :nonregression
 
   @reference_videos_file "test/peertube_index/instance_scanner_non_regression_test_data/reference_videos.json"
   @reference_instances_file "test/peertube_index/instance_scanner_non_regression_test_data/reference_instances.json"

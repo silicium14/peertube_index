@@ -1,4 +1,4 @@
-FROM elixir:1.8.2-alpine
+FROM elixir:1.9.1-alpine
 RUN apk update && apk add git
 
 ENV MIX_ENV prod

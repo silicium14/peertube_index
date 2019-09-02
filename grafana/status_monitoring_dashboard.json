@@ -221,6 +221,60 @@
       "type": "table"
     },
     {
+      "columns": [],
+      "datasource": "Instances",
+      "fontSize": "100%",
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 20
+      },
+      "id": 13,
+      "links": [],
+      "pageSize": null,
+      "scroll": true,
+      "showHeader": true,
+      "sort": {
+        "col": 2,
+        "desc": true
+      },
+      "styles": [],
+      "targets": [
+        {
+          "format": "table",
+          "group": [],
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT host, reason, date\nFROM instance\nWHERE status = 'error'\nAND reason LIKE '{:invalid_video_document, %'\nORDER BY date DESC",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Validation errors",
+      "transform": "table",
+      "type": "table"
+    },
+    {
       "aliasColors": {},
       "bars": false,
       "dashLength": 10,
@@ -231,7 +285,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 20
+        "y": 30
       },
       "id": 4,
       "legend": {
@@ -357,7 +411,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 30
+        "y": 40
       },
       "id": 12,
       "legend": {
@@ -490,5 +544,5 @@
   "timezone": "",
   "title": "Instances",
   "uid": "owa5wX6ik",
-  "version": 10
+  "version": 12
 }
