@@ -110,7 +110,7 @@ services:
         target: /var/lib/postgresql/data
 
   prometheus:
-    image: "prom/prometheus:v2.8.0"
+    image: "prom/prometheus:v2.12.0"
     volumes:
       - type: volume
         source: prometheus_data
@@ -121,7 +121,7 @@ services:
         read_only: true
 
   grafana:
-    image: "grafana/grafana:6.0.1"
+    image: "grafana/grafana:6.3.5"
     volumes:
       - type: volume
         source: grafana_data

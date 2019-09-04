@@ -1,13 +1,13 @@
 # Install procedure
 ```bash
 cd /root/
-wget https://github.com/prometheus/node_exporter/releases/download/v0.17.0/node_exporter-0.17.0.linux-amd64.tar.gz
-tar xvzf node_exporter-0.17.0.linux-amd64.tar.gz
+wget https://github.com/prometheus/node_exporter/releases/download/v0.18.1/node_exporter-0.18.1.linux-amd64.tar.gz
+tar xvzf node_exporter-0.18.1.linux-amd64.tar.gz
 ```
 
 # Start node_exporter
 ```bash
-cd /root/node_exporter-0.17.0.linux-amd64
+cd /root/node_exporter-0.18.1.linux-amd64
 ./node_exporter --web.listen-address="127.0.0.1:9100" --log.level debug
 ```
 
