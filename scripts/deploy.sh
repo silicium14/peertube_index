@@ -37,6 +37,7 @@ function deploy {
     cp traefik/traefik.toml "${ARTIFACTS_DIRECTORY}/traefik.toml"
     cp "${MONITORING_USERS_CREDENTIALS_FILE}" "${ARTIFACTS_DIRECTORY}/monitoring_users_credentials.htdigest"
     cp prometheus/prometheus.yml "${ARTIFACTS_DIRECTORY}/prometheus.yml"
+    cp -r grafana "${ARTIFACTS_DIRECTORY}/"
     cp docker-compose.yml "${ARTIFACTS_DIRECTORY}/docker-compose.yml"
     echo "COMPOSE_PROJECT_NAME=peertube-index" > "${ARTIFACTS_DIRECTORY}/.env"
 

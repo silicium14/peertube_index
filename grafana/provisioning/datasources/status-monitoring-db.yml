@@ -1,0 +1,17 @@
+apiVersion: 1
+
+datasources:
+- name: Instances
+  type: postgres
+  access: proxy
+  orgId: 1
+  url: status-monitoring-db
+  user: postgres
+  database: peertube_index
+  basicAuth: false
+  isDefault: false
+  jsonData:
+     sslmode: disable
+     postgresVersion: 1000
+  version: 2
+  editable: false

@@ -126,6 +126,10 @@ services:
       - type: volume
         source: grafana_data
         target: /var/lib/grafana
+      - type: bind
+        source: ./grafana
+        target: /etc/grafana
+        read_only: true
 
   node-exporter-relay:
     image: "peertube-index/node-exporter-relay:prod"
