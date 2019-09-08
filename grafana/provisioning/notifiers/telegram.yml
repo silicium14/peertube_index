@@ -1,0 +1,14 @@
+notifiers:
+  - name: "Telegram bot"
+    type: telegram
+    uid: telegram
+    org_id: 1
+    is_default: false
+    send_reminder: false
+    disable_resolve_message: true
+    settings:
+      # TODO
+      bottoken: "${GRAFANA_ALERTS_TELEGRAM_BOT_TOKEN}"
+      chatid: "${GRAFANA_ALERTS_TELEGRAM_BOT_CHAT_ID}"
+      uploadImage: true
+      httpMethod: POST

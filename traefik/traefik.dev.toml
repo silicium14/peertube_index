@@ -20,9 +20,9 @@ defaultEntryPoints = []
   [entryPoints.http-monitoring]
     address = ":8080"
     compress = true
-    [entryPoints.http-monitoring.auth.digest]
-    usersFile = "/srv/monitoring_users_credentials.htdigest"
-    removeHeader = true
+        [entryPoints.http-monitoring.redirect]
+        regex = "^http://([^/]+)/metrics$"
+        replacement = "http://$1"
 
 [backends]
   [backends.peertube-index]
@@ -52,7 +52,6 @@ defaultEntryPoints = []
   [frontends.peertube-index.routes.default]
     rule = "HostRegexp: {hostname:.*}"
 
-  # Monitoring
   [frontends.monitoring]
   entryPoints = ["http-monitoring"]
   backend = "monitoring"
