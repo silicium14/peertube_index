@@ -1,4 +1,0 @@
-# Source this file to manage the local development docker-compose stack
-
-export COMPOSE_PROJECT_NAME=peertube-index
-export COMPOSE_FILE=docker-compose.yml:dev_compose_stack/docker-compose.dev.yml
