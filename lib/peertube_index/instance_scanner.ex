@@ -381,7 +381,7 @@ defmodule PeertubeIndex.InstanceScanner.VideoParams do
     embedPath!: :string,
     createdAt!: :string, # Validate date format?
     updatedAt!: :string, # Validate date format?
-    publishedAt: :string, # Validate date format?
+    publishedAt!: :string, # Validate date format?
     account!: %{
       id: :integer, # we used to require this field but found it may be absent
       uuid: :string, # we used to require this field but found it may be absent
