@@ -34,7 +34,7 @@ defmodule PeertubeIndex.InstanceScanner.Http do
 
       {:ok, {videos, instances}}
     else
-      {:error, {:invalid_video_document, faulty_video_document, validation_errors}} ->
+      {:error, {:invalid_video_document, _faulty_video_document, validation_errors}} ->
         version =
         case get_json_page(api_base_url <> "config", request_timeout) do
           {:ok, %{"serverVersion" => fetched_version}} ->
@@ -45,7 +45,7 @@ defmodule PeertubeIndex.InstanceScanner.Http do
         {
           :error, {
             :invalid_video_document,
-            %{version: version, is_local: Map.get(faulty_video_document, "isLocal")},
+            %{version: version},
             validation_errors
           }
         }
@@ -92,8 +92,9 @@ defmodule PeertubeIndex.InstanceScanner.Http do
 
     result_of_processing =
     videos_url
-    |> get_collection(page_size, request_timeout) # {:ok, video} or {:error, page_error}
-    |> Stream.map(&validate_one_video_and_keep_errors/1) # {:ok, video} or {:error, page_error} or {:error, :invalid_video_document}
+    |> get_collection(page_size, request_timeout)
+    |> Stream.map(&validate_one_video_and_keep_errors/1)
+    |> Stream.reject(&is_invalid_and_non_local_video?/1)
     |> reduce_enum_while_no_error({buffer_file, MapSet.new()}, &save_videos_and_reduce_instances/2)
 
     File.close(buffer_file)
@@ -239,25 +240,26 @@ defmodule PeertubeIndex.InstanceScanner.Http do
       {:ok, video}
     else
       errors = Ecto.Changeset.traverse_errors(changeset, fn error -> error end)
-      if Map.get(video, "isLocal") == false
-         and Map.keys(errors) == [:account]
-         and is_map(Map.get(errors, :account))
-         and Map.keys(Map.get(errors, :account)) == [:displayName] do
-        {:ok, video}
-      else
-        {
-          :error, {
-            :invalid_video_document,
-            video,
-            errors
-          }
+      {
+        :error, {
+          :invalid_video_document,
+          video,
+          errors
         }
-      end
+      }
     end
   end
 
   defp validate_one_video_and_keep_errors({:error, reason}) do
     {:error, reason}
+  end
+
+  defp is_invalid_and_non_local_video?({:error, {:invalid_video_document, %{"isLocal" => false}, _errors}}) do
+    true
+  end
+
+  defp is_invalid_and_non_local_video?(_) do
+    false
   end
 
   #  Returns an stream of ok/error tuples for each item of the collection: {:ok, item} or {:error, reason}.

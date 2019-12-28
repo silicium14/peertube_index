@@ -209,9 +209,9 @@ defmodule PeertubeIndex.InstanceScannerTest do
     assert result == {:error, :page_invalid}
   end
 
-  test "validates incoming video documents and returns validation errors with server version and value of isLocal field", %{bypass: bypass} do
+  test "validates incoming video documents and returns validation errors with server version", %{bypass: bypass} do
     valid_video = @valid_video |> Map.put("isLocal", true)
-    invalid_video = @valid_video |> Map.delete("account") |> Map.put("isLocal", false)
+    invalid_video = @valid_video |> Map.delete("account")
     empty_instance_but(bypass, :expect, "GET", "/api/v1/videos", fn conn ->
       Plug.Conn.resp(
         conn,
@@ -234,7 +234,7 @@ defmodule PeertubeIndex.InstanceScannerTest do
     assert result == {
              :error, {
                :invalid_video_document,
-               %{version: "1.4.0", is_local: false},
+               %{version: "1.4.0"},
                %{account: [{"can't be blank", [validation: :required]}]}
              }
            }
@@ -264,14 +264,14 @@ defmodule PeertubeIndex.InstanceScannerTest do
     assert result == {
              :error, {
                :invalid_video_document,
-               %{version: nil, is_local: true},
+               %{version: nil},
                %{uuid: [{"can't be blank", [validation: :required]}]}
              }
            }
   end
 
-  test "allows validation errors on account.displayName field for non local videos and discard these videos but report host", %{bypass: bypass} do
-    invalid_video = @valid_video |> put_in(["account", "displayName"], "") |> Map.put("isLocal", false) |> put_in(["account", "host"], "foreign-peertube.example.com")
+  test "allows validation errors on non local videos and discard these videos", %{bypass: bypass} do
+    invalid_video = @valid_video |> Map.delete("name") |> Map.put("isLocal", false) |> put_in(["account", "host"], "foreign-peertube.example.com")
     empty_instance_but(bypass, :expect, "GET", "/api/v1/videos", fn conn ->
       Plug.Conn.resp(
         conn,
@@ -289,44 +289,14 @@ defmodule PeertubeIndex.InstanceScannerTest do
     end)
 
     {:ok, {videos, instances}} = PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}", 10, false)
-
     assert Enum.to_list(videos) == [@valid_video]
-    assert instances == MapSet.new([
-             get_in(@valid_video, ["account", "host"]),
-             "foreign-peertube.example.com"
-           ])
+    assert instances == MapSet.new([get_in(@valid_video, ["account", "host"])])
   end
 
-  test "does not allow validation errors on account.displayName field for local videos", %{bypass: bypass} do
-    invalid_video = @valid_video |> put_in(["account", "displayName"], "")
-    empty_instance_but(bypass, :expect, "GET", "/api/v1/videos", fn conn ->
-      Plug.Conn.resp(
-        conn,
-        200,
-        ~s<
-        {
-          "total": 1,
-          "data": [
-            #{Poison.encode!(invalid_video)}
-          ]
-        }
-        >
-      )
-    end)
-    Bypass.expect_once(bypass, "GET", "/api/v1/config", fn conn ->
-      Plug.Conn.resp(conn, 200, ~s<{"serverVersion": "1.4.0"}>)
-    end)
-
-    result = PeertubeIndex.InstanceScanner.Http.scan("localhost:#{bypass.port}", 10, false)
-
-    assert result == {
-             :error, {
-               :invalid_video_document,
-               %{version: "1.4.0", is_local: true},
-               %{account: %{displayName: [{"can't be blank", [validation: :required]}]}}
-             }
-           }
-  end
+  # TODO
+#  test "video document without isLocal field" do
+#
+#  end
 
   test "can timeout on requests", %{bypass: bypass} do
     reponse_delay = 600
