@@ -73,13 +73,14 @@ body {
     width: 288px;
 }
 .homeButton--bottom a {
-    bottom: 70px;
+    bottom: 140px;
 }
 
 .main {
     width: 267px;
     /* The bottom margin leaves room for the home button */
     margin: 80px auto 90px auto;
+    flex-grow: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -171,6 +172,7 @@ body {
 </style>
 <link rel="stylesheet" href="/static/search_bar.css">
 <link rel="stylesheet" href="/static/warning_footer.css">
+<link rel="stylesheet" href="/static/retirement_message.css">
 
 <title>PeerTube Index</title>
 </head>
@@ -258,6 +260,7 @@ body {
     </div>
     <div class="homeButton homeButton--bottom"><span><a href="/">home</a></span></div>
     <%= PeertubeIndex.Templates.warning_footer() %>
+    <%= PeertubeIndex.Templates.retirement_message() %>
 </body>
 
 </html>

@@ -13,7 +13,7 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 20px auto;
+    margin: 20px auto 0px;
     font-family: Verdana, sans-serif;
 }
 @media (min-width: 900px) {
@@ -89,11 +89,13 @@ body {
 .navigationLinks {
     text-align: center;
     margin-top: 30px;
+    margin-bottom: 20px;
 }
 .navigationLinks a {
     color: black
 }
 </style>
+<link rel="stylesheet" href="/static/retirement_message.css">
 </head>
 
 <body>
@@ -177,6 +179,7 @@ body {
 </article>
 
 <nav class="navigationLinks"><a href="/">home page</a> - <a href="javascript:history.back()">go back</a></nav>
+<%= PeertubeIndex.Templates.retirement_message() %>
 </body>
 
 </html>

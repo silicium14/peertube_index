@@ -76,6 +76,7 @@ body {
 
 <link rel="stylesheet" href="/static/search_bar.css">
 <link rel="stylesheet" href="/static/warning_footer.css">
+<link rel="stylesheet" href="/static/retirement_message.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Bitter&display=swap">
 
 <title>PeerTube Index</title>
@@ -91,5 +92,6 @@ body {
 <a href="/about#this-site">about this site</a> - <a href="/about#photo">photo credits</a>
 </div>
 <%= PeertubeIndex.Templates.warning_footer() %>
+<%= PeertubeIndex.Templates.retirement_message() %>
 </body>
 </html>
