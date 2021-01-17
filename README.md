@@ -16,12 +16,9 @@ This project is not affiliated to Framasoft, the maintainer of the [PeerTube](ht
 
 ## State of the project
 
-This is a toy project built with the objectives of
-learning the Elixir language and experimenting some coding practices
-while building something that may be useful enough to keep me motivated.
+**I will stop maintaining PeerTube Index, it will be retired soon.**
 
-I may improve it if it has enough users.
-
-## Contributing
-
-As this a toy project for practice and learning purposes, I do **not** want code contributions for now.
+Framasoft, the maintainer of PeerTube, now has an official solution for global search on the PeerTube federation: [Sepia Search at https://search.joinpeertube.org/](https://search.joinpeertube.org/).
+People can use it instead of PeerTube Index.
+It is open source and people can use it to setup their own search engine with their own rules if they want.
+It does not automatically discovers new instances as PeerTube index does (by fetching following and followed instances).
